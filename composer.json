@@ -1,0 +1,25 @@
+{
+    "name": "tiime-software/en-16931",
+    "description": "EN-16931 compliant invoices as PHP objects",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Tiime\\EN16931\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Flavien RODRIGUES",
+            "email": "rodrigues.flavien@gmail.com"
+        },
+        {
+            "name": "Lucas GERARD",
+            "email": "lucas.gerard.web@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1"
+    }
+}
