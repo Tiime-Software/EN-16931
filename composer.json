@@ -1,5 +1,5 @@
 {
-    "name": "tiime-software/en-16931",
+    "name": "tiime/en-16931",
     "description": "EN-16931 compliant invoices as PHP objects",
     "type": "library",
     "license": "MIT",
