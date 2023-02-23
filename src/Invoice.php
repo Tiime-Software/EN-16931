@@ -258,7 +258,7 @@ class Invoice
         $this->documentLevelCharges = [];
         $this->additionalSupportingDocuments = [];
     }
-    
+
     public function getNumber(): InvoiceIdentifier
     {
         return $this->number;

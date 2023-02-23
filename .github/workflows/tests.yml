@@ -1,0 +1,30 @@
+name: 🕵️ Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: [ '8.1', '8.2' ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: 📥 Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🐛 Run test suite
+        run: composer run-script test
