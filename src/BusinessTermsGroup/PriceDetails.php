@@ -48,6 +48,10 @@ class PriceDetails
 
     public function __construct(float $itemNetPrice)
     {
+        if ($itemNetPrice < 0) {
+            throw new \Exception('@todo');
+        }
+
         $this->itemNetPrice = $itemNetPrice;
         $this->itemPriceDiscount = null;
         $this->itemGrossPrice = null;
@@ -86,6 +90,10 @@ class PriceDetails
 
     public function setItemGrossPrice(?float $itemGrossPrice): self
     {
+        if ($itemGrossPrice < 0) {
+            throw new \Exception('@todo');
+        }
+
         $this->itemGrossPrice = $itemGrossPrice;
 
         return $this;

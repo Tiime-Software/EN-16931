@@ -65,13 +65,18 @@ class VatBreakdown
     public function __construct(
         float $vatCategoryTaxableAmount,
         float $vatCategoryTaxAmount,
-        VatCategory $vatCategoryCode
+        VatCategory $vatCategoryCode,
+        ?float $vatCategoryRate = null,
     ) {
+        if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX && !is_float($vatCategoryRate)) {
+            throw new \Exception('@todo');
+        }
+
         $this->vatCategoryTaxableAmount = $vatCategoryTaxableAmount;
         $this->vatCategoryTaxAmount = $vatCategoryTaxAmount;
         $this->vatCategoryCode = $vatCategoryCode;
+        $this->vatCategoryRate = $vatCategoryRate;
 
-        $this->vatCategoryRate = null;
         $this->vatExemptionReasonText = null;
         $this->vatExemptionReasonCode = null;
     }
@@ -107,6 +112,10 @@ class VatBreakdown
 
     public function setVatCategoryCode(VatCategory $vatCategoryCode): self
     {
+        if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX && !is_float($this->vatCategoryRate)) {
+            throw new \Exception('@todo');
+        }
+
         $this->vatCategoryCode = $vatCategoryCode;
 
         return $this;
@@ -119,6 +128,10 @@ class VatBreakdown
 
     public function setVatCategoryRate(?float $vatCategoryRate): self
     {
+        if ($this->vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX && !is_float($vatCategoryRate)) {
+            throw new \Exception('@todo');
+        }
+
         $this->vatCategoryRate = $vatCategoryRate;
 
         return $this;

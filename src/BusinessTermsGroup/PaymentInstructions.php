@@ -10,6 +10,8 @@ use Tiime\EN16931\DataType\PaymentMeansCode;
  */
 class PaymentInstructions
 {
+    private const CREDIT_TRANSFER_CODES = [PaymentMeansCode::CREDIT_TRANSFER, PaymentMeansCode::SEPA_CREDIT_TRANSFER];
+
     /**
      * BT-81
      * The means, expressed as code, for how a payment is expected to be or has been settled.
@@ -37,12 +39,16 @@ class PaymentInstructions
 
     private ?DirectDebit $directDebit;
 
-    public function __construct(PaymentMeansCode $paymentMeansTypeCode)
+    /**
+     * @param array<int, CreditTransfer> $creditTransfers
+     */
+    public function __construct(PaymentMeansCode $paymentMeansTypeCode, array $creditTransfers = [])
     {
         $this->paymentMeansTypeCode = $paymentMeansTypeCode;
         $this->paymentMeansText = null;
         $this->remittanceInformation = null;
-        $this->creditTransfers = [];
+        $this->setCreditTransfers($creditTransfers);
+
         $this->paymentCardInformation = null;
         $this->directDebit = null;
     }
@@ -50,13 +56,6 @@ class PaymentInstructions
     public function getPaymentMeansTypeCode(): PaymentMeansCode
     {
         return $this->paymentMeansTypeCode;
-    }
-
-    public function setPaymentMeansTypeCode(PaymentMeansCode $paymentMeansTypeCode): self
-    {
-        $this->paymentMeansTypeCode = $paymentMeansTypeCode;
-
-        return $this;
     }
 
     public function getPaymentMeansText(): ?string
@@ -96,9 +95,25 @@ class PaymentInstructions
      */
     public function setCreditTransfers(array $creditTransfers): self
     {
-        $this->creditTransfers = $creditTransfers;
+        if (
+            \count($creditTransfers) === 0
+            && \in_array($this->paymentMeansTypeCode, self::CREDIT_TRANSFER_CODES, true)
+        ) {
+            throw new \Exception('@todo');
+        }
+
+        $this->creditTransfers = [];
+
+        foreach ($creditTransfers as $creditTransfer) {
+            $this->addCreditTransfer($creditTransfer);
+        }
 
         return $this;
+    }
+
+    private function addCreditTransfer(CreditTransfer $creditTransfer): void
+    {
+        $this->creditTransfers[] = $creditTransfer;
     }
 
     public function getPaymentCardInformation(): ?PaymentCardInformation

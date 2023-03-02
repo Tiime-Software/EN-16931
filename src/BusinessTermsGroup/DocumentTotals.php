@@ -72,14 +72,15 @@ class DocumentTotals
         float $sumOfInvoiceLineNetAmount,
         float $invoiceTotalAmountWithoutVat,
         float $invoiceTotalAmountWithVat,
-        float $amountDueForPayment
+        float $amountDueForPayment,
+        ?float $invoiceTotalVatAmountInAccountingCurrency = null,
     ) {
         $this->sumOfInvoiceLineNetAmount = $sumOfInvoiceLineNetAmount;
         $this->invoiceTotalAmountWithoutVat = $invoiceTotalAmountWithoutVat;
         $this->invoiceTotalAmountWithVat = $invoiceTotalAmountWithVat;
         $this->amountDueForPayment = $amountDueForPayment;
-
         $this->invoiceTotalVatAmount = null;
+        $this->invoiceTotalVatAmountInAccountingCurrency = $invoiceTotalVatAmountInAccountingCurrency;
     }
 
     public function getSumOfInvoiceLineNetAmount(): float
@@ -145,14 +146,6 @@ class DocumentTotals
     public function getInvoiceTotalVatAmountInAccountingCurrency(): ?float
     {
         return $this->invoiceTotalVatAmountInAccountingCurrency;
-    }
-
-    public function setInvoiceTotalVatAmountInAccountingCurrency(
-        ?float $invoiceTotalVatAmountInAccountingCurrency
-    ): self {
-        $this->invoiceTotalVatAmountInAccountingCurrency = $invoiceTotalVatAmountInAccountingCurrency;
-
-        return $this;
     }
 
     public function getInvoiceTotalAmountWithVat(): float

@@ -22,7 +22,7 @@ class PaymentCardInformation
 
     public function __construct(string $primaryAccountNumber)
     {
-        $this->primaryAccountNumber = $primaryAccountNumber;
+        $this->setPrimaryAccountNumber($primaryAccountNumber);
         $this->holderName = null;
     }
 
@@ -33,6 +33,10 @@ class PaymentCardInformation
 
     public function setPrimaryAccountNumber(string $primaryAccountNumber): self
     {
+        if (!preg_match('/^[^0-9]*\d{4,6}$/', $primaryAccountNumber)) {
+            throw new \Exception('@todo');
+        }
+
         $this->primaryAccountNumber = $primaryAccountNumber;
 
         return $this;

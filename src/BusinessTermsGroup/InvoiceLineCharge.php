@@ -43,8 +43,12 @@ class InvoiceLineCharge
      */
     private ?ChargeReasonCode $reasonCode;
 
-    public function __construct(float $amount)
+    public function __construct(float $amount, ?string $reason = null, ?ChargeReasonCode $reasonCode = null)
     {
+        if (!is_string($reason) && !$reasonCode instanceof ChargeReasonCode) {
+            throw new \Exception('@todo');
+        }
+
         $this->amount = $amount;
         $this->baseAmount = null;
         $this->percentage = null;
@@ -95,6 +99,10 @@ class InvoiceLineCharge
 
     public function setReason(?string $reason): self
     {
+        if (!is_string($reason) && !$this->reasonCode instanceof ChargeReasonCode) {
+            throw new \Exception('@todo');
+        }
+
         $this->reason = $reason;
 
         return $this;
@@ -107,6 +115,10 @@ class InvoiceLineCharge
 
     public function setReasonCode(?ChargeReasonCode $reasonCode): self
     {
+        if (!is_string($this->reason) && !$reasonCode instanceof ChargeReasonCode) {
+            throw new \Exception('@todo');
+        }
+
         $this->reasonCode = $reasonCode;
 
         return $this;

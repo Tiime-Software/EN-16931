@@ -55,15 +55,23 @@ class DocumentLevelAllowance
      */
     private ?AllowanceReasonCode $reasonCode;
 
-    public function __construct(float $amount, VatCategory $vatCategoryCode)
-    {
+    public function __construct(
+        float $amount,
+        VatCategory $vatCategoryCode,
+        ?string $reason = null,
+        ?AllowanceReasonCode $reasonCode = null
+    ) {
+        if (!is_string($reason) && !$reasonCode instanceof AllowanceReasonCode) {
+            throw new \Exception('@todo');
+        }
+
         $this->amount = $amount;
         $this->baseAmount = null;
         $this->percentage = null;
         $this->vatCategoryCode = $vatCategoryCode;
         $this->vatRate = null;
-        $this->reason = null;
-        $this->reasonCode = null;
+        $this->reason = $reason;
+        $this->reasonCode = $reasonCode;
     }
 
     public function getAmount(): float
@@ -133,6 +141,10 @@ class DocumentLevelAllowance
 
     public function setReason(?string $reason): self
     {
+        if (!is_string($reason) && !$this->reasonCode instanceof AllowanceReasonCode) {
+            throw new \Exception('@todo');
+        }
+
         $this->reason = $reason;
 
         return $this;
@@ -145,6 +157,10 @@ class DocumentLevelAllowance
 
     public function setReasonCode(?AllowanceReasonCode $reasonCode): self
     {
+        if (!is_string($this->reason) && !$reasonCode instanceof AllowanceReasonCode) {
+            throw new \Exception('@todo');
+        }
+
         $this->reasonCode = $reasonCode;
 
         return $this;

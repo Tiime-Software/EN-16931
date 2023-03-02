@@ -21,7 +21,6 @@ use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\DateCode2005;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
 use Tiime\EN16931\DataType\Identifier\ObjectIdentifier;
-use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\Reference\ContractReference;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
@@ -246,6 +245,7 @@ class Invoice
         $this->typeCode = $typeCode;
         $this->invoiceNote = [];
         $this->currencyCode = $currencyCode;
+        $this->vatAccountingCurrencyCode = null;
         $this->processControl = $processControl;
         $this->seller = $seller;
         $this->buyer = $buyer;
@@ -286,6 +286,13 @@ class Invoice
 
     public function setVatAccountingCurrencyCode(?CurrencyCode $vatAccountingCurrencyCode): self
     {
+        if (
+            $vatAccountingCurrencyCode instanceof CurrencyCode
+            && !is_float($this->documentTotals->getInvoiceTotalVatAmountInAccountingCurrency())
+        ) {
+            throw new \Exception('@todo');
+        }
+
         $this->vatAccountingCurrencyCode = $vatAccountingCurrencyCode;
 
         return $this;
@@ -546,6 +553,20 @@ class Invoice
     public function getDocumentTotals(): DocumentTotals
     {
         return $this->documentTotals;
+    }
+
+    public function setDocumentTotals(DocumentTotals $documentTotals): self
+    {
+        if (
+            $this->vatAccountingCurrencyCode instanceof CurrencyCode
+            && !is_float($documentTotals->getInvoiceTotalVatAmountInAccountingCurrency())
+        ) {
+            throw new \Exception('@todo');
+        }
+
+        $this->documentTotals = $documentTotals;
+
+        return $this;
     }
 
     /**

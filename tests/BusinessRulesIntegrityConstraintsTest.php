@@ -3,12 +3,33 @@
 namespace Tests\Tiime\EN16931;
 
 use PHPUnit\Framework\TestCase;
+use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\CreditTransfer;
+use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
+use Tiime\EN16931\BusinessTermsGroup\InvoiceLineAllowance;
+use Tiime\EN16931\BusinessTermsGroup\InvoiceLineCharge;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLinePeriod;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceNote;
+use Tiime\EN16931\BusinessTermsGroup\ItemAttribute;
+use Tiime\EN16931\BusinessTermsGroup\Payee;
+use Tiime\EN16931\BusinessTermsGroup\PaymentCardInformation;
+use Tiime\EN16931\BusinessTermsGroup\PaymentInstructions;
+use Tiime\EN16931\BusinessTermsGroup\PrecedingInvoice;
+use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
+use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
+use Tiime\EN16931\DataType\ElectronicAddressScheme;
+use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
+use Tiime\EN16931\DataType\Identifier\ItemClassificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\PaymentAccountIdentifier;
+use Tiime\EN16931\DataType\Identifier\StandardItemIdentifier;
+use Tiime\EN16931\DataType\Identifier\VatIdentifier;
+use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\BusinessTermsGroup\InvoicingPeriod;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -23,6 +44,10 @@ use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
 use Tiime\EN16931\DataType\Identifier\InvoiceLineIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\ItemTypeCode;
+use Tiime\EN16931\DataType\PaymentMeansCode;
+use Tiime\EN16931\DataType\Reference\PrecedingInvoiceReference;
+use Tiime\EN16931\DataType\Reference\SupportingDocumentReference;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\Invoice;
@@ -43,7 +68,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             new DocumentTotals(0, 0, 0, 0),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD)],
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
@@ -65,13 +90,19 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     /** @test BR-1 */
     public function an_invoice_shall_have_a_specification_identifier(): void
     {
-        $this->markTestSkipped('@todo');
+        $specificationIdentifier = $this->invoice->getProcessControl()->getSpecificationIdentifier();
+
+        $this->assertInstanceOf(SpecificationIdentifier::class, $specificationIdentifier);
+        $this->assertSame($specificationIdentifier->value, SpecificationIdentifier::BASIC);
     }
 
     /** @test BR-2 */
     public function an_invoice_shall_have_an_invoice_number(): void
     {
-        $this->assertInstanceOf(InvoiceIdentifier::class, $this->invoice->getNumber());
+        $invoiceNumber = $this->invoice->getNumber();
+
+        $this->assertInstanceOf(InvoiceIdentifier::class, $invoiceNumber);
+        $this->assertSame($invoiceNumber->value, '34');
     }
 
     /** @test BR-3 */
@@ -131,25 +162,25 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     /** @test BR-12 */
     public function an_invoice_shall_have_the_sum_of_invoice_line_net_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
     }
 
     /** @test BR-13 */
     public function an_invoice_shall_have_the_invoice_total_amount_without_vat(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
     }
 
     /** @test BR-14 */
     public function an_invoice_shall_have_the_invoice_total_amount_with_vat(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
     }
 
     /** @test BR-15 */
     public function an_invoice_shall_have_the_amount_due_for_payment(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
     }
 
     /** @test BR-16 */
@@ -166,7 +197,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             new DocumentTotals(0, 0, 0, 0),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD)],
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
             [] // without invoice line
         );
     }
@@ -174,73 +205,166 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     /** @test BR-17 */
     public function the_payee_name_shall_be_provided_in_the_invoice_if_the_payee_is_different_from_the_seller(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->invoice->setPayee(new Payee('Jane Doe'));
+
+        $this->assertInstanceOf(Payee::class, $this->invoice->getPayee());
+        $this->assertSame('Jane Doe', $this->invoice->getPayee()->getName());
     }
 
     /** @test BR-18 */
     public function the_seller_tax_representative_name_shall_be_provided_in_the_invoice_if_the_seller_has_a_seller_tax_representative_party(): void
     {
-        $this->markTestSkipped('@todo');
+        $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
+            'Freddie Hines',
+            new VatIdentifier('vatId'),
+            new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+        );
+
+        $this->assertSame('Freddie Hines', $sellerTaxRepresentativeParty->getName());
     }
 
     /** @test BR-19 */
     public function the_seller_tax_representative_postal_address_shall_be_provided_in_the_invoice_if_the_seller_has_a_seller_tax_representative_party(): void
     {
-        $this->markTestSkipped('@todo');
+        $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
+            'Freddie Hines',
+            new VatIdentifier('vatId'),
+            new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+        );
+
+        $this->assertInstanceOf(
+            SellerTaxRepresentativePostalAddress::class,
+            $sellerTaxRepresentativeParty->getAddress()
+        );
     }
 
     /** @test BR-20 */
     public function the_seller_tax_representative_postal_address_shall_contain_a_tax_representative_country_code_if_the_seller_has_a_seller_tax_representative_party(): void
     {
-        $this->markTestSkipped('@todo');
+        $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
+            'Freddie Hines',
+            new VatIdentifier('vatId'),
+            new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+        );
+
+        $this->assertInstanceOf(
+            CountryAlpha2Code::class,
+            $sellerTaxRepresentativeParty->getAddress()->getCountryCode()
+        );
     }
 
     /** @test BR-21 */
     public function each_invoice_line_shall_have_an_invoice_line_identifier(): void
     {
-        $this->markTestSkipped('@todo');
+        $invoiceLine = new InvoiceLine(
+            new InvoiceLineIdentifier("1"),
+            1,
+            UnitOfMeasurement::BOX_REC21,
+            0,
+            new PriceDetails(12),
+            new LineVatInformation(VatCategory::STANDARD),
+            new ItemInformation("A thing"),
+        );
+
+        $this->assertInstanceOf(InvoiceLineIdentifier::class, $invoiceLine->getIdentifier());
     }
 
     /** @test BR-22 */
     public function each_invoice_line_shall_have_an_invoiced_quantity(): void
     {
-        $this->markTestSkipped('@todo');
+        $invoiceLine = new InvoiceLine(
+            new InvoiceLineIdentifier("1"),
+            1,
+            UnitOfMeasurement::BOX_REC21,
+            0,
+            new PriceDetails(12),
+            new LineVatInformation(VatCategory::STANDARD),
+            new ItemInformation("A thing"),
+        );
+
+        $this->assertEquals(1, $invoiceLine->getInvoicedQuantity());
     }
 
     /** @test BR-23 */
     public function an_invoice_line_shall_have_an_invoiced_quantity_unit_of_measure_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $invoiceLine = new InvoiceLine(
+            new InvoiceLineIdentifier("1"),
+            1,
+            UnitOfMeasurement::BOX_REC21,
+            0,
+            new PriceDetails(12),
+            new LineVatInformation(VatCategory::STANDARD),
+            new ItemInformation("A thing"),
+        );
+
+        $this->assertInstanceOf(UnitOfMeasurement::class, $invoiceLine->getInvoicedQuantityUnitOfMeasureCode());
     }
 
     /** @test BR-24 */
     public function each_invoice_line_shall_have_an_invoice_line_net_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $invoiceLine = new InvoiceLine(
+            new InvoiceLineIdentifier("1"),
+            1,
+            UnitOfMeasurement::BOX_REC21,
+            0,
+            new PriceDetails(12),
+            new LineVatInformation(VatCategory::STANDARD),
+            new ItemInformation("A thing"),
+        );
+
+        $this->assertEquals(0, $invoiceLine->getNetAmount());
     }
 
     /** @test BR-25 */
     public function each_invoice_line_shall_contain_the_item_name(): void
     {
-        $this->markTestSkipped('@todo');
+        $invoiceLine = new InvoiceLine(
+            new InvoiceLineIdentifier("1"),
+            1,
+            UnitOfMeasurement::BOX_REC21,
+            0,
+            new PriceDetails(12),
+            new LineVatInformation(VatCategory::STANDARD),
+            new ItemInformation("A thing"),
+        );
+
+        $this->assertSame('A thing', $invoiceLine->getItemInformation()->getName());
     }
 
     /** @test BR-26 */
     public function each_invoice_line_shall_contain_the_item_net_price(): void
     {
-        $this->markTestSkipped('@todo');
+        $invoiceLine = new InvoiceLine(
+            new InvoiceLineIdentifier("1"),
+            1,
+            UnitOfMeasurement::BOX_REC21,
+            0,
+            new PriceDetails(12),
+            new LineVatInformation(VatCategory::STANDARD),
+            new ItemInformation("A thing"),
+        );
+
+        $this->assertEquals(12, $invoiceLine->getPriceDetails()->getItemNetPrice());
     }
 
     /** @test BR-27 */
     public function the_item_net_price_shall_not_be_negative(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->expectException(\Exception::class);
+
+        new PriceDetails(-1);
     }
 
     /** @test BR-28 */
     public function the_item_gross_price_shall_not_be_negative(): void
     {
-        $this->markTestSkipped('@todo');
+        $priceDetails = new PriceDetails(1);
+
+        $this->expectException(\Exception::class);
+
+        $priceDetails->setItemGrossPrice(-1);
     }
 
     /** @test BR-29 */
@@ -262,168 +386,287 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     /** @test BR-31 */
     public function each_document_level_allowance_shall_have_a_document_level_allowance_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank');
+
+        $this->assertEquals(1, $allowance->getAmount());
     }
 
     /** @test BR-32 */
     public function each_document_level_allowance_shall_have_a_document_level_allowance_vat_category_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank');
+
+        $this->assertSame(VatCategory::STANDARD, $allowance->getVatCategoryCode());
     }
 
     /** @test BR-33 */
     public function each_document_level_allowance_shall_have_a_document_level_allowance_reason_or_a_document_level_allowance_reason_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelAllowance(1, VatCategory::STANDARD);
     }
 
     /** @test BR-36 */
     public function each_document_level_charge_shall_have_a_document_level_charge_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank');
+
+        $this->assertEquals(1, $charge->getAmount());
     }
 
     /** @test BR-37 */
     public function each_document_level_charge_shall_have_a_document_level_charge_vat_category_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank');
+
+        $this->assertSame(VatCategory::STANDARD, $charge->getVatCategoryCode());
     }
 
     /** @test BR-38 */
     public function each_document_level_charge_shall_have_a_document_level_charge_reason_or_a_document_level_charge_reason_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelCharge(1, VatCategory::STANDARD);
     }
 
     /** @test BR-41 */
     public function each_invoice_line_allowance_shall_have_an_invoice_line_allowance_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $allowance = new InvoiceLineAllowance(1, 'Hoobastank');
+
+        $this->assertEquals(1, $allowance->getAmount());
     }
 
     /** @test BR-42 */
     public function each_invoice_line_allowance_shall_have_an_invoice_line_allowance_reason_or_an_invoice_line_allowance_reason_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->expectException(\Exception::class);
+
+        new InvoiceLineAllowance(1);
     }
 
     /** @test BR-43 */
     public function each_invoice_line_charge_shall_have_an_invoice_line_charge_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $charge = new InvoiceLineCharge(1, 'Hoobastank');
+
+        $this->assertEquals(1, $charge->getAmount());
     }
 
     /** @test BR-44 */
     public function each_invoice_line_charge_shall_have_an_invoice_line_charge_reason_or_an_invoice_line_charge_reason_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->expectException(\Exception::class);
+
+        new InvoiceLineCharge(1);
     }
 
     /** @test BR-45 */
     public function each_vat_breakdown_shall_have_a_vat_category_taxable_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+
+        $this->assertEquals(5, $vatBreakdown->getVatCategoryTaxableAmount());
     }
 
     /** @test BR-46 */
     public function each_vat_breakdown_shall_have_a_vat_category_tax_amount(): void
     {
-        $this->markTestSkipped('@todo');
+        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+
+        $this->assertEquals(1, $vatBreakdown->getVatCategoryTaxAmount());
     }
 
     /** @test BR-47 */
     public function each_vat_breakdown_shall_be_defined_through_a_vat_category_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+
+        $this->assertInstanceOf(VatCategory::class, $vatBreakdown->getVatCategoryCode());
+        $this->assertSame(VatCategory::STANDARD, $vatBreakdown->getVatCategoryCode());
     }
 
     /** @test BR-48 */
     public function each_vat_breakdown_shall_have_a_vat_category_rate_except_if_the_invoice_is_not_subject_to_vat(): void
     {
-        $this->markTestSkipped('@todo');
+        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+
+        $this->assertSame(VatCategory::STANDARD, $vatBreakdown->getVatCategoryCode());
+        $this->assertSame(0.2, $vatBreakdown->getVatCategoryRate());
+
+        $vatBreakdown = new VatBreakdown(5, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX);
+
+        $this->assertSame(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, $vatBreakdown->getVatCategoryCode());
+        $this->assertNull( $vatBreakdown->getVatCategoryRate());
+
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(5, 1, VatCategory::STANDARD);
     }
 
     /** @test BR-49 */
     public function a_payment_instruction_shall_specify_the_payment_means_type_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $paymentInstructions = new PaymentInstructions(PaymentMeansCode::DEBIT_TRANSFER);
+
+        $this->assertSame(PaymentMeansCode::DEBIT_TRANSFER, $paymentInstructions->getPaymentMeansTypeCode());
     }
 
     /** @test BR-50 */
-    public function a_payment_account_identifier_shall_be_present_if_credit_transfert_information_is_provided_in_the_invoice(): void
+    public function a_payment_account_identifier_shall_be_present_if_credit_transfer_information_is_provided_in_the_invoice(): void
     {
-        $this->markTestSkipped('@todo');
+        $creditTransfer = new CreditTransfer(new PaymentAccountIdentifier('123'));
+
+        $this->assertInstanceOf(PaymentAccountIdentifier::class, $creditTransfer->getPaymentAccountIdentifier());
     }
 
     /** @test BR-51 */
     public function the_last_4_to_6_digits_of_the_payment_card_primary_account_number_shall_be_present_if_payment_card_information_is_provided_in_the_invoice(): void
     {
-        $this->markTestSkipped('@todo');
+        $validNumbers = [
+            '1234',
+            '12345',
+            '123456',
+            '****1234',
+            '****12345',
+            '****123456',
+        ];
+
+        $invalidNumbers = [
+            '',
+            'invalid',
+            '123',
+            '1234567',
+            '123*****1234',
+        ];
+
+        foreach ($validNumbers as $validNumber) {
+            $paymentCardInformation = new PaymentCardInformation($validNumber);
+
+            $this->assertSame($validNumber, $paymentCardInformation->getPrimaryAccountNumber());
+        }
+
+        foreach ($invalidNumbers as $invalidNumber) {
+            try {
+                $paymentCardInformation = new PaymentCardInformation($invalidNumber);
+
+                $this->assertNotInstanceOf(PaymentCardInformation::class, $paymentCardInformation);
+            } catch (\Exception $e) {
+                $this->assertInstanceOf(\Exception::class, $e);
+            }
+        }
     }
 
     /** @test BR-52 */
     public function each_additional_supporting_document_shall_contain_a_supporting_document_reference(): void
     {
-        $this->markTestSkipped('@todo');
+        $supportingDocument = new AdditionalSupportingDocument(new SupportingDocumentReference('ref'));
+
+        $this->assertInstanceOf(SupportingDocumentReference::class, $supportingDocument->getReference());
+        $this->assertSame('ref', $supportingDocument->getReference()->value);
     }
 
     /** @test BR-53 */
     public function if_the_vat_accounting_currency_code_is_present_then_the_invoice_total_vat_amount_in_accounting_currency_shall_be_provided(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->invoice->setDocumentTotals(new DocumentTotals(1, 1, 1, 1, 1));
+        $this->invoice->setVatAccountingCurrencyCode(CurrencyCode::CANADIAN_DOLLAR);
+
+        $this->assertSame(CurrencyCode::CANADIAN_DOLLAR, $this->invoice->getVatAccountingCurrencyCode());
+        $this->assertEquals(1, $this->invoice->getDocumentTotals()->getInvoiceTotalVatAmountInAccountingCurrency());
+
+        $this->invoice->setVatAccountingCurrencyCode(CurrencyCode::CANADIAN_DOLLAR);
+
+        $this->expectException(\Exception::class);
+        $this->invoice->setDocumentTotals(new DocumentTotals(1,1,1,1));
     }
 
     /** @test BR-54 */
     public function each_item_attribute_shall_contain_an_item_attribute_name_and_an_item_attribute_value(): void
     {
-        $this->markTestSkipped('@todo');
+        $itemAttribute = new ItemAttribute('name', 'value');
+
+        $this->assertSame('name', $itemAttribute->getName());
+        $this->assertSame('value', $itemAttribute->getValue());
     }
 
     /** @test BR-55 */
     public function each_preceding_invoice_reference_shall_contain_a_preceding_invoice_reference(): void
     {
-        $this->markTestSkipped('@todo');
+        $precedingInvoice = new PrecedingInvoice(new PrecedingInvoiceReference('ref'));
+
+        $this->assertInstanceOf(PrecedingInvoiceReference::class, $precedingInvoice->getReference());
+        $this->assertSame('ref', $precedingInvoice->getReference()->value);
     }
 
     /** @test BR-56 */
     public function each_seller_tax_representative_party_shall_have_a_seller_tax_representative_vat_identifier(): void
     {
-        $this->markTestSkipped('@todo');
+        $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
+            'name',
+            new VatIdentifier('123'),
+            new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+        );
+
+        $this->assertInstanceOf(VatIdentifier::class, $sellerTaxRepresentativeParty->getVatIdentifier());
+        $this->assertSame('123', $sellerTaxRepresentativeParty->getVatIdentifier()->value);
     }
 
     /** @test BR-57 */
-    public function each_deliver_ti_address_shall_contain_a_deliver_to_country_code(): void
+    public function each_deliver_to_address_shall_contain_a_deliver_to_country_code(): void
     {
-        $this->markTestSkipped('@todo');
+        $deliverToAdress = new DeliverToAddress(CountryAlpha2Code::FRANCE);
+
+        $this->assertSame(CountryAlpha2Code::FRANCE, $deliverToAdress->getCountryCode());
     }
 
     /** @test BR-61 */
     public function if_the_payment_means_type_code_means_SEPA_credit_transfer_local_credit_transfer_or_non_SEPA_international_credit_transfer_the_payment_account_identifier_shall_be_present(): void
     {
-        $this->markTestSkipped('@todo');
+        $paymentInstructions = new PaymentInstructions(
+            PaymentMeansCode::CREDIT_TRANSFER,
+            [new CreditTransfer(new PaymentAccountIdentifier('id'))]
+        );
+
+        $this->assertSame(PaymentMeansCode::CREDIT_TRANSFER, $paymentInstructions->getPaymentMeansTypeCode());
+        $this->assertInstanceOf(PaymentAccountIdentifier::class, $paymentInstructions->getCreditTransfers()[0]->getPaymentAccountIdentifier());
+
+        $paymentInstructions = new PaymentInstructions(
+            PaymentMeansCode::SEPA_CREDIT_TRANSFER,
+            [new CreditTransfer(new PaymentAccountIdentifier('id'))]
+        );
+
+        $this->assertSame(PaymentMeansCode::SEPA_CREDIT_TRANSFER, $paymentInstructions->getPaymentMeansTypeCode());
+        $this->assertInstanceOf(PaymentAccountIdentifier::class, $paymentInstructions->getCreditTransfers()[0]->getPaymentAccountIdentifier());
+
+        $this->expectException(\Exception::class);
+
+        new PaymentInstructions(PaymentMeansCode::SEPA_CREDIT_TRANSFER);
+        new PaymentInstructions(PaymentMeansCode::CREDIT_TRANSFER);
     }
 
-    /** @test BR-62 */
-    public function the_seller_electronic_address_shall_have_a_scheme_identifier(): void
+    /** @test BR-62 & BR-63 */
+    public function the_seller_and_buyer_electronic_addresses_shall_have_a_scheme_identifier(): void
     {
-        $this->markTestSkipped('@todo');
-    }
+        $electronicAddressIdentifier = new ElectronicAddressIdentifier('value', ElectronicAddressScheme::SIRET_CODE);
 
-    /** @test BR-63 */
-    public function the_buyer_electronic_address_shall_have_a_scheme_identifier(): void
-    {
-        $this->markTestSkipped('@todo');
+        $this->assertSame(ElectronicAddressScheme::SIRET_CODE, $electronicAddressIdentifier->scheme);
     }
 
     /** @test BR-64 */
     public function the_item_standard_identifier_shall_have_a_scheme_identifier(): void
     {
-        $this->markTestSkipped('@todo');
+        $standardItemIdentifier = new StandardItemIdentifier('value', InternationalCodeDesignator::COMMON_LANGUAGE);
+
+        $this->assertSame(InternationalCodeDesignator::COMMON_LANGUAGE, $standardItemIdentifier->scheme);
     }
 
     /** @test BR-65 */
     public function the_item_classification_identifier_shall_have_a_scheme_identifier(): void
     {
-        $this->markTestSkipped('@todo');
+        $itemClassificationIdentifier = new ItemClassificationIdentifier('value', ItemTypeCode::BUYER_ITEM_NUMBER, 'v1');
+        $this->assertSame(ItemTypeCode::BUYER_ITEM_NUMBER, $itemClassificationIdentifier->scheme);
     }
 }
