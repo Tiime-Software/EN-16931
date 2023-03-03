@@ -2,7 +2,7 @@
 
 namespace Tiime\EN16931\DataType;
 
-enum ChargeReasonCode
+enum ChargeReasonCode: string
 {
     case ADVERTISING = "AA";
     case TELECOMMUNICATION = "AAA";

@@ -52,8 +52,8 @@ class InvoiceLineCharge
         $this->amount = $amount;
         $this->baseAmount = null;
         $this->percentage = null;
-        $this->reason = null;
-        $this->reasonCode = null;
+        $this->reason = $reason;
+        $this->reasonCode = $reasonCode;
     }
 
     public function getAmount(): float

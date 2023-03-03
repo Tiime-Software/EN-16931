@@ -23,6 +23,8 @@ use Tiime\EN16931\BusinessTermsGroup\PaymentInstructions;
 use Tiime\EN16931\BusinessTermsGroup\PrecedingInvoice;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
+use Tiime\EN16931\DataType\AllowanceReasonCode;
+use Tiime\EN16931\DataType\ChargeReasonCode;
 use Tiime\EN16931\DataType\ElectronicAddressScheme;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\ItemClassificationIdentifier;
@@ -87,8 +89,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
 
-    /** @test BR-1 */
-    public function an_invoice_shall_have_a_specification_identifier(): void
+    /**
+     * @test
+     * @testdox BR-1 : An invoice shall have a specification identifier
+     */
+    public function br1MandatorySpecificationIdentifier(): void
     {
         $specificationIdentifier = $this->invoice->getProcessControl()->getSpecificationIdentifier();
 
@@ -96,8 +101,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame($specificationIdentifier->value, SpecificationIdentifier::BASIC);
     }
 
-    /** @test BR-2 */
-    public function an_invoice_shall_have_an_invoice_number(): void
+    /**
+     * @test
+     * @testdox BR-2 : An invoice shall have an invoice number
+     */
+    public function br2MandatoryInvoiceNumber(): void
     {
         $invoiceNumber = $this->invoice->getNumber();
 
@@ -105,86 +113,139 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame($invoiceNumber->value, '34');
     }
 
-    /** @test BR-3 */
-    public function an_invoice_shall_have_an_invoice_issue_date(): void
+    /**
+     * @test
+     * @testdox BR-3 : An invoice shall have an invoice issue date
+     */
+    public function br3MandatoryIssueDate(): void
     {
         $this->assertInstanceOf(\DateTimeInterface::class, $this->invoice->getIssueDate());
     }
 
-    /** @test BR-4 */
-    public function an_invoice_shall_have_an_invoice_type_code(): void
+    /**
+     * @test
+     * @testdox BR-4 : An invoice shall have an invoice type code
+     */
+    public function br4MandatoryTypeCode(): void
     {
+        $this->assertInstanceOf(InvoiceTypeCode::class, $this->invoice->getTypeCode());
         $this->assertSame(InvoiceTypeCode::COMMERCIAL_INVOICE, $this->invoice->getTypeCode());
     }
 
-    /** @test BR-5 */
-    public function an_invoice_shall_have_an_invoice_currency_code(): void
+    /**
+     * @test
+     * @testdox BR-5 : An invoice shall have an invoice currency code
+     */
+    public function br5MandatoryCurrencyCode(): void
     {
+        $this->assertInstanceOf(CurrencyCode::class, $this->invoice->getCurrencyCode());
         $this->assertSame(CurrencyCode::EURO, $this->invoice->getCurrencyCode());
     }
 
-    /** @test BR-6 */
-    public function an_invoice_shall_contain_the_seller_name(): void
+    /**
+     * @test
+     * @testdox BR-6 : An invoice shall contain the seller name
+     */
+    public function br6MandatorySellerName(): void
     {
         $this->assertSame('John Doe', $this->invoice->getSeller()->getName());
     }
 
-    /** @test BR-7 */
-    public function an_invoice_shall_contain_the_buyer_name(): void
+    /**
+     * @test
+     * @testdox BR-7 : An invoice shall contain the buyer name
+     */
+    public function br7MandatoryBuyerName(): void
     {
         $this->assertSame('Richard Roe', $this->invoice->getBuyer()->getName());
     }
 
-    /** @test BR-8 */
-    public function an_invoice_shall_contain_the_seller_postal_address(): void
+    /**
+     * @test
+     * @testdox BR-8 : An invoice shall contain the seller postal address
+     */
+    public function br8MandatorySellerPostalAddress(): void
     {
         $this->assertInstanceOf(SellerPostalAddress::class, $this->invoice->getSeller()->getAddress());
     }
 
-    /** @test BR-9 */
-    public function the_seller_postal_address_shall_contain_a_seller_country_code(): void
+    /**
+     * @test
+     * @testdox BR-9 : The seller postal address shall contain a seller country code
+     */
+    public function br9MandatorySellerCountryCode(): void
     {
-        $this->assertSame(CountryAlpha2Code::FRANCE, $this->invoice->getSeller()->getAddress()->getCountryCode());
+        $sellerPostalAddress = new SellerPostalAddress(CountryAlpha2Code::FRANCE);
+
+        $this->assertInstanceOf(CountryAlpha2Code::class, $sellerPostalAddress->getCountryCode());
+        $this->assertSame(CountryAlpha2Code::FRANCE, $sellerPostalAddress->getCountryCode());
     }
 
-    /** @test BR-10 */
-    public function an_invoice_shall_contain_the_buyer_postal_address(): void
+    /**
+     * @test
+     * @testdox BR-10 : An invoice shall contain the buyer postal address
+     */
+    public function br10MandatoryBuyerPostalAddress(): void
     {
         $this->assertInstanceOf(BuyerPostalAddress::class, $this->invoice->getBuyer()->getAddress());
     }
 
-    /** @test BR-11 */
-    public function the_buyer_postal_address_shall_contain_a_seller_country_code(): void
+    /**
+     * @test
+     * @testdox BR-11 : The buyer postal address shall contain a buyer country code
+     */
+    public function br11MandatoryBuyerCountryCode(): void
     {
-        $this->assertSame(CountryAlpha2Code::FRANCE, $this->invoice->getBuyer()->getAddress()->getCountryCode());
+        $buyerPostalAddress = new BuyerPostalAddress(CountryAlpha2Code::FRANCE);
+
+        $this->assertInstanceOf(CountryAlpha2Code::class, $buyerPostalAddress->getCountryCode());
+        $this->assertSame(CountryAlpha2Code::FRANCE, $buyerPostalAddress->getCountryCode());
     }
 
-    /** @test BR-12 */
-    public function an_invoice_shall_have_the_sum_of_invoice_line_net_amount(): void
+    /**
+     * @test
+     * @testdox BR-12 : An invoice shall have the sum of invoice line net amount
+     */
+    public function br12MandatoryInvoiceLineNetAmount(): void
     {
+        $this->assertIsFloat($this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
         $this->assertEquals(0, $this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
     }
 
-    /** @test BR-13 */
-    public function an_invoice_shall_have_the_invoice_total_amount_without_vat(): void
+    /**
+     * @test
+     * @testdox BR-13 : An invoice shall have the invoice total amount without VAT
+     */
+    public function br13MandatoryTotalAmountWithoutVat(): void
     {
+        $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
         $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
     }
 
-    /** @test BR-14 */
-    public function an_invoice_shall_have_the_invoice_total_amount_with_vat(): void
+    /**
+     * @test
+     * @testdox BR-14 : An invoice shall have the invoice total amount with VAT
+     */
+    public function br14MandatoryTotalAmountWithVat(): void
     {
+        $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
         $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
     }
 
-    /** @test BR-15 */
-    public function an_invoice_shall_have_the_amount_due_for_payment(): void
+    /**
+     * @test
+     * @testdox BR-15 : An invoice shall have the amount due for payment
+     */
+    public function br15MandatoryAmountDueForPayment(): void
     {
         $this->assertEquals(0, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
     }
 
-    /** @test BR-16 */
-    public function an_invoice_shall_have_at_least_one_invoice_line(): void
+    /**
+     * @test
+     * @testdox BR-16 [case without lines] : An invoice shall have at least one invoice line
+     */
+    public function br16CaseWithoutLines(): void
     {
         $this->expectException(\Exception::class);
 
@@ -198,12 +259,88 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             new DocumentTotals(0, 0, 0, 0),
             [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
-            [] // without invoice line
+            []
         );
     }
 
-    /** @test BR-17 */
-    public function the_payee_name_shall_be_provided_in_the_invoice_if_the_payee_is_different_from_the_seller(): void
+    /**
+     * @test
+     * @testdox BR-16 [case with lines] : An invoice shall have at least one invoice line
+     * @dataProvider provideBR16InvoiceLines
+     * @param array<int, InvoiceLine> $lines
+     */
+    public function br16CaseWithLines(array $lines): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::MINIMUM)),
+            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new DocumentTotals(0, 0, 0, 0),
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            $lines
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+        $this->assertTrue(count($invoice->getInvoiceLines()) > 0);
+
+        foreach ($invoice->getInvoiceLines() as $line) {
+            $this->assertInstanceOf(InvoiceLine::class, $line);
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR16InvoiceLines(): array
+    {
+        return [
+            'single line' => [
+                'lines' => [
+                    new InvoiceLine(
+                        new InvoiceLineIdentifier('value'),
+                        1,
+                        UnitOfMeasurement::CENTILITRE_REC20,
+                        10,
+                        new PriceDetails(10),
+                        new LineVatInformation(VatCategory::STANDARD),
+                        new ItemInformation('item')
+                    )
+                ]
+            ],
+            'multiple lines' => [
+                'lines' => [
+                    new InvoiceLine(
+                        new InvoiceLineIdentifier('value'),
+                        1,
+                        UnitOfMeasurement::CENTILITRE_REC20,
+                        10,
+                        new PriceDetails(10),
+                        new LineVatInformation(VatCategory::STANDARD),
+                        new ItemInformation('item')
+                    ),
+                    new InvoiceLine(
+                        new InvoiceLineIdentifier('value2'),
+                        1,
+                        UnitOfMeasurement::CENTILITRE_REC20,
+                        10,
+                        new PriceDetails(10),
+                        new LineVatInformation(VatCategory::STANDARD),
+                        new ItemInformation('item2')
+                    )
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-17 : The payee name shall be provided in the invoice if the payee is different from the seller
+     */
+    public function br17MandatoryPayeeNameInPayee(): void
     {
         $this->invoice->setPayee(new Payee('Jane Doe'));
 
@@ -211,8 +348,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('Jane Doe', $this->invoice->getPayee()->getName());
     }
 
-    /** @test BR-18 */
-    public function the_seller_tax_representative_name_shall_be_provided_in_the_invoice_if_the_seller_has_a_seller_tax_representative_party(): void
+    /**
+     * @test
+     * @testdox BR-18 : The seller tax representative name shall be provided in the invoice if the seller has a seller tax representative party
+     */
+    public function br18MandatorySellerTaxRepresentativeName(): void
     {
         $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
             'Freddie Hines',
@@ -223,8 +363,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('Freddie Hines', $sellerTaxRepresentativeParty->getName());
     }
 
-    /** @test BR-19 */
-    public function the_seller_tax_representative_postal_address_shall_be_provided_in_the_invoice_if_the_seller_has_a_seller_tax_representative_party(): void
+    /**
+     * @test
+     * @testdox BR-19 : The seller tax representative postal address shall be provided in the invoice if the seller has a seller tax representative party
+     */
+    public function br19MandatorySellerTaxRepresentativePostalAddress(): void
     {
         $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
             'Freddie Hines',
@@ -238,23 +381,30 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         );
     }
 
-    /** @test BR-20 */
-    public function the_seller_tax_representative_postal_address_shall_contain_a_tax_representative_country_code_if_the_seller_has_a_seller_tax_representative_party(): void
+    /**
+     * @test
+     * @testdox BR-20 : The seller tax representative postal address shall contain a tax representative country code if the seller has a seller tax representative party
+     */
+    public function br20MandatoryCountryCodeInSellerTaxRepresentativePostalAddress(): void
     {
-        $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
-            'Freddie Hines',
-            new VatIdentifier('vatId'),
-            new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
-        );
+        $address = new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE);
 
         $this->assertInstanceOf(
             CountryAlpha2Code::class,
-            $sellerTaxRepresentativeParty->getAddress()->getCountryCode()
+            $address->getCountryCode()
+        );
+
+        $this->assertSame(
+            CountryAlpha2Code::FRANCE,
+            $address->getCountryCode()
         );
     }
 
-    /** @test BR-21 */
-    public function each_invoice_line_shall_have_an_invoice_line_identifier(): void
+    /**
+     * @test
+     * @testdox BR-21 : Each invoice line shall have an invoice line identifier
+     */
+    public function br21MandatoryInvoiceLineIdentifier(): void
     {
         $invoiceLine = new InvoiceLine(
             new InvoiceLineIdentifier("1"),
@@ -267,10 +417,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         );
 
         $this->assertInstanceOf(InvoiceLineIdentifier::class, $invoiceLine->getIdentifier());
+        $this->assertSame('1', $invoiceLine->getIdentifier()->value);
     }
 
-    /** @test BR-22 */
-    public function each_invoice_line_shall_have_an_invoiced_quantity(): void
+    /**
+     * @test
+     * @testdox BR-22 : Each invoice line shall have an invoiced quantity
+     */
+    public function br22MandatoryInvoicedQuantity(): void
     {
         $invoiceLine = new InvoiceLine(
             new InvoiceLineIdentifier("1"),
@@ -282,11 +436,15 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new ItemInformation("A thing"),
         );
 
+        $this->assertIsFloat($invoiceLine->getInvoicedQuantity());
         $this->assertEquals(1, $invoiceLine->getInvoicedQuantity());
     }
 
-    /** @test BR-23 */
-    public function an_invoice_line_shall_have_an_invoiced_quantity_unit_of_measure_code(): void
+    /**
+     * @test
+     * @testdox BR-23 : An invoice line shall have an invoiced quantity unit of measure code
+     */
+    public function br23MandatoryInvoicedQuantityUnitOfMeasureCode(): void
     {
         $invoiceLine = new InvoiceLine(
             new InvoiceLineIdentifier("1"),
@@ -301,8 +459,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertInstanceOf(UnitOfMeasurement::class, $invoiceLine->getInvoicedQuantityUnitOfMeasureCode());
     }
 
-    /** @test BR-24 */
-    public function each_invoice_line_shall_have_an_invoice_line_net_amount(): void
+    /**
+     * @test
+     * @testdox BR-24 : Each invoice line shall have an invoice line net amount
+     */
+    public function br24MandatoryInvoiceLineNetAmount(): void
     {
         $invoiceLine = new InvoiceLine(
             new InvoiceLineIdentifier("1"),
@@ -317,8 +478,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertEquals(0, $invoiceLine->getNetAmount());
     }
 
-    /** @test BR-25 */
-    public function each_invoice_line_shall_contain_the_item_name(): void
+    /**
+     * @test
+     * @testdox BR-25 : Each invoice line shall contain the item name
+     */
+    public function br25MandatoryItemName(): void
     {
         $invoiceLine = new InvoiceLine(
             new InvoiceLineIdentifier("1"),
@@ -333,8 +497,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('A thing', $invoiceLine->getItemInformation()->getName());
     }
 
-    /** @test BR-26 */
-    public function each_invoice_line_shall_contain_the_item_net_price(): void
+    /**
+     * @test
+     * @testdox BR-26 : Each invoice line shall contain the item net price
+     */
+    public function br26MandatoryItemNetPrice(): void
     {
         $invoiceLine = new InvoiceLine(
             new InvoiceLineIdentifier("1"),
@@ -349,16 +516,45 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertEquals(12, $invoiceLine->getPriceDetails()->getItemNetPrice());
     }
 
-    /** @test BR-27 */
-    public function the_item_net_price_shall_not_be_negative(): void
+    /**
+     * @test
+     * @testdox BR-27 [case with negative price] : The item net price shall not be negative
+     */
+    public function br27WithNegativePrice(): void
     {
         $this->expectException(\Exception::class);
 
         new PriceDetails(-1);
     }
 
-    /** @test BR-28 */
-    public function the_item_gross_price_shall_not_be_negative(): void
+    /**
+     * @test
+     * @testdox BR-27 [case with positive price] : The item net price shall not be negative
+     * @dataProvider provideBR27NetPrices
+     */
+    public function br27WithPositivePrice(float $netPrice): void
+    {
+        $priceDetails =  new PriceDetails($netPrice);
+
+        $this->assertSame($netPrice, $priceDetails->getItemNetPrice());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR27NetPrices(): array
+    {
+        return [
+            'strictly positive' => [1.0],
+            'zero' => [0.0]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-28 [case with negative price] : The item gross price shall not be negative
+     */
+    public function br28WithNegativePrice(): void
     {
         $priceDetails = new PriceDetails(1);
 
@@ -367,120 +563,376 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $priceDetails->setItemGrossPrice(-1);
     }
 
-    /** @test BR-29 */
-    public function if_both_invoicing_period_start_date_and_invoicing_period_end_date_are_given_then_the_invoicing_period_end_date_shall_be_later_or_equal_to_the_invoicing_period_start_date(): void
+    /**
+     * @test
+     * @testdox BR-28 [case with positive price] : The item gross price shall not be negative
+     * @dataProvider provideBR28GrossPrices
+     */
+    public function br28WithPositivePrice(float $price): void
+    {
+        $priceDetails = new PriceDetails(1);
+        $priceDetails->setItemGrossPrice($price);
+
+        $this->assertSame($price, $priceDetails->getItemGrossPrice());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR28GrossPrices(): array
+    {
+        return [
+            'strictly positive' => [1.0],
+            'zero' => [0.0]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-29 [case with start date later than end date] : If both invoicing period start date and invoicing period end date are given then the invoicing period end date shall be later or equal to the invoicing period start date
+     */
+    public function br29CaseWithStartDateLaterThanEndDate(): void
     {
         $this->expectException(\Exception::class);
 
         new InvoicingPeriod(new \DateTimeImmutable('2021-01-02'), new \DateTimeImmutable('2021-01-01'));
     }
 
-    /** @test BR-30 */
-    public function if_both_invoice_line_period_start_date_and_invoice_line_period_end_date_are_given_then_the_invoice_line_period_end_date_shall_be_later_or_equal_to_the_invoice_line_period_start_date(): void
+
+    /**
+     * @test
+     * @testdox BR-29 [case with start date earlier or equal to end date]: If both invoicing period start date and invoicing period end date are given then the invoicing period end date shall be later or equal to the invoicing period start date
+     * @dataProvider provideBR29Dates
+     */
+    public function br29CaseWithStartDateEarlierOrEqualToEndDate(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): void
+    {
+        $period = new InvoicingPeriod($startDate, $endDate);
+
+        $this->assertEquals($startDate, $period->getStartDate());
+        $this->assertEquals($endDate, $period->getEndDate());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR29Dates(): array
+    {
+        return [
+            'start earlier than end' => [new \DateTimeImmutable('2021-01-01'), new \DateTimeImmutable('2021-01-02')],
+            'start equal to end' => [new \DateTimeImmutable('2021-01-01'), new \DateTimeImmutable('2021-01-01')]
+        ];
+    }
+
+    /**
+     * @test BR-30
+     * @testdox BR-30 [case with start date later than end date] : If both invoice line period start date and invoice line period end date are given then the invoice line period end date shall be later or equal to the invoice line period start date
+     */
+    public function br30CaseWithStartDateLaterThanEndDate(): void
     {
         $this->expectException(\Exception::class);
 
         new InvoiceLinePeriod(new \DateTimeImmutable('2021-01-02'), new \DateTimeImmutable('2021-01-01'));
     }
 
-    /** @test BR-31 */
-    public function each_document_level_allowance_shall_have_a_document_level_allowance_amount(): void
+
+    /**
+     * @test BR-30
+     * @testdox BR-30 [case with start date earlier or equal to end date] : If both invoice line period start date and invoice line period end date are given then the invoice line period end date shall be later or equal to the invoice line period start date
+     * @dataProvider provideBR30Dates
+     */
+    public function br30CaseWithStartDateEarlierOrEqualToEndDate(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): void
+    {
+        $period = new InvoiceLinePeriod($startDate, $endDate);
+
+        $this->assertEquals($startDate, $period->getStartDate());
+        $this->assertEquals($endDate, $period->getEndDate());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR30Dates(): array
+    {
+        return [
+            'start earlier than end' => [new \DateTimeImmutable('2021-01-01'), new \DateTimeImmutable('2021-01-02')],
+            'start equal to end' => [new \DateTimeImmutable('2021-01-01'), new \DateTimeImmutable('2021-01-01')]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-31 : Each document level allowance shall have a document level allowance amount
+     */
+    public function br31MandatoryDocumentLevelAllowanceAmount(): void
     {
         $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank');
 
         $this->assertEquals(1, $allowance->getAmount());
     }
 
-    /** @test BR-32 */
-    public function each_document_level_allowance_shall_have_a_document_level_allowance_vat_category_code(): void
+    /**
+     * @test
+     * @testdox BR-32 : Each document level allowance shall have a document level allowance vat category code
+     */
+    public function br32MandatoryDocumentLevelAllowanceVatCategoryCode(): void
     {
         $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank');
 
         $this->assertSame(VatCategory::STANDARD, $allowance->getVatCategoryCode());
     }
 
-    /** @test BR-33 */
-    public function each_document_level_allowance_shall_have_a_document_level_allowance_reason_or_a_document_level_allowance_reason_code(): void
+    /**
+     * @test
+     * @testdox BR-33 [case without reason or code] : Each document level allowance shall have a document level allowance reason or a document level allowance reason code
+     */
+    public function br33CaseWithoutReasonOrCode(): void
     {
         $this->expectException(\Exception::class);
 
         new DocumentLevelAllowance(1, VatCategory::STANDARD);
     }
 
-    /** @test BR-36 */
-    public function each_document_level_charge_shall_have_a_document_level_charge_amount(): void
+    /**
+     * @test
+     * @testdox BR-33 [cases with at least a reason or code] : Each document level allowance shall have a document level allowance reason or a document level allowance reason code
+     * @dataProvider provideBR33ReasonAndCodeCombinations
+     */
+    public function br33CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    {
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, $reason, $reasonCode);
+
+        $this->assertSame($reason, $allowance->getReason());
+        $this->assertSame($reasonCode, $allowance->getReasonCode());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR33ReasonAndCodeCombinations(): array
+    {
+        return [
+            'with reason, without code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => null
+            ],
+            'with reason, with code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => AllowanceReasonCode::STANDARD
+            ],
+            'without reason, with code' => [
+                'reason' => null,
+                'reasonCode' => AllowanceReasonCode::STANDARD
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-36 : Each document level charge shall have a document level charge amount
+     */
+    public function br36MandatoryDocumentLevelChargeAmount(): void
     {
         $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank');
 
         $this->assertEquals(1, $charge->getAmount());
     }
 
-    /** @test BR-37 */
-    public function each_document_level_charge_shall_have_a_document_level_charge_vat_category_code(): void
+    /**
+     * @test
+     * @testdox BR-37 : Each document level charge shall have a document level charge vat category code
+     */
+    public function br37MandatoryDocumentLevelChargeVatCategoryCode(): void
     {
         $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank');
 
         $this->assertSame(VatCategory::STANDARD, $charge->getVatCategoryCode());
     }
 
-    /** @test BR-38 */
-    public function each_document_level_charge_shall_have_a_document_level_charge_reason_or_a_document_level_charge_reason_code(): void
+    /**
+     * @test
+     * @testdox BR-38 [case without reason or code] : Each document level charge shall have a document level charge reason or a document level charge reason code
+     */
+    public function br38CaseWithoutReasonOrCode(): void
     {
         $this->expectException(\Exception::class);
 
         new DocumentLevelCharge(1, VatCategory::STANDARD);
     }
 
-    /** @test BR-41 */
-    public function each_invoice_line_allowance_shall_have_an_invoice_line_allowance_amount(): void
+    /**
+     * @test
+     * @testdox BR-38 [cases with at least a reason or code] : Each document level charge shall have a document level charge reason or a document level charge reason code
+     * @dataProvider provideBR38ReasonAndCodeCombinations
+     */
+    public function br38CasesWithReasonAndCodeCombinations(?string $reason, ?ChargeReasonCode $reasonCode): void
+    {
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, $reason, $reasonCode);
+
+        $this->assertSame($reason, $charge->getReason());
+        $this->assertSame($reasonCode, $charge->getReasonCode());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR38ReasonAndCodeCombinations(): array
+    {
+        return [
+            'with reason, without code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => null
+            ],
+            'with reason, with code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => ChargeReasonCode::TESTING
+            ],
+            'without reason, with code' => [
+                'reason' => null,
+                'reasonCode' => ChargeReasonCode::TESTING
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-41 : Each invoice line allowance shall have an invoice line allowance amount
+     */
+    public function br41MandatoryInvoiceLineAllowanceAmount(): void
     {
         $allowance = new InvoiceLineAllowance(1, 'Hoobastank');
 
         $this->assertEquals(1, $allowance->getAmount());
     }
 
-    /** @test BR-42 */
-    public function each_invoice_line_allowance_shall_have_an_invoice_line_allowance_reason_or_an_invoice_line_allowance_reason_code(): void
+    /**
+     * @test
+     * @testdox BR-42 [case without reason or code] : Each invoice line allowance shall have an invoice line allowance reason or an invoice line allowance reason code
+     */
+    public function br42CaseWithoutReasonOrCode(): void
     {
         $this->expectException(\Exception::class);
 
         new InvoiceLineAllowance(1);
     }
 
-    /** @test BR-43 */
-    public function each_invoice_line_charge_shall_have_an_invoice_line_charge_amount(): void
+
+    /**
+     * @test
+     * @testdox BR-42 [cases with at least a reason or code] : Each invoice line allowance shall have an invoice line allowance reason or an invoice line allowance reason code
+     * @dataProvider provideBR42ReasonAndCodeCombinations
+     */
+    public function br42CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    {
+        $allowance = new InvoiceLineAllowance(1, $reason, $reasonCode);
+
+        $this->assertSame($reason, $allowance->getReason());
+        $this->assertSame($reasonCode, $allowance->getReasonCode());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR42ReasonAndCodeCombinations(): array
+    {
+        return [
+            'with reason, without code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => null
+            ],
+            'with reason, with code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => AllowanceReasonCode::STANDARD
+            ],
+            'without reason, with code' => [
+                'reason' => null,
+                'reasonCode' => AllowanceReasonCode::STANDARD
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-43 : Each invoice line charge shall have an invoice line charge amount
+     */
+    public function br43MandatoryInvoiceLineChargeAmount(): void
     {
         $charge = new InvoiceLineCharge(1, 'Hoobastank');
 
         $this->assertEquals(1, $charge->getAmount());
     }
 
-    /** @test BR-44 */
-    public function each_invoice_line_charge_shall_have_an_invoice_line_charge_reason_or_an_invoice_line_charge_reason_code(): void
+    /**
+     * @test
+     * @testdox BR-44 [case without reason or code] : Each invoice line charge shall have an invoice line charge reason or an invoice line charge reason code
+     */
+    public function br44CaseWithoutReasonOrCode(): void
     {
         $this->expectException(\Exception::class);
 
         new InvoiceLineCharge(1);
     }
 
-    /** @test BR-45 */
-    public function each_vat_breakdown_shall_have_a_vat_category_taxable_amount(): void
+    /**
+     * @test
+     * @testdox BR-44 [case with at least a reason or code] : Each invoice line charge shall have an invoice line charge reason or an invoice line charge reason code
+     * @dataProvider provideBR44ReasonAndCodeCombinations
+     */
+    public function br44CasesWithReasonAndCodeCombinations(?string $reason, ?ChargeReasonCode $reasonCode): void
+    {
+        $charge = new InvoiceLineCharge(1, $reason, $reasonCode);
+
+        $this->assertSame($reason, $charge->getReason());
+        $this->assertSame($reasonCode, $charge->getReasonCode());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function provideBR44ReasonAndCodeCombinations(): array
+    {
+        return [
+            'with reason, without code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => null
+            ],
+            'with reason, with code' => [
+                'reason' => 'Hoobastank',
+                'reasonCode' => ChargeReasonCode::TESTING
+            ],
+            'without reason, with code' => [
+                'reason' => null,
+                'reasonCode' => ChargeReasonCode::TESTING
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-45 : Each vat breakdown shall have a vat category taxable amount
+     */
+    public function br45MandatoryVatCategoryTaxableAmount(): void
     {
         $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
 
         $this->assertEquals(5, $vatBreakdown->getVatCategoryTaxableAmount());
     }
 
-    /** @test BR-46 */
-    public function each_vat_breakdown_shall_have_a_vat_category_tax_amount(): void
+    /**
+     * @test
+     * @testdox BR-46 : Each vat breakdown shall have a vat category tax amount
+     */
+    public function br46MandatoryVatCategoryTaxAmount(): void
     {
         $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
 
         $this->assertEquals(1, $vatBreakdown->getVatCategoryTaxAmount());
     }
 
-    /** @test BR-47 */
-    public function each_vat_breakdown_shall_be_defined_through_a_vat_category_code(): void
+    /**
+     * @test
+     * @testdox BR-47 : Each vat breakdown shall be defined through a vat category code
+     */
+    public function br47MandatoryVatCategoryCode(): void
     {
         $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
 
@@ -488,7 +940,10 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame(VatCategory::STANDARD, $vatBreakdown->getVatCategoryCode());
     }
 
-    /** @test BR-48 */
+    /**
+     * @test
+     * @testdox @todo BR-48 : Each vat breakdown shall have a vat category rate except if the invoice is not subject to vat
+     */
     public function each_vat_breakdown_shall_have_a_vat_category_rate_except_if_the_invoice_is_not_subject_to_vat(): void
     {
         $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
@@ -506,34 +961,36 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         new VatBreakdown(5, 1, VatCategory::STANDARD);
     }
 
-    /** @test BR-49 */
-    public function a_payment_instruction_shall_specify_the_payment_means_type_code(): void
+    /**
+     * @test
+     * @testdox BR-49 : A payment instruction shall specify the payment means type code
+     */
+    public function br49MandatoryPaymentMeansTypeCode(): void
     {
         $paymentInstructions = new PaymentInstructions(PaymentMeansCode::DEBIT_TRANSFER);
 
         $this->assertSame(PaymentMeansCode::DEBIT_TRANSFER, $paymentInstructions->getPaymentMeansTypeCode());
     }
 
-    /** @test BR-50 */
-    public function a_payment_account_identifier_shall_be_present_if_credit_transfer_information_is_provided_in_the_invoice(): void
+    /**
+     * @test
+     * @testdox BR-50 : A payment account identifier shall be present if credit transfer information is provided in the invoice
+     */
+    public function br50MandatoryPaymentAccountIdentifier(): void
     {
         $creditTransfer = new CreditTransfer(new PaymentAccountIdentifier('123'));
 
         $this->assertInstanceOf(PaymentAccountIdentifier::class, $creditTransfer->getPaymentAccountIdentifier());
+        $this->assertSame('123', $creditTransfer->getPaymentAccountIdentifier()->value);
     }
 
-    /** @test BR-51 */
-    public function the_last_4_to_6_digits_of_the_payment_card_primary_account_number_shall_be_present_if_payment_card_information_is_provided_in_the_invoice(): void
+    /**
+     * @test
+     * @testdox BR-51 [with valid numbers] : (Only) The last 4 to 6 digits of the payment card primary account number shall be present if payment card information is provided in the invoice
+     * @dataProvider provideBR51ValidNumbers
+     */
+    public function br51CasesWithValidNumbers(string $validNumber): void
     {
-        $validNumbers = [
-            '1234',
-            '12345',
-            '123456',
-            '****1234',
-            '****12345',
-            '****123456',
-        ];
-
         $invalidNumbers = [
             '',
             'invalid',
@@ -542,25 +999,57 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             '123*****1234',
         ];
 
-        foreach ($validNumbers as $validNumber) {
-            $paymentCardInformation = new PaymentCardInformation($validNumber);
+        $paymentCardInformation = new PaymentCardInformation($validNumber);
 
-            $this->assertSame($validNumber, $paymentCardInformation->getPrimaryAccountNumber());
-        }
-
-        foreach ($invalidNumbers as $invalidNumber) {
-            try {
-                $paymentCardInformation = new PaymentCardInformation($invalidNumber);
-
-                $this->assertNotInstanceOf(PaymentCardInformation::class, $paymentCardInformation);
-            } catch (\Exception $e) {
-                $this->assertInstanceOf(\Exception::class, $e);
-            }
-        }
+        $this->assertSame($validNumber, $paymentCardInformation->getPrimaryAccountNumber());
     }
 
-    /** @test BR-52 */
-    public function each_additional_supporting_document_shall_contain_a_supporting_document_reference(): void
+    /**
+     * @return array<int, mixed>
+     */
+    public static function provideBR51ValidNumbers(): array
+    {
+        return [
+            ['1234'],
+            ['12345'],
+            ['123456'],
+            ['****1234'],
+            ['****12345'],
+            ['****123456'],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-51 [with invalid numbers] : (Only) The last 4 to 6 digits of the payment card primary account number shall be present if payment card information is provided in the invoice
+     * @dataProvider provideBR51InvalidNumbers
+     */
+    public function br51CasesWithInvalidNumbers(string $invalidNumber): void
+    {
+        $this->expectException(\Exception::class);
+
+        new PaymentCardInformation($invalidNumber);
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public static function provideBR51InvalidNumbers(): array
+    {
+        return [
+            [''],
+            ['invalid'],
+            ['123'],
+            ['1234567'],
+            ['123*****1234'],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-52 : Each additional supporting document shall contain a supporting document reference
+     */
+    public function br52MandatorySupportingDocumentReference(): void
     {
         $supportingDocument = new AdditionalSupportingDocument(new SupportingDocumentReference('ref'));
 
@@ -568,7 +1057,10 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('ref', $supportingDocument->getReference()->value);
     }
 
-    /** @test BR-53 */
+    /**
+     * @test
+     * @testdox @todo BR-53 : If the vat accounting currency code is present then the invoice total vat amount in accounting currency shall be provided
+     */
     public function if_the_vat_accounting_currency_code_is_present_then_the_invoice_total_vat_amount_in_accounting_currency_shall_be_provided(): void
     {
         $this->invoice->setDocumentTotals(new DocumentTotals(1, 1, 1, 1, 1));
@@ -583,8 +1075,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->invoice->setDocumentTotals(new DocumentTotals(1,1,1,1));
     }
 
-    /** @test BR-54 */
-    public function each_item_attribute_shall_contain_an_item_attribute_name_and_an_item_attribute_value(): void
+    /**
+     * @test
+     * @testdox BR-54 : Each item attribute shall contain an item attribute name and an item attribute value
+     */
+    public function br54MandatoryItemAttributeNameAndValue(): void
     {
         $itemAttribute = new ItemAttribute('name', 'value');
 
@@ -592,8 +1087,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('value', $itemAttribute->getValue());
     }
 
-    /** @test BR-55 */
-    public function each_preceding_invoice_reference_shall_contain_a_preceding_invoice_reference(): void
+    /**
+     * @test
+     * @testdox BR-55 : Each preceding invoice reference shall contain a preceding invoice reference
+     */
+    public function br55MandatoryPrecedingInvoiceReference(): void
     {
         $precedingInvoice = new PrecedingInvoice(new PrecedingInvoiceReference('ref'));
 
@@ -601,8 +1099,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('ref', $precedingInvoice->getReference()->value);
     }
 
-    /** @test BR-56 */
-    public function each_seller_tax_representative_party_shall_have_a_seller_tax_representative_vat_identifier(): void
+    /**
+     * @test
+     * @testdox BR-56 : Each seller tax representative party shall have a seller tax representative vat identifier
+     */
+    public function br56MandatorySellerTaxRepresentativePartyVatIdentifier(): void
     {
         $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
             'name',
@@ -614,16 +1115,22 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $this->assertSame('123', $sellerTaxRepresentativeParty->getVatIdentifier()->value);
     }
 
-    /** @test BR-57 */
-    public function each_deliver_to_address_shall_contain_a_deliver_to_country_code(): void
+    /**
+     * @test
+     * @testdox BR-57 : Each deliver to address shall contain a deliver to country code
+     */
+    public function br57MandatoryDeliverToAddressCountryCode(): void
     {
         $deliverToAdress = new DeliverToAddress(CountryAlpha2Code::FRANCE);
 
         $this->assertSame(CountryAlpha2Code::FRANCE, $deliverToAdress->getCountryCode());
     }
 
-    /** @test BR-61 */
-    public function if_the_payment_means_type_code_means_SEPA_credit_transfer_local_credit_transfer_or_non_SEPA_international_credit_transfer_the_payment_account_identifier_shall_be_present(): void
+    /**
+     * @test BR-61
+     * @testdox @todo BR-61 : If the payment means type code means SEPA credit transfer local credit transfer or non SEPA international credit transfer the payment account identifier shall be present
+     */
+    public function br61(): void
     {
         $paymentInstructions = new PaymentInstructions(
             PaymentMeansCode::CREDIT_TRANSFER,
@@ -647,26 +1154,36 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         new PaymentInstructions(PaymentMeansCode::CREDIT_TRANSFER);
     }
 
-    /** @test BR-62 & BR-63 */
-    public function the_seller_and_buyer_electronic_addresses_shall_have_a_scheme_identifier(): void
+    /**
+     * @test
+     * @testdox BR-62 & BR-63 : The seller and buyer electronic addresses shall have a scheme identifier
+     */
+    public function br62br63MandatoryElectronicAddressIdentifierScheme(): void
     {
         $electronicAddressIdentifier = new ElectronicAddressIdentifier('value', ElectronicAddressScheme::SIRET_CODE);
 
         $this->assertSame(ElectronicAddressScheme::SIRET_CODE, $electronicAddressIdentifier->scheme);
     }
 
-    /** @test BR-64 */
-    public function the_item_standard_identifier_shall_have_a_scheme_identifier(): void
+    /**
+     * @test
+     * @testdox BR-64 : The item standard identifier shall have a scheme identifier
+     */
+    public function br64MandatoryStandardItemIdentifierScheme(): void
     {
         $standardItemIdentifier = new StandardItemIdentifier('value', InternationalCodeDesignator::COMMON_LANGUAGE);
 
         $this->assertSame(InternationalCodeDesignator::COMMON_LANGUAGE, $standardItemIdentifier->scheme);
     }
 
-    /** @test BR-65 */
-    public function the_item_classification_identifier_shall_have_a_scheme_identifier(): void
+    /**
+     * @test
+     * @testdox BR-65 : The item classification identifier shall have a scheme identifier
+     */
+    public function br65MandatoryItemClassificationIdentifierScheme(): void
     {
         $itemClassificationIdentifier = new ItemClassificationIdentifier('value', ItemTypeCode::BUYER_ITEM_NUMBER, 'v1');
+
         $this->assertSame(ItemTypeCode::BUYER_ITEM_NUMBER, $itemClassificationIdentifier->scheme);
     }
 }
