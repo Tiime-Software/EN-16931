@@ -69,6 +69,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 ->setBusinessProcessType('A1'),
             new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
             new DocumentTotals(0, 0, 0, 0),
             [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
             [new InvoiceLine(
@@ -257,6 +258,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::MINIMUM)),
             new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
             new DocumentTotals(0, 0, 0, 0),
             [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
             []
@@ -279,6 +281,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::MINIMUM)),
             new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
             new DocumentTotals(0, 0, 0, 0),
             [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
             $lines
@@ -293,7 +296,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array<string, array<int, InvoiceLine>>>
      */
     public static function provideBR16InvoiceLines(): array
     {
@@ -540,7 +543,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array<int, float>>
      */
     public static function provideBR27NetPrices(): array
     {
@@ -577,7 +580,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array<int, float>>
      */
     public static function provideBR28GrossPrices(): array
     {
@@ -613,7 +616,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array<int, \DateTimeImmutable>>
      */
     public static function provideBR29Dates(): array
     {
@@ -649,7 +652,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array<int, \DateTimeImmutable>>
      */
     public static function provideBR30Dates(): array
     {
@@ -706,7 +709,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array{reason: ?string, reasonCode: ?AllowanceReasonCode}>
      */
     public static function provideBR33ReasonAndCodeCombinations(): array
     {
@@ -773,7 +776,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array{reason: ?string, reasonCode: ?ChargeReasonCode}>
      */
     public static function provideBR38ReasonAndCodeCombinations(): array
     {
@@ -830,7 +833,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array{reason: ?string, reasonCode: ?AllowanceReasonCode}>
      */
     public static function provideBR42ReasonAndCodeCombinations(): array
     {
@@ -886,7 +889,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, array{reason: ?string, reasonCode: ?ChargeReasonCode}>
      */
     public static function provideBR44ReasonAndCodeCombinations(): array
     {
@@ -942,23 +945,61 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
 
     /**
      * @test
-     * @testdox @todo BR-48 : Each vat breakdown shall have a vat category rate except if the invoice is not subject to vat
+     * @testdox BR-48 [case with coherent vat category & rate] : Each vat breakdown shall have a vat category rate except if the invoice is not subject to vat
+     * @dataProvider provideBR48SuccessfulCases
      */
-    public function each_vat_breakdown_shall_have_a_vat_category_rate_except_if_the_invoice_is_not_subject_to_vat(): void
+    public function br48SuccessfulCases(VatCategory $vatCategory, ?float $vatRate): void
     {
-        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+        $vatBreakdown = new VatBreakdown(5, 1, $vatCategory, $vatRate);
 
-        $this->assertSame(VatCategory::STANDARD, $vatBreakdown->getVatCategoryCode());
-        $this->assertSame(0.2, $vatBreakdown->getVatCategoryRate());
+        $this->assertSame($vatCategory, $vatBreakdown->getVatCategoryCode());
+        $this->assertSame($vatRate, $vatBreakdown->getVatCategoryRate());
+    }
 
-        $vatBreakdown = new VatBreakdown(5, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX);
+    /**
+     * @return array<string, array{vatCategory: VatCategory, vatRate: ?float}>
+     */
+    public static function provideBR48SuccessfulCases(): array
+    {
+        return [
+            'subject to vat with rate' => [
+                'vatCategory' => VatCategory::STANDARD,
+                'vatRate' => 0.2,
+            ],
+            'not subject to vat without rate' => [
+                'vatCategory' => VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX,
+                'vatRate' => null,
+            ],
+        ];
+    }
 
-        $this->assertSame(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, $vatBreakdown->getVatCategoryCode());
-        $this->assertNull( $vatBreakdown->getVatCategoryRate());
-
+    /**
+     * @test
+     * @testdox BR-48 [cases with non-coherent vat category & rate] : Each vat breakdown shall have a vat category rate except if the invoice is not subject to vat
+     * @dataProvider provideBR48FailingCases
+     */
+    public function br48FailingCases(VatCategory $vatCategory, ?float $vatRate): void
+    {
         $this->expectException(\Exception::class);
 
-        new VatBreakdown(5, 1, VatCategory::STANDARD);
+        new VatBreakdown(5, 0, $vatCategory, $vatRate);
+    }
+
+    /**
+     * @return array<string, array{vatCategory: VatCategory, vatRate: ?float}>
+     */
+    public static function provideBR48FailingCases(): array
+    {
+        return [
+            'subject to vat without rate' => [
+                'vatCategory' => VatCategory::STANDARD,
+                'vatRate' => null,
+            ],
+            'not subject to vat with rate' => [
+                'vatCategory' => VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX,
+                'vatRate' => 0.2,
+            ],
+        ];
     }
 
     /**
@@ -1005,7 +1046,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array<int, array<int, string>>
      */
     public static function provideBR51ValidNumbers(): array
     {
@@ -1032,7 +1073,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array<int, array<int, string>>
      */
     public static function provideBR51InvalidNumbers(): array
     {
@@ -1059,20 +1100,104 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
 
     /**
      * @test
-     * @testdox @todo BR-53 : If the vat accounting currency code is present then the invoice total vat amount in accounting currency shall be provided
+     * @testdox BR-53 [cases with coherent currency and amount] : If the vat accounting currency code is present then the invoice total vat amount in accounting currency shall be provided
+     * @dataProvider provideBR53SuccessfulCases
      */
-    public function if_the_vat_accounting_currency_code_is_present_then_the_invoice_total_vat_amount_in_accounting_currency_shall_be_provided(): void
+    public function br53SuccessfulCases(?CurrencyCode $currencyCode, ?float $vatAmount): void
     {
-        $this->invoice->setDocumentTotals(new DocumentTotals(1, 1, 1, 1, 1));
-        $this->invoice->setVatAccountingCurrencyCode(CurrencyCode::CANADIAN_DOLLAR);
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            $currencyCode,
+            new DocumentTotals(0, 0, 0, 0, $vatAmount),
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::STANDARD),
+                new ItemInformation("A thing"),
+            )]
+        );
 
-        $this->assertSame(CurrencyCode::CANADIAN_DOLLAR, $this->invoice->getVatAccountingCurrencyCode());
-        $this->assertEquals(1, $this->invoice->getDocumentTotals()->getInvoiceTotalVatAmountInAccountingCurrency());
+        $this->assertSame($currencyCode, $invoice->getVatAccountingCurrencyCode());
+        $this->assertSame($vatAmount, $invoice->getDocumentTotals()->getInvoiceTotalVatAmountInAccountingCurrency());
+    }
 
-        $this->invoice->setVatAccountingCurrencyCode(CurrencyCode::CANADIAN_DOLLAR);
+    /**
+     * @return array<string, array{currencyCode: ?CurrencyCode, vatAmount: ?float}>
+     */
+    public static function provideBR53SuccessfulCases(): array
+    {
+        return [
+            'case with accounting currency code and with total vat amount in accounting currency' => [
+                'currencyCode' => CurrencyCode::CANADIAN_DOLLAR,
+                'vatAmount' => 1.0,
+            ],
+            'case without accounting currency code and without total vat amount in accounting currency' => [
+                'currencyCode' => null,
+                'vatAmount' => null,
+            ],
+        ];
+    }
 
+    /**
+     * @test
+     * @testdox BR-53 [cases with non-coherent currency and amount] : If the vat accounting currency code is present then the invoice total vat amount in accounting currency shall be provided
+     * @dataProvider provideBR53FailingCases
+     */
+    public function br53FailingCases(?CurrencyCode $currencyCode, ?float $vatAmount): void
+    {
         $this->expectException(\Exception::class);
-        $this->invoice->setDocumentTotals(new DocumentTotals(1,1,1,1));
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            $currencyCode,
+            new DocumentTotals(0, 0, 0, 0, $vatAmount),
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::STANDARD),
+                new ItemInformation("A thing"),
+            )]
+        );
+    }
+
+
+    /**
+     * @return array<string, array{currencyCode: ?CurrencyCode, vatAmount: ?float}>
+     */
+    public static function provideBR53FailingCases(): array
+    {
+        return [
+            'case with accounting currency code and without total vat amount in accounting currency' => [
+                'currencyCode' => CurrencyCode::CANADIAN_DOLLAR,
+                'vatAmount' => null,
+            ],
+            'case without accounting currency code and with total vat amount in accounting currency' => [
+                'currencyCode' => null,
+                'vatAmount' => 1.0,
+            ],
+        ];
     }
 
     /**
@@ -1128,30 +1253,82 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
 
     /**
      * @test BR-61
-     * @testdox @todo BR-61 : If the payment means type code means SEPA credit transfer local credit transfer or non SEPA international credit transfer the payment account identifier shall be present
+     * @testdox BR-61 [cases with coherent code and credit transfers] : If the payment means type code means SEPA credit transfer local credit transfer or non SEPA international credit transfer the payment account identifier shall be present
+     * @dataProvider provideBR61SuccessfulCases
+     *
+     * @param array<int, CreditTransfer> $creditTransfers
      */
-    public function br61(): void
+    public function br61SuccessfulCases(PaymentMeansCode $code, array $creditTransfers): void
     {
         $paymentInstructions = new PaymentInstructions(
-            PaymentMeansCode::CREDIT_TRANSFER,
-            [new CreditTransfer(new PaymentAccountIdentifier('id'))]
+            $code,
+            $creditTransfers
         );
 
-        $this->assertSame(PaymentMeansCode::CREDIT_TRANSFER, $paymentInstructions->getPaymentMeansTypeCode());
-        $this->assertInstanceOf(PaymentAccountIdentifier::class, $paymentInstructions->getCreditTransfers()[0]->getPaymentAccountIdentifier());
+        $this->assertSame($code, $paymentInstructions->getPaymentMeansTypeCode());
 
-        $paymentInstructions = new PaymentInstructions(
-            PaymentMeansCode::SEPA_CREDIT_TRANSFER,
-            [new CreditTransfer(new PaymentAccountIdentifier('id'))]
-        );
+        foreach ($paymentInstructions->getCreditTransfers() as $creditTransfer) {
+            $this->assertInstanceOf(PaymentAccountIdentifier::class, $creditTransfer->getPaymentAccountIdentifier());
+        }
+    }
 
-        $this->assertSame(PaymentMeansCode::SEPA_CREDIT_TRANSFER, $paymentInstructions->getPaymentMeansTypeCode());
-        $this->assertInstanceOf(PaymentAccountIdentifier::class, $paymentInstructions->getCreditTransfers()[0]->getPaymentAccountIdentifier());
+    /**
+     * @return array<string, array{code: PaymentMeansCode, creditTransfers: array<int, CreditTransfer>}>
+     */
+    public static function provideBR61SuccessfulCases(): array
+    {
+        return [
+            'with code credit transfer and with account identifier' => [
+                'code' => PaymentMeansCode::CREDIT_TRANSFER,
+                'creditTransfers' => [new CreditTransfer(new PaymentAccountIdentifier('id'))],
+            ],
+            'with code SEPA credit transfer and with account identifier' => [
+                'code' => PaymentMeansCode::SEPA_CREDIT_TRANSFER,
+                'creditTransfers' => [new CreditTransfer(new PaymentAccountIdentifier('id'))],
+            ],
+            'with other code and with account identifier' => [ // shall this case throw an exception ?
+                'code' => PaymentMeansCode::ACCEPTED_BILL_OF_EXCHANGE,
+                'creditTransfers' => [new CreditTransfer(new PaymentAccountIdentifier('id'))],
+            ],
+            'with other code and without account identifier' => [
+                'code' => PaymentMeansCode::ACCEPTED_BILL_OF_EXCHANGE,
+                'creditTransfers' => [],
+            ],
+        ];
+    }
 
+    /**
+     * @test BR-61
+     * @testdox BR-61 [cases with coherent code and credit transfers] : If the payment means type code means SEPA credit transfer local credit transfer or non SEPA international credit transfer the payment account identifier shall be present
+     * @dataProvider provideBR61FailingCases
+     *
+     * @param array<int, CreditTransfer> $creditTransfers
+     */
+    public function br61FailingCases(PaymentMeansCode $code, array $creditTransfers): void
+    {
         $this->expectException(\Exception::class);
 
-        new PaymentInstructions(PaymentMeansCode::SEPA_CREDIT_TRANSFER);
-        new PaymentInstructions(PaymentMeansCode::CREDIT_TRANSFER);
+        new PaymentInstructions(
+            $code,
+            $creditTransfers
+        );
+    }
+
+    /**
+     * @return array<string, array{code: PaymentMeansCode, creditTransfers: array<int, CreditTransfer>}>
+     */
+    public static function provideBR61FailingCases(): array
+    {
+        return [
+            'with code credit transfer and without account identifier' => [
+                'code' => PaymentMeansCode::CREDIT_TRANSFER,
+                'creditTransfers' => [],
+            ],
+            'with code SEPA credit transfer and without account identifier' => [
+                'code' => PaymentMeansCode::SEPA_CREDIT_TRANSFER,
+                'creditTransfers' => [],
+            ],
+        ];
     }
 
     /**

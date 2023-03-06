@@ -214,6 +214,7 @@ class Invoice
         ProcessControl $processControl,
         Seller $seller,
         Buyer $buyer,
+        ?CurrencyCode $vatAccountingCurrencyCode,
         DocumentTotals $documentTotals,
         array $vatBreakdowns,
         array $invoiceLines
@@ -240,12 +241,19 @@ class Invoice
             throw new \Exception('@todo');
         }
 
+        if (
+            $vatAccountingCurrencyCode instanceof CurrencyCode
+            xor is_float($documentTotals->getInvoiceTotalVatAmountInAccountingCurrency())
+        ) {
+            throw new \Exception('@todo');
+        }
+
         $this->number = $number;
         $this->issueDate = $issueDate;
         $this->typeCode = $typeCode;
         $this->invoiceNote = [];
         $this->currencyCode = $currencyCode;
-        $this->vatAccountingCurrencyCode = null;
+        $this->vatAccountingCurrencyCode = $vatAccountingCurrencyCode;
         $this->processControl = $processControl;
         $this->seller = $seller;
         $this->buyer = $buyer;
@@ -282,20 +290,6 @@ class Invoice
     public function getVatAccountingCurrencyCode(): ?CurrencyCode
     {
         return $this->vatAccountingCurrencyCode;
-    }
-
-    public function setVatAccountingCurrencyCode(?CurrencyCode $vatAccountingCurrencyCode): self
-    {
-        if (
-            $vatAccountingCurrencyCode instanceof CurrencyCode
-            && !is_float($this->documentTotals->getInvoiceTotalVatAmountInAccountingCurrency())
-        ) {
-            throw new \Exception('@todo');
-        }
-
-        $this->vatAccountingCurrencyCode = $vatAccountingCurrencyCode;
-
-        return $this;
     }
 
     public function getValueAddedTaxPointDate(): ?\DateTimeInterface
@@ -553,20 +547,6 @@ class Invoice
     public function getDocumentTotals(): DocumentTotals
     {
         return $this->documentTotals;
-    }
-
-    public function setDocumentTotals(DocumentTotals $documentTotals): self
-    {
-        if (
-            $this->vatAccountingCurrencyCode instanceof CurrencyCode
-            && !is_float($documentTotals->getInvoiceTotalVatAmountInAccountingCurrency())
-        ) {
-            throw new \Exception('@todo');
-        }
-
-        $this->documentTotals = $documentTotals;
-
-        return $this;
     }
 
     /**

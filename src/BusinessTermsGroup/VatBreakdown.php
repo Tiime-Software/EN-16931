@@ -68,7 +68,7 @@ class VatBreakdown
         VatCategory $vatCategoryCode,
         ?float $vatCategoryRate = null,
     ) {
-        if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX && !is_float($vatCategoryRate)) {
+        if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX xor is_float($vatCategoryRate)) {
             throw new \Exception('@todo');
         }
 
@@ -110,31 +110,9 @@ class VatBreakdown
         return $this->vatCategoryCode;
     }
 
-    public function setVatCategoryCode(VatCategory $vatCategoryCode): self
-    {
-        if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX && !is_float($this->vatCategoryRate)) {
-            throw new \Exception('@todo');
-        }
-
-        $this->vatCategoryCode = $vatCategoryCode;
-
-        return $this;
-    }
-
     public function getVatCategoryRate(): ?float
     {
         return $this->vatCategoryRate;
-    }
-
-    public function setVatCategoryRate(?float $vatCategoryRate): self
-    {
-        if ($this->vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX && !is_float($vatCategoryRate)) {
-            throw new \Exception('@todo');
-        }
-
-        $this->vatCategoryRate = $vatCategoryRate;
-
-        return $this;
     }
 
     public function getVatExemptionReasonText(): ?string
