@@ -80,7 +80,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD),
                 new ItemInformation("A thing"),
-            )]
+            )],
+            null,
+            null,
         ))
             ->setBuyerReference("SERVEXEC")
             ->addIncludedNote(
@@ -261,7 +263,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             new DocumentTotals(0, 0, 0, 0),
             [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
-            []
+            [],
+            null,
+            null,
         );
     }
 
@@ -284,7 +288,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             new DocumentTotals(0, 0, 0, 0),
             [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
-            $lines
+            $lines,
+            null,
+            null,
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -1237,7 +1243,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         );
 
         $this->assertInstanceOf(VatIdentifier::class, $sellerTaxRepresentativeParty->getVatIdentifier());
-        $this->assertSame('123', $sellerTaxRepresentativeParty->getVatIdentifier()->value);
+        $this->assertSame('123', $sellerTaxRepresentativeParty->getVatIdentifier()->getValue());
     }
 
     /**

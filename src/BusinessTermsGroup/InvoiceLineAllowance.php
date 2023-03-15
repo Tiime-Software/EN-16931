@@ -44,7 +44,7 @@ class InvoiceLineAllowance
 
     public function __construct(float $amount, ?string $reason = null, ?AllowanceReasonCode $reasonCode = null)
     {
-        if (!is_string($reason) && !$reasonCode instanceof AllowanceReasonCode) {
+        if ((!is_string($reason) || empty($reason)) && !$reasonCode instanceof AllowanceReasonCode) {
             throw new \Exception('@todo');
         }
 
@@ -96,31 +96,8 @@ class InvoiceLineAllowance
         return $this->reason;
     }
 
-    public function setReason(?string $reason): self
-    {
-        if (!is_string($reason) && !$this->reasonCode instanceof AllowanceReasonCode) {
-            throw new \Exception('@todo');
-        }
-
-
-        $this->reason = $reason;
-
-        return $this;
-    }
-
     public function getReasonCode(): ?AllowanceReasonCode
     {
         return $this->reasonCode;
-    }
-
-    public function setReasonCode(?AllowanceReasonCode $reasonCode): self
-    {
-        if (!is_string($this->reason) && !$reasonCode instanceof AllowanceReasonCode) {
-            throw new \Exception('@todo');
-        }
-
-        $this->reasonCode = $reasonCode;
-
-        return $this;
     }
 }

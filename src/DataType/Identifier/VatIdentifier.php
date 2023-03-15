@@ -2,10 +2,27 @@
 
 namespace Tiime\EN16931\DataType\Identifier;
 
+use Tiime\EN16931\DataType\CountryAlpha2Code;
+
 class VatIdentifier
 {
-    public function __construct(public readonly string $value)
+    private string $value;
+
+    public function __construct(string $value)
     {
-        // @todo : $value should be typed VatIdentificationNumber
+        $countryCode = substr($value, 0, 2);
+
+        if (null === CountryAlpha2Code::tryFrom($countryCode) && $countryCode !== 'EL') {
+            throw new \Exception('@todo');
+        }
+
+        $this->value = $value;
+
+        // @todo : Verification for length ? 13 SellerTaxRepresentativeTradeParty / 15 Buyer / 14 Seller (Annexe 1)
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
     }
 }

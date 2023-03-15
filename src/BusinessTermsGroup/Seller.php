@@ -73,11 +73,31 @@ class Seller
 
     private ?SellerContact $contact;
 
-    public function __construct(string $name, SellerPostalAddress $address)
-    {
+    /**
+     * @param array<int, SellerIdentifier> $identifiers
+     */
+    public function __construct(
+        string $name,
+        SellerPostalAddress $address,
+        array $identifiers,
+        ?LegalRegistrationIdentifier $legalRegistrationIdentifier,
+        ?VatIdentifier $vatIdentifier,
+    ) {
         $this->name = $name;
         $this->address = $address;
+        $this->legalRegistrationIdentifier = $legalRegistrationIdentifier;
+        $this->vatIdentifier = $vatIdentifier;
+
         $this->identifiers = [];
+        foreach ($identifiers as $identifier) {
+            if ($identifier instanceof SellerIdentifier) {
+                $this->identifiers[] = $identifier;
+            }
+        }
+
+        if (empty($this->identifiers) && null === $legalRegistrationIdentifier && null === $vatIdentifier) {
+            throw new \Exception('@todo');
+        }
     }
 
     public function getName(): string

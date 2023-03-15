@@ -30,6 +30,10 @@ class InvoicingPeriod
             throw new \Exception('@todo');
         }
 
+        if (null === $startDate && null === $endDate) {
+            throw new \Exception('@todo : BR-CO-19');
+        }
+
         $this->startDate = $startDate;
         $this->endDate = $endDate;
     }

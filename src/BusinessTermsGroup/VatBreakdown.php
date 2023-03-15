@@ -4,6 +4,10 @@ namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\DataType\VatExoneration;
+use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\IntNumber;
+use Tiime\EN16931\SemanticDataType\Percentage;
+use Tiime\EN16931\SemanticDataType\SemanticDataType;
 
 /**
  * BG-23
@@ -20,7 +24,7 @@ class VatBreakdown
      * Somme de tous les montants soumis à taxes assujettis à un code et à un taux de type de
      * TVA spécifiques (si le Taux de type de TVA est applicable).
      */
-    private float $vatCategoryTaxableAmount;
+    private Amount $vatCategoryTaxableAmount;
 
     /**
      * BT-117
@@ -28,7 +32,7 @@ class VatBreakdown
      *
      * Montant total de la TVA pour un type donné de TVA.
      */
-    private float $vatCategoryTaxAmount;
+    private Amount $vatCategoryTaxAmount;
 
     /**
      * BT-118
@@ -44,7 +48,7 @@ class VatBreakdown
      *
      * Taux de TVA, exprimé sous forme de pourcentage, applicable au type de TVA correspondant.
      */
-    private ?float $vatCategoryRate;
+    private ?Percentage $vatCategoryRate;
 
     /**
      * BT-120
@@ -72,35 +76,41 @@ class VatBreakdown
             throw new \Exception('@todo');
         }
 
-        $this->vatCategoryTaxableAmount = $vatCategoryTaxableAmount;
-        $this->vatCategoryTaxAmount = $vatCategoryTaxAmount;
+        $this->vatCategoryTaxableAmount = new Amount($vatCategoryTaxableAmount);
+        $this->vatCategoryTaxAmount = new Amount($vatCategoryTaxAmount);
         $this->vatCategoryCode = $vatCategoryCode;
-        $this->vatCategoryRate = $vatCategoryRate;
+        $this->vatCategoryRate = $vatCategoryRate !== null ? new Percentage($vatCategoryRate) : $vatCategoryRate;
 
         $this->vatExemptionReasonText = null;
         $this->vatExemptionReasonCode = null;
+
+        $BT119_divided_100 = ($this->vatCategoryRate ?? new Percentage(0.00))->divide(new IntNumber(100));
+        $BT119_100_multiply_BT117 = $this->vatCategoryTaxableAmount->multiply(new Amount($BT119_divided_100), Amount::DECIMALS);
+        if ($this->vatCategoryTaxAmount->getValue() !== $BT119_100_multiply_BT117) {
+            throw new \Exception('@todo : BR-CO-17');
+        }
     }
 
     public function getVatCategoryTaxableAmount(): float
     {
-        return $this->vatCategoryTaxableAmount;
+        return $this->vatCategoryTaxableAmount->getValue();
     }
 
     public function setVatCategoryTaxableAmount(float $vatCategoryTaxableAmount): self
     {
-        $this->vatCategoryTaxableAmount = $vatCategoryTaxableAmount;
+        $this->vatCategoryTaxableAmount = new Amount($vatCategoryTaxableAmount);
 
         return $this;
     }
 
     public function getVatCategoryTaxAmount(): float
     {
-        return $this->vatCategoryTaxAmount;
+        return $this->vatCategoryTaxAmount->getValue();
     }
 
     public function setVatCategoryTaxAmount(float $vatCategoryTaxAmount): self
     {
-        $this->vatCategoryTaxAmount = $vatCategoryTaxAmount;
+        $this->vatCategoryTaxAmount = new Amount($vatCategoryTaxAmount);
 
         return $this;
     }
@@ -112,7 +122,7 @@ class VatBreakdown
 
     public function getVatCategoryRate(): ?float
     {
-        return $this->vatCategoryRate;
+        return $this->vatCategoryRate?->getValue();
     }
 
     public function getVatExemptionReasonText(): ?string

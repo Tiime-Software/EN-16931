@@ -63,7 +63,7 @@ class DocumentLevelCharge
         ?string $reason = null,
         ?ChargeReasonCode $reasonCode = null
     ) {
-        if (!is_string($reason) && !$reasonCode instanceof ChargeReasonCode) {
+        if ((!is_string($reason) || empty($reason)) && !$reasonCode instanceof ChargeReasonCode) {
             throw new \Exception('@todo');
         }
 
@@ -141,30 +141,8 @@ class DocumentLevelCharge
         return $this->reason;
     }
 
-    public function setReason(?string $reason): self
-    {
-        if (!is_string($reason) && !$this->reasonCode instanceof ChargeReasonCode) {
-            throw new \Exception('@todo');
-        }
-
-        $this->reason = $reason;
-
-        return $this;
-    }
-
     public function getReasonCode(): ?ChargeReasonCode
     {
         return $this->reasonCode;
-    }
-
-    public function setReasonCode(?ChargeReasonCode $reasonCode): self
-    {
-        if (!is_string($this->reason) && !$reasonCode instanceof ChargeReasonCode) {
-            throw new \Exception('@todo');
-        }
-
-        $this->reasonCode = $reasonCode;
-
-        return $this;
     }
 }

@@ -217,7 +217,11 @@ class Invoice
         ?CurrencyCode $vatAccountingCurrencyCode,
         DocumentTotals $documentTotals,
         array $vatBreakdowns,
-        array $invoiceLines
+        array $invoiceLines,
+        ?\DateTimeInterface $valueAddedTaxPointDate,
+        ?DateCode2005 $valueAddedTaxPointDateCode,
+        ?\DateTimeInterface $paymentDueDate,
+        ?string $paymentTerms
     ) {
         $this->vatBreakdowns = [];
         foreach ($vatBreakdowns as $vatBreakdown) {
@@ -248,16 +252,31 @@ class Invoice
             throw new \Exception('@todo');
         }
 
+        if (
+            $valueAddedTaxPointDate instanceof \DateTimeInterface
+            && $valueAddedTaxPointDateCode instanceof DateCode2005
+        ) {
+            throw new \Exception('@todo');
+        }
+
+        if ($documentTotals->getAmountDueForPayment() > 0 && null === $paymentDueDate && empty($paymentTerms)) {
+            throw new \Exception('@todo (BR-CO-25)');
+        }
+
         $this->number = $number;
         $this->issueDate = $issueDate;
         $this->typeCode = $typeCode;
         $this->invoiceNote = [];
         $this->currencyCode = $currencyCode;
         $this->vatAccountingCurrencyCode = $vatAccountingCurrencyCode;
+        $this->valueAddedTaxPointDate = $valueAddedTaxPointDate;
+        $this->valueAddedTaxPointDateCode = $valueAddedTaxPointDateCode;
         $this->processControl = $processControl;
         $this->seller = $seller;
         $this->buyer = $buyer;
         $this->documentTotals = $documentTotals;
+        $this->paymentDueDate = $paymentDueDate;
+        $this->paymentTerms = $paymentTerms;
 
         $this->buyerReference = null;
         $this->deliveryInformation = null;
@@ -297,35 +316,14 @@ class Invoice
         return $this->valueAddedTaxPointDate;
     }
 
-    public function setValueAddedTaxPointDate(?\DateTimeInterface $valueAddedTaxPointDate): self
-    {
-        $this->valueAddedTaxPointDate = $valueAddedTaxPointDate;
-
-        return $this;
-    }
-
     public function getValueAddedTaxPointDateCode(): ?DateCode2005
     {
         return $this->valueAddedTaxPointDateCode;
     }
 
-    public function setValueAddedTexPointDateCode(?DateCode2005 $valueAddedTaxPointDateCode): self
-    {
-        $this->valueAddedTaxPointDateCode = $valueAddedTaxPointDateCode;
-
-        return $this;
-    }
-
     public function getPaymentDueDate(): ?\DateTimeInterface
     {
         return $this->paymentDueDate;
-    }
-
-    public function setPaymentDueDate(?\DateTimeInterface $paymentDueDate): self
-    {
-        $this->paymentDueDate = $paymentDueDate;
-
-        return $this;
     }
 
     public function getBuyerReference(): ?string
@@ -444,13 +442,6 @@ class Invoice
     public function getPaymentTerms(): ?string
     {
         return $this->paymentTerms;
-    }
-
-    public function setPaymentTerms(?string $paymentTerms): self
-    {
-        $this->paymentTerms = $paymentTerms;
-
-        return $this;
     }
 
     /**
