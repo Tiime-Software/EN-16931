@@ -2,6 +2,7 @@
 
 namespace Tests\Tiime\EN16931;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
@@ -63,7 +64,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -76,8 +83,10 @@ class BusinessRulesConditionsTest extends TestCase
             )],
             null,
             null,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -107,7 +116,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -120,8 +135,10 @@ class BusinessRulesConditionsTest extends TestCase
             )],
             new \DateTimeImmutable(),
             null,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -151,7 +168,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -164,8 +187,10 @@ class BusinessRulesConditionsTest extends TestCase
             )],
             null,
             DateCode2005::DELIVERY_DATE_TIME,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -197,7 +222,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             CurrencyCode::CANADIAN_DOLLAR,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -210,8 +241,10 @@ class BusinessRulesConditionsTest extends TestCase
             )],
             new \DateTimeImmutable(),
             DateCode2005::DELIVERY_DATE_TIME,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         );
     }
 
@@ -359,13 +392,21 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals($total, 0, 0, 0),
+            new DocumentTotals(
+                $total,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             $invoiceLines,
             null,
             null,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $invoiceLinesFromObject = $invoice->getInvoiceLines();
@@ -446,13 +487,21 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals($total, 0, 0, 0),
+            new DocumentTotals(
+                $total,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             $invoiceLines,
             null,
             null,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $invoiceLinesFromObject = $invoice->getInvoiceLines();
@@ -479,19 +528,341 @@ class BusinessRulesConditionsTest extends TestCase
     /**
      * @test
      * @testdox BR-CO-11 : Sum of allowances on document level (BT-107) = ∑ Document level allowance amount (BT-92).
+     * @dataProvider provideBrCo11Success
      */
-    public function brCo11(): void
+    public function brCo11_success(DocumentTotals $documentTotals, array $documentLevelAllowances): void
     {
-        $this->markTestSkipped('@todo');
+        $invoice = (new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotals,
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            []
+        ));
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrCo11Success(): \Generator
+    {
+        yield 'BR-CO-11 Success #1' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfAllowancesOnDocumentLevel: 100
+                ),
+            'documentLevelAllowances' => [
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+            ]
+        ];
+        yield 'BR-CO-11 Success #2' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfAllowancesOnDocumentLevel: 0
+                ),
+            'documentLevelAllowances' => [
+                new DocumentLevelAllowance(0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+            ]
+        ];
+        yield 'BR-CO-11 Success #3' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfAllowancesOnDocumentLevel: 1100.00
+                ),
+            'documentLevelAllowances' => [
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD),
+                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+            ]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-CO-11 : Sum of allowances on document level (BT-107) = ∑ Document level allowance amount (BT-92).
+     * @dataProvider provideBrCo11Error
+     */
+    public function brCo11_error(DocumentTotals $documentTotals, array $documentLevelAllowances): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotals,
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            []
+        );
+    }
+
+    public static function provideBrCo11Error(): \Generator
+    {
+        yield 'BR-CO-11 Error #1' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfAllowancesOnDocumentLevel: 1000.00
+                ),
+            'documentLevelAllowances' => [
+                new DocumentLevelAllowance(0.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+            ]
+        ];
+        yield 'BR-CO-11 Error #2' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfAllowancesOnDocumentLevel: 1000.00
+                ),
+            'documentLevelAllowances' => [
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD),
+                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+            ]
+        ];
     }
 
     /**
      * @test
      * @testdox BR-CO-12 : Sum of charges on document level (BT-108) = ∑ Document level charge amount (BT-99).
+     * @dataProvider provideBrCo12Success
      */
-    public function brCo12(): void
+    public function brCo12_success(DocumentTotals $documentTotals, array $documentLevelCharges): void
     {
-        $this->markTestSkipped('@todo');
+        $invoice = (new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotals,
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            $documentLevelCharges
+        ));
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrCo12Success(): \Generator
+    {
+        yield 'BR-CO-12 Success #1' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfChargesOnDocumentLevel: 100
+                ),
+            'documentLevelCharges' => [
+                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+            ]
+        ];
+        yield 'BR-CO-12 Success #2' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfChargesOnDocumentLevel: 0
+                ),
+            'documentLevelCharges' => [
+                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+            ]
+        ];
+        yield 'BR-CO-12 Success #3' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfChargesOnDocumentLevel: 1100.00
+                ),
+            'documentLevelCharges' => [
+                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING),
+                new DocumentLevelCharge(1000.0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+            ]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-CO-12 : Sum of charges on document level (BT-108) = ∑ Document level charge amount (BT-99).
+     * @dataProvider provideBrCo12Error
+     */
+    public function brCo12_error(DocumentTotals $documentTotals, array $documentLevelCharges): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotals,
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            $documentLevelCharges
+        );
+    }
+
+    public static function provideBrCo12Error(): \Generator
+    {
+        yield 'BR-CO-12 Error #1' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfChargesOnDocumentLevel: 1000
+                ),
+            'documentLevelCharges' => [
+                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+            ]
+        ];
+        yield 'BR-CO-12 Error #2' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    20,
+                    20,
+                    invoiceTotalVatAmount: 20,
+                    sumOfChargesOnDocumentLevel: 1000
+                ),
+            'documentLevelCharges' => [
+                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING),
+                new DocumentLevelCharge(1000, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+            ]
+        ];
     }
 
     /**
@@ -506,10 +877,195 @@ class BusinessRulesConditionsTest extends TestCase
     /**
      * @test
      * @testdox BR-CO-14 : Invoice total VAT amount (BT-110) = ∑ VAT category tax amount (BT-117).
+     * @dataProvider provideBrCo14Success
      */
-    public function brCo14(): void
+    public function brCo14_success(DocumentTotals $documentTotals, array $vatBreakdowns): void
     {
-        $this->markTestSkipped('@todo');
+        $invoice = (new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotals,
+            $vatBreakdowns,
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            []
+        ));
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrCo14Success(): \Generator
+    {
+        yield 'BR-CO-14 Success #1' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    250,
+                    250,
+                    invoiceTotalVatAmount: 250
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 250, VatCategory::STANDARD, 25)
+            ]
+        ];
+        yield 'BR-CO-14 Success #2' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    400,
+                    400,
+                    invoiceTotalVatAmount: 400
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 250, VatCategory::STANDARD, 25),
+                new VatBreakdown(600, 150, VatCategory::STANDARD, 25)
+            ]
+        ];
+        yield 'BR-CO-14 Success #3' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    250,
+                    250,
+                    invoiceTotalVatAmount: 250.0
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 250, VatCategory::STANDARD, 25),
+                new VatBreakdown(0, 0, VatCategory::STANDARD, 0)
+            ]
+        ];
+        yield 'BR-CO-14 Success #4' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    0,
+                    0,
+                    invoiceTotalVatAmount: 00
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(0, 0, VatCategory::STANDARD, 0),
+                new VatBreakdown(0, 0.00, VatCategory::STANDARD, 0)
+            ]
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-CO-14 : Invoice total VAT amount (BT-110) = ∑ VAT category tax amount (BT-117).
+     * @dataProvider provideBrCo14Error
+     */
+    public function brCo14_error(DocumentTotals $documentTotals, array $vatBreakdowns): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotals,
+            $vatBreakdowns,
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                0,
+                new PriceDetails(12),
+                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            []
+        );
+    }
+
+    public static function provideBrCo14Error(): \Generator
+    {
+        yield 'BR-CO-14 Error #1' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    250,
+                    250,
+                    invoiceTotalVatAmount: 250
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(600, 300, VatCategory::STANDARD, 50)
+            ]
+        ];
+        yield 'BR-CO-14 Error #2' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    300,
+                    300,
+                    invoiceTotalVatAmount: 300
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 250, VatCategory::STANDARD, 25),
+                new VatBreakdown(600, 150, VatCategory::STANDARD, 25)
+            ]
+        ];
+        yield 'BR-CO-14 Error #3' => [
+            'documentTotals' =>
+                new DocumentTotals(
+                    0,
+                    0,
+                    1,
+                    1,
+                    invoiceTotalVatAmount: 1
+                ),
+            'vatBreakdowns' => [
+                new VatBreakdown(0, 0, VatCategory::STANDARD, 0),
+                new VatBreakdown(0, 0, VatCategory::STANDARD, 0)
+            ]
+        ];
     }
 
     /**
@@ -517,7 +1073,12 @@ class BusinessRulesConditionsTest extends TestCase
      * @testdox BR-CO-15 : Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-109) + Invoice total VAT amount (BT-110).
      * @dataProvider provideBrCo15_success
      */
-    public function brCo15_success(float $invoiceTotalAmountWithoutVat, ?float $invoiceTotalVatAmount, float $invoiceTotalAmountWithVat, float $amountDueForPayment): void
+    public function brCo15_success(
+        float $invoiceTotalAmountWithoutVat,
+        ?float $invoiceTotalVatAmount,
+        float $invoiceTotalAmountWithVat,
+        float $amountDueForPayment
+    ): void
     {
         $documentTotals = new DocumentTotals(
             0,
@@ -535,22 +1096,40 @@ class BusinessRulesConditionsTest extends TestCase
     {
         // BT-109, BT-110, BT-112, BT-115
         yield 'Standard calculation' => [
-            1000, 300, 1300, 1300
+            'invoiceTotalAmountWithoutVat' => 1000,
+            'invoiceTotalVatAmount' => 300,
+            'invoiceTotalAmountWithVat' => 1300,
+            'amountDueForPayment' => 1300
         ];
         yield 'Standard calculation with VAT to null' => [
-            1300, null, 1300, 1300
+            'invoiceTotalAmountWithoutVat' => 1300,
+            'invoiceTotalVatAmount' => null,
+            'invoiceTotalAmountWithVat' => 1300,
+            'amountDueForPayment' => 1300
         ];
         yield 'Standard calculation with VAT to 0' => [
-            1300, 0, 1300, 1300
+            'invoiceTotalAmountWithoutVat' => 1300,
+            'invoiceTotalVatAmount' => 0,
+            'invoiceTotalAmountWithVat' => 1300,
+            'amountDueForPayment' => 1300
         ];
         yield 'Calculation with Invoice Total Amount Without VAT < 0' => [
-            -100, 300, 200, 200
+            'invoiceTotalAmountWithoutVat' => -100,
+            'invoiceTotalVatAmount' => 300,
+            'invoiceTotalAmountWithVat' => 200,
+            'amountDueForPayment' => 200
         ];
         yield 'Calculation with Invoice Total Amount Without VAT < 0 and Invoice Total Amount With VAT = 0' => [
-            -100, 100, 0.0, 0.0
+            'invoiceTotalAmountWithoutVat' => -100,
+            'invoiceTotalVatAmount' => 100,
+            'invoiceTotalAmountWithVat' => 0.0,
+            'amountDueForPayment' => 0.0
         ];
         yield 'Calculation with all data = 0' => [
-            0.00, 0, 0.0, 0.0
+            'invoiceTotalAmountWithoutVat' => 0.00,
+            'invoiceTotalVatAmount' => 0,
+            'invoiceTotalAmountWithVat' => 0.0,
+            'amountDueForPayment' => 0.0
         ];
     }
 
@@ -670,36 +1249,65 @@ class BusinessRulesConditionsTest extends TestCase
 
     public static function provideBrCo17_success(): \Generator
     {
-        // BT-116, BT-117, BT-118, BT-119
         yield 'BR-CO-17 Success #1' => [
-            1000, 250, VatCategory::STANDARD, 25
+            'vatCategoryTaxableAmount' => 1000,
+            'vatCategoryTaxAmount' => 250,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 25
         ];
         yield 'BR-CO-17 Success #2' => [
-            -6491.34, -1622.84, VatCategory::STANDARD, 25
+            'vatCategoryTaxableAmount' => -6491.34,
+            'vatCategoryTaxAmount' => -1622.84,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 25
         ];
         yield 'BR-CO-17 Success #3' => [
-            2141.05, 299.75, VatCategory::STANDARD, 14
+            'vatCategoryTaxableAmount' => 2141.05,
+            'vatCategoryTaxAmount' => 299.75,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 14
         ];
         yield 'BR-CO-17 Success #4' => [
-            2141.05, .00, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null
+            'vatCategoryTaxableAmount' => 2141.05,
+            'vatCategoryTaxAmount' => .00,
+            'vatCategoryCode' => VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX,
+            'vatCategoryRate' => null
         ];
         yield 'BR-CO-17 Success #5' => [
-            2141.19, 44.96, VatCategory::STANDARD, 2.1
+            'vatCategoryTaxableAmount' => 2141.19,
+            'vatCategoryTaxAmount' => 44.96,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 2.1
         ];
         yield 'BR-CO-17 Success #6' => [
-            2141.19, 0.0, VatCategory::STANDARD, 0
+            'vatCategoryTaxableAmount' => 2141.19,
+            'vatCategoryTaxAmount' => 0.0,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 0
         ];
         yield 'BR-CO-17 Success #7' => [
-            -2141.19, -117.77, VatCategory::STANDARD, 5.5
+            'vatCategoryTaxableAmount' => -2141.19,
+            'vatCategoryTaxAmount' => -117.77,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 5.5
         ];
         yield 'BR-CO-17 Success #8' => [
-            -25.00, 0.00, VatCategory::STANDARD, 0
+            'vatCategoryTaxableAmount' => -25.00,
+            'vatCategoryTaxAmount' => 0.00,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 0
         ];
         yield 'BR-CO-17 Success #9' => [
-            -2141.19, -117.77, VatCategory::STANDARD, 5.5
+            'vatCategoryTaxableAmount' => -2141.19,
+            'vatCategoryTaxAmount' => -117.77,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 5.5
         ];
         yield 'BR-CO-17 Success #10' => [
-            6491.34, 1622.84, VatCategory::STANDARD, 25
+            'vatCategoryTaxableAmount' => 6491.34,
+            'vatCategoryTaxAmount' => 1622.84,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 25
         ];
     }
 
@@ -729,10 +1337,28 @@ class BusinessRulesConditionsTest extends TestCase
     {
         // BT-116, BT-117, BT-118, BT-119
         yield 'BR-CO-17 Error #1' => [
-            1000, 251, VatCategory::STANDARD, 25
+            'vatCategoryTaxableAmount' => 1000,
+            'vatCategoryTaxAmount' => 251,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 25
         ];
         yield 'BR-CO-17 Error #2' => [
-            2141.19, 43.91, VatCategory::STANDARD, 2.1
+            'vatCategoryTaxableAmount' => 2141.19,
+            'vatCategoryTaxAmount' => 43.91,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 2.1
+        ];
+        yield 'BR-CO-17 Error #3' => [
+            'vatCategoryTaxableAmount' => 2141.194,
+            'vatCategoryTaxAmount' => 43.91,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 2.1
+        ];
+        yield 'BR-CO-17 Error #4' => [
+            'vatCategoryTaxableAmount' => 2141.19,
+            'vatCategoryTaxAmount' => 43.919,
+            'vatCategoryCode' => VatCategory::STANDARD,
+            'vatCategoryRate' => 2.1
         ];
     }
 
@@ -758,7 +1384,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -771,8 +1403,10 @@ class BusinessRulesConditionsTest extends TestCase
             )],
             null,
             null,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $this->assertEquals(1, count($invoice->getVatBreakdowns()));
@@ -816,7 +1450,9 @@ class BusinessRulesConditionsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         );
     }
 
@@ -837,13 +1473,16 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo19_success(): \Generator
     {
         yield 'Invoicing period start date (BT-73) is present' => [
-            new \DateTimeImmutable('2021-01-02'), null
+            'startDate' => new \DateTimeImmutable('2021-01-02'),
+            'endDate' => null
         ];
         yield 'Invoicing period end date (BT-74) is present' => [
-            null, new \DateTimeImmutable('2021-01-03')
+            'startDate' => null,
+            'endDate' => new \DateTimeImmutable('2021-01-03')
         ];
         yield 'Invoicing period start date (BT-73) and Invoicing period end date (BT-74) are present' => [
-            new \DateTimeImmutable('2021-01-02'), new \DateTimeImmutable('2021-01-03')
+            'startDate' => new \DateTimeImmutable('2021-01-02'),
+            'endDate' => new \DateTimeImmutable('2021-01-03')
         ];
     }
 
@@ -876,13 +1515,16 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo20_success(): \Generator
     {
         yield 'Invoice line period start date (BT-134) is present' => [
-            new \DateTimeImmutable('2021-01-02'), null
+            'startDate' => new \DateTimeImmutable('2021-01-02'),
+            'endDate' => null
         ];
         yield 'Invoice line period end date (BT-135) is present' => [
-            null, new \DateTimeImmutable('2021-01-03')
+            'startDate' => null,
+            'endDate' => new \DateTimeImmutable('2021-01-03')
         ];
         yield 'Invoice line period start date (BT-134) and Invoice line period end date (BT-135) are present' => [
-            new \DateTimeImmutable('2021-01-02'), new \DateTimeImmutable('2021-01-03')
+            'startDate' => new \DateTimeImmutable('2021-01-02'),
+            'endDate' => new \DateTimeImmutable('2021-01-03')
         ];
     }
 
@@ -914,13 +1556,16 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo21_success(): \Generator
     {
         yield 'Document level allowance reason (BT-97) is present' => [
-            'Reason', null
+            'reason' => 'Reason',
+            'reasonCode' => null
         ];
         yield 'Document level allowance reason code (BT-98) is present' => [
-            null, AllowanceReasonCode::STANDARD
+            'reason' => null,
+            'reasonCode' => AllowanceReasonCode::STANDARD
         ];
         yield 'Document level allowance reason (BT-97) and Document level allowance reason code (BT-98) are present' => [
-            'Reason', AllowanceReasonCode::STANDARD
+            'reason' => 'Reason',
+            'reasonCode' => AllowanceReasonCode::STANDARD
         ];
     }
 
@@ -939,10 +1584,12 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo21_error(): \Generator
     {
         yield 'Document level allowance reason (BT-97) as an empty string' => [
-            '', null
+            'reason' => '',
+            'reasonCode' => null
         ];
         yield 'Document level allowance reason (BT-97) and Document level allowance reason code (BT-98) are null' => [
-            null, null
+            'reason' => null,
+            'reasonCode' => null
         ];
     }
 
@@ -963,13 +1610,16 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo22_success(): \Generator
     {
         yield 'Document level charge reason (BT-104) is present' => [
-            'Reason', null
+            'reason' => 'Reason',
+            'reasonCode' => null
         ];
         yield 'Document level charge reason code (BT-105) is present' => [
-            null, ChargeReasonCode::ADVERTISING
+            'reason' => null,
+            'reasonCode' => ChargeReasonCode::ADVERTISING
         ];
         yield 'Document level charge reason (BT-104) and Document level charge reason code (BT-105) are present' => [
-            'Reason', ChargeReasonCode::ADVERTISING
+            'reason' => 'Reason',
+            'reasonCode' => ChargeReasonCode::ADVERTISING
         ];
     }
 
@@ -988,10 +1638,12 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo22_error(): \Generator
     {
         yield 'Document level charge reason (BT-104) as an empty string' => [
-            '', null
+            'reason' => '',
+            'reasonCode' => null
         ];
         yield 'Document level charge reason (BT-104) and Document level charge reason code (BT-105) are null' => [
-            null, null
+            'reason' => null,
+            'reasonCode' => null
         ];
     }
 
@@ -1012,13 +1664,16 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo23_success(): \Generator
     {
         yield 'Invoice line allowance reason (BT-139) is present' => [
-            'Reason', null
+            'reason' => 'Reason',
+            'reasonCode' => null
         ];
         yield 'Invoice line allowance reason code (BT-140) is present' => [
-            null, AllowanceReasonCode::STANDARD
+            'reason' => null,
+            'reasonCode' => AllowanceReasonCode::STANDARD
         ];
         yield 'Invoice line allowance reason (BT-139) and Invoice line allowance reason code (BT-140) are present' => [
-            'Reason', AllowanceReasonCode::STANDARD
+            'reason' => 'Reason',
+            'reasonCode' => AllowanceReasonCode::STANDARD
         ];
     }
 
@@ -1037,10 +1692,12 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo23_error(): \Generator
     {
         yield 'Invoice line allowance reason (BT-139) as an empty string' => [
-            '', null
+            'reason' => '',
+            'reasonCode' => null
         ];
         yield 'Invoice line allowance reason (BT-139) and Invoice line allowance reason code (BT-140) are null' => [
-            null, null
+            'reason' => null,
+            'reasonCode' => null
         ];
     }
 
@@ -1061,13 +1718,16 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo24_success(): \Generator
     {
         yield 'Invoice line charge reason (BT-144) is present' => [
-            'Reason', null
+            'reason' => 'Reason',
+            'reasonCode' => null
         ];
         yield 'Invoice line charge reason code (BT-145) is present' => [
-            null, ChargeReasonCode::ADVERTISING
+            'reason' => null,
+            'reasonCode' => ChargeReasonCode::ADVERTISING
         ];
         yield 'Invoice line charge reason (BT-144) and Invoice line charge reason code (BT-145) are present' => [
-            'Reason', ChargeReasonCode::ADVERTISING
+            'reason' => 'Reason',
+            'reasonCode' => ChargeReasonCode::ADVERTISING
         ];
     }
 
@@ -1086,10 +1746,12 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo24_error(): \Generator
     {
         yield 'Invoice line charge reason (BT-144) as an empty string' => [
-            '', null
+            'reason' => '',
+            'reasonCode' => null
         ];
         yield 'Invoice line charge reason (BT-144) and Invoice line charge reason code (BT-145) are null' => [
-            null, null
+            'reason' => null,
+            'reasonCode' => null
         ];
     }
 
@@ -1100,12 +1762,6 @@ class BusinessRulesConditionsTest extends TestCase
      */
     public function brCo25_success(float $amountDueForPayment, ?\DateTimeInterface $paymentDueDate, ?string $paymentTerms): void
     {
-        # To validate BR-CO-16
-        $invoiceTotalAmountWithVat = $amountDueForPayment;
-
-        # To validate BR-CO-15
-        $invoiceTotalAmountWithoutVat = $invoiceTotalAmountWithVat;
-
         $invoice = (new Invoice(
             new InvoiceIdentifier('34'),
             new \DateTimeImmutable(),
@@ -1122,7 +1778,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, $invoiceTotalAmountWithoutVat, $invoiceTotalAmountWithVat, $amountDueForPayment),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                $amountDueForPayment,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -1136,7 +1798,9 @@ class BusinessRulesConditionsTest extends TestCase
             null,
             null,
             $paymentDueDate,
-            $paymentTerms
+            $paymentTerms,
+            [],
+            []
         ));
 
         if ($invoice->getDocumentTotals()->getAmountDueForPayment() > 0) {
@@ -1149,19 +1813,21 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo25_success(): \Generator
     {
         yield 'Amount due for payment (BT-115) is positive and the Payment due date (BT-9) is present' => [
-            12.2, new \DateTimeImmutable('2021-01-02'), null
+            'amountDueForPayment' => 20,
+            'paymentDueDate' => new \DateTimeImmutable('2021-01-02'),
+            'paymentTerms' => null
         ];
 
         yield 'Amount due for payment (BT-115) is positive and the Payment terms (BT-20) is present' => [
-            12.2, null, '30 JOURS NETS'
+            'amountDueForPayment' => 20,
+            'paymentDueDate' => null,
+            'paymentTerms' => '30 JOURS NETS'
         ];
 
         yield 'Amount due for payment (BT-115) is positive, the Payment due date (BT-9) and the Payment terms (BT-20) are present' => [
-            12.2, new \DateTimeImmutable('2021-01-02'), '30 JOURS NETS'
-        ];
-
-        yield 'Amount due for payment (BT-115) is negative' => [
-            -40, null, null
+            'amountDueForPayment' => 20,
+            'paymentDueDate' => new \DateTimeImmutable('2021-01-02'),
+            'paymentTerms' => '30 JOURS NETS'
         ];
     }
 
@@ -1204,14 +1870,18 @@ class BusinessRulesConditionsTest extends TestCase
             null,
             null,
             $paymentDueDate,
-            $paymentTerms
+            $paymentTerms,
+            [],
+            []
         );
     }
 
     public static function provideBrCo25_error(): \Generator
     {
         yield 'Amount due for payment (BT-115) is positive, the Payment due date (BT-9) and the Payment terms (BT-20) are not present' => [
-            12.2, null, null
+            'amountDueForPayment' => 12.2,
+            'paymentDueDate' => null,
+            'paymentTerms' => null
         ];
     }
 
@@ -1243,7 +1913,13 @@ class BusinessRulesConditionsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -1256,8 +1932,10 @@ class BusinessRulesConditionsTest extends TestCase
             )],
             null,
             null,
+            new \DateTimeImmutable(),
             null,
-            null
+            [],
+            []
         ));
 
         $seller = $invoice->getSeller();
@@ -1267,39 +1945,39 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo26_success(): \Generator
     {
         yield 'Seller identifier (BT-29)' => [
-            [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
-            null,
-            null
+            'identifiers' => [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+            'legalRegistrationIdentifier' => null,
+            'vatIdentifier' => null
         ];
         yield 'Seller legal registration identifier (BT-30)' => [
-            [],
-            new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
-            null
+            'identifiers' => [],
+            'legalRegistrationIdentifier' => new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
+            'vatIdentifier' => null
         ];
         yield 'Seller VAT identifier (BT-31)' => [
-            [],
-            null,
-            new VatIdentifier('FR88100000009')
+            'identifiers' => [],
+            'legalRegistrationIdentifier' => null,
+            'vatIdentifier' => new VatIdentifier('FR88100000009')
         ];
         yield 'Seller identifier (BT-29) and Seller legal registration identifier (BT-30)' => [
-            [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
-            new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
-            null
+            'identifiers' => [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+            'legalRegistrationIdentifier' => new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
+            'vatIdentifier' => null
         ];
         yield 'Seller identifier (BT-29) and Seller VAT identifier (BT-31)' => [
-            [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
-            null,
-            new VatIdentifier('FR88100000009')
+            'identifiers' => [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+            'legalRegistrationIdentifier' => null,
+            'vatIdentifier' => new VatIdentifier('FR88100000009')
         ];
         yield 'Seller legal registration identifier (BT-30) and Seller VAT identifier (BT-31)' => [
-            [],
-            new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
-            new VatIdentifier('FR88100000009')
+            'identifiers' => [],
+            'legalRegistrationIdentifier' => new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
+            'vatIdentifier' => new VatIdentifier('FR88100000009')
         ];
         yield 'Seller identifier (BT-29) and Seller legal registration identifier (BT-30) and Seller VAT identifier (BT-31)' => [
-            [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
-            new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
-            new VatIdentifier('FR88100000009')
+            'identifiers' => [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+            'legalRegistrationIdentifier' => new LegalRegistrationIdentifier('100000009', InternationalCodeDesignator::SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE),
+            'vatIdentifier' => new VatIdentifier('FR88100000009')
         ];
     }
 
@@ -1347,16 +2025,18 @@ class BusinessRulesConditionsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         );
     }
 
     public static function provideBrCo26_error(): \Generator
     {
         yield 'No field are filled in' => [
-            [],
-            null,
-            null
+            'identifiers' => [],
+            'legalRegistrationIdentifier' => null,
+            'vatIdentifier' => null
         ];
     }
 }

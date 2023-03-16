@@ -2,7 +2,7 @@
 
 namespace Tiime\EN16931\SemanticDataType;
 
-class Quantity extends SemanticDataType
+class Quantity extends DecimalNumber
 {
     public const DECIMALS = 4;
 

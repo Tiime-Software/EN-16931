@@ -91,7 +91,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         ))
             ->setBuyerReference("SERVEXEC")
             ->addIncludedNote(
@@ -282,7 +284,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         );
     }
 
@@ -315,7 +319,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -1172,7 +1178,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         );
 
         $this->assertSame($currencyCode, $invoice->getVatAccountingCurrencyCode());
@@ -1235,7 +1243,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             null,
             null,
             null,
-            null
+            null,
+            [],
+            []
         );
     }
 

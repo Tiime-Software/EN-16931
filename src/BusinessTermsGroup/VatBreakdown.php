@@ -5,6 +5,8 @@ namespace Tiime\EN16931\BusinessTermsGroup;
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\DecimalNumber;
+use Tiime\EN16931\SemanticDataType\IntegerNumber;
 use Tiime\EN16931\SemanticDataType\IntNumber;
 use Tiime\EN16931\SemanticDataType\Percentage;
 use Tiime\EN16931\SemanticDataType\SemanticDataType;
@@ -84,8 +86,8 @@ class VatBreakdown
         $this->vatExemptionReasonText = null;
         $this->vatExemptionReasonCode = null;
 
-        $BT119_divided_100 = ($this->vatCategoryRate ?? new Percentage(0.00))->divide(new IntNumber(100));
-        $BT119_100_multiply_BT117 = $this->vatCategoryTaxableAmount->multiply(new Amount($BT119_divided_100), Amount::DECIMALS);
+        $BT119_divided_100 = ($this->vatCategoryRate ?? new Percentage(0.00))->divide(new IntegerNumber(100));
+        $BT119_100_multiply_BT117 = $this->vatCategoryTaxableAmount->multiply(new DecimalNumber($BT119_divided_100), Amount::DECIMALS);
         if ($this->vatCategoryTaxAmount->getValue() !== $BT119_100_multiply_BT117) {
             throw new \Exception('@todo : BR-CO-17');
         }
@@ -106,13 +108,6 @@ class VatBreakdown
     public function getVatCategoryTaxAmount(): float
     {
         return $this->vatCategoryTaxAmount->getValue();
-    }
-
-    public function setVatCategoryTaxAmount(float $vatCategoryTaxAmount): self
-    {
-        $this->vatCategoryTaxAmount = new Amount($vatCategoryTaxAmount);
-
-        return $this;
     }
 
     public function getVatCategoryCode(): VatCategory

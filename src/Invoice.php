@@ -29,6 +29,9 @@ use Tiime\EN16931\DataType\Reference\PurchaseOrderReference;
 use Tiime\EN16931\DataType\Reference\ReceivingAdviceReference;
 use Tiime\EN16931\DataType\Reference\SalesOrderReference;
 use Tiime\EN16931\DataType\Reference\TenderOrLotReference;
+use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\DecimalNumber;
+use Tiime\EN16931\SemanticDataType\IntegerNumber;
 
 class Invoice
 {
@@ -221,13 +224,28 @@ class Invoice
         ?\DateTimeInterface $valueAddedTaxPointDate,
         ?DateCode2005 $valueAddedTaxPointDateCode,
         ?\DateTimeInterface $paymentDueDate,
-        ?string $paymentTerms
+        ?string $paymentTerms,
+        array $documentLevelAllowances,
+        array $documentLevelCharges
     ) {
+        $totalVatBreakdowns = new DecimalNumber(0);
         $this->vatBreakdowns = [];
         foreach ($vatBreakdowns as $vatBreakdown) {
             if ($vatBreakdown instanceof VatBreakdown) {
                 $this->vatBreakdowns[] = $vatBreakdown;
+
+                $totalVatBreakdowns = new DecimalNumber(
+                    $totalVatBreakdowns->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
+                );
             }
+        }
+
+        $totalVatBreakdowns = new Amount($totalVatBreakdowns->getValue());
+        if (
+            count($this->vatBreakdowns) > 0
+            && $totalVatBreakdowns->getValueRounded() !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
+        ) {
+            throw new \Exception('@todo : BR-CO-14');
         }
 
         if (empty($this->vatBreakdowns)) {
@@ -256,12 +274,54 @@ class Invoice
             $valueAddedTaxPointDate instanceof \DateTimeInterface
             && $valueAddedTaxPointDateCode instanceof DateCode2005
         ) {
-            throw new \Exception('@todo');
+            throw new \Exception('@todo : BR-CO-3');
         }
 
         if ($documentTotals->getAmountDueForPayment() > 0 && null === $paymentDueDate && empty($paymentTerms)) {
-            throw new \Exception('@todo (BR-CO-25)');
+            throw new \Exception('@todo : BR-CO-25');
         }
+
+        $totalDocumentLevelAllowances = new DecimalNumber(0);
+        $this->documentLevelAllowances = [];
+        foreach ($documentLevelAllowances as $documentLevelAllowance) {
+            if ($documentLevelAllowance instanceof DocumentLevelAllowance) {
+                $this->documentLevelAllowances[] = $documentLevelAllowance;
+
+                $totalDocumentLevelAllowances = new DecimalNumber(
+                    $totalDocumentLevelAllowances->add(new DecimalNumber($documentLevelAllowance->getAmount()))
+                );
+            }
+        }
+
+        $totalDocumentLevelAllowances = new Amount($totalDocumentLevelAllowances->getValue());
+        if (
+            count($this->documentLevelAllowances) > 0
+            && $totalDocumentLevelAllowances->getValueRounded() !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+        ) {
+            throw new \Exception('@todo : BR-CO-11');
+        }
+
+        $totalDocumentLevelCharges = new DecimalNumber(0);
+        $this->documentLevelCharges = [];
+        foreach ($documentLevelCharges as $documentLevelCharge) {
+            if ($documentLevelCharge instanceof DocumentLevelCharge) {
+                $this->documentLevelCharges[] = $documentLevelCharge;
+
+                $totalDocumentLevelCharges = new DecimalNumber(
+                    $totalDocumentLevelCharges->add(new DecimalNumber($documentLevelCharge->getAmount()))
+                );
+            }
+        }
+
+        $totalDocumentLevelCharges = new Amount($totalDocumentLevelCharges->getValue());
+        if (
+            count($this->documentLevelCharges) > 0
+            && $totalDocumentLevelCharges->getValueRounded() !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+        ) {
+            throw new \Exception('@todo : BR-CO-12');
+        }
+
+
 
         $this->number = $number;
         $this->issueDate = $issueDate;
@@ -281,7 +341,6 @@ class Invoice
         $this->buyerReference = null;
         $this->deliveryInformation = null;
         $this->paymentInstructions = null;
-        $this->documentLevelAllowances = [];
         $this->documentLevelCharges = [];
         $this->additionalSupportingDocuments = [];
     }

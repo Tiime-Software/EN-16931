@@ -2,7 +2,17 @@
 
 namespace Tiime\EN16931\SemanticDataType;
 
-class Number
+interface Number
 {
+    public function getValue(): float;
 
+    public function add(Number $number, ?int $decimals = null): float;
+
+    public function subtract(Number $number, ?int $decimals = null): float;
+
+    public function multiply(Number $number, ?int $decimals = null): float;
+
+    public function divide(Number $number, ?int $decimals = null): float;
+
+    public function __toString(): string;
 }

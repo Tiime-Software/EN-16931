@@ -3,6 +3,7 @@
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\DecimalNumber;
 
 /**
  * BG-22
@@ -79,6 +80,8 @@ class DocumentTotals
         ?float $invoiceTotalVatAmount = null,
         ?float $paidAmount = null,
         ?float $roundingAmount = null,
+        ?float $sumOfAllowancesOnDocumentLevel = null,
+        ?float $sumOfChargesOnDocumentLevel = null,
     ) {
         $this->sumOfInvoiceLineNetAmount = new Amount($sumOfInvoiceLineNetAmount);
         $this->invoiceTotalAmountWithoutVat = new Amount($invoiceTotalAmountWithoutVat);
@@ -89,6 +92,9 @@ class DocumentTotals
         $this->invoiceTotalVatAmount = $invoiceTotalVatAmount !== null ? new Amount($invoiceTotalVatAmount) : $invoiceTotalVatAmount;
         $this->paidAmount = $paidAmount !== null ? new Amount($paidAmount) : $paidAmount;
         $this->roundingAmount = $roundingAmount !== null ? new Amount($roundingAmount) : $roundingAmount;
+        $this->sumOfAllowancesOnDocumentLevel = $sumOfAllowancesOnDocumentLevel !== null ? new Amount($sumOfAllowancesOnDocumentLevel) : $sumOfAllowancesOnDocumentLevel;
+        $this->sumOfChargesOnDocumentLevel = $sumOfChargesOnDocumentLevel !== null ? new Amount($sumOfChargesOnDocumentLevel) : $sumOfChargesOnDocumentLevel;
+
 
         $BT109_plus_BT110 = $this->invoiceTotalAmountWithoutVat->add($this->invoiceTotalVatAmount ?? new Amount(0.00), Amount::DECIMALS);
         if ($this->invoiceTotalAmountWithVat->getValueRounded() !== $BT109_plus_BT110) {
@@ -96,10 +102,12 @@ class DocumentTotals
         }
 
         $BT112_minus_BT113 = $this->invoiceTotalAmountWithVat->subtract($this->paidAmount ?? new Amount(0.00));
-        $BT112_BT113_plus_BT114 = (new Amount($BT112_minus_BT113))->add($this->roundingAmount ?? new Amount(0.00), Amount::DECIMALS);
+        $BT112_BT113_plus_BT114 = (new DecimalNumber($BT112_minus_BT113))->add($this->roundingAmount ?? new Amount(0.00), Amount::DECIMALS);
         if ($this->amountDueForPayment->getValueRounded() !== $BT112_BT113_plus_BT114) {
             throw new \Exception('@todo : BR-CO-16');
         }
+
+
     }
 
     public function getSumOfInvoiceLineNetAmount(): float
@@ -119,23 +127,9 @@ class DocumentTotals
         return $this->sumOfAllowancesOnDocumentLevel?->getValueRounded();
     }
 
-    public function setSumOfAllowancesOnDocumentLevel(?float $sumOfAllowancesOnDocumentLevel): self
-    {
-        $this->sumOfAllowancesOnDocumentLevel = $sumOfAllowancesOnDocumentLevel ? new Amount($sumOfAllowancesOnDocumentLevel) : $sumOfAllowancesOnDocumentLevel;
-
-        return $this;
-    }
-
     public function getSumOfChargesOnDocumentLevel(): ?float
     {
         return $this->sumOfChargesOnDocumentLevel?->getValueRounded();
-    }
-
-    public function setSumOfChargesOnDocumentLevel(?float $sumOfChargesOnDocumentLevel): self
-    {
-        $this->sumOfChargesOnDocumentLevel = $sumOfChargesOnDocumentLevel ? new Amount($sumOfChargesOnDocumentLevel) : $sumOfChargesOnDocumentLevel;
-
-        return $this;
     }
 
     public function getInvoiceTotalAmountWithoutVat(): float
@@ -153,13 +147,6 @@ class DocumentTotals
     public function getInvoiceTotalVatAmount(): ?float
     {
         return $this->invoiceTotalVatAmount?->getValueRounded();
-    }
-
-    public function setInvoiceTotalVatAmount(?float $invoiceTotalVatAmount): self
-    {
-        $this->invoiceTotalVatAmount = $invoiceTotalVatAmount ? new Amount($invoiceTotalVatAmount) : $invoiceTotalVatAmount;
-
-        return $this;
     }
 
     public function getInvoiceTotalVatAmountInAccountingCurrency(): ?float

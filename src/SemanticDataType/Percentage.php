@@ -2,7 +2,7 @@
 
 namespace Tiime\EN16931\SemanticDataType;
 
-class Percentage extends SemanticDataType
+class Percentage extends DecimalNumber
 {
     public const DECIMALS = 2;
 
