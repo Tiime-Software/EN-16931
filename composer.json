@@ -16,6 +16,10 @@
         {
             "name": "Lucas GERARD",
             "email": "lucas.gerard.web@gmail.com"
+        },
+        {
+            "name": "Aurélien PILLEVESSE",
+            "email": "aurelienpillevesse@hotmail.fr"
         }
     ],
     "minimum-stability": "stable",
