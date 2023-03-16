@@ -13,7 +13,7 @@ class VatIdentifier
         $countryCode = substr($value, 0, 2);
 
         if (null === CountryAlpha2Code::tryFrom($countryCode) && $countryCode !== 'EL') {
-            throw new \Exception('@todo');
+            throw new \Exception('@todo : BR-CO-9');
         }
 
         $this->value = $value;

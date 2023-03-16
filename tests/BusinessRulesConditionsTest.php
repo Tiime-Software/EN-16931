@@ -274,10 +274,52 @@ class BusinessRulesConditionsTest extends TestCase
     /**
      * @test
      * @testdox BR-CO-9 : The Seller VAT identifier (BT-31), the Seller tax representative VAT identifier (BT-63) and the Buyer VAT identifier (BT-48) shall have a prefix in accordance with ISO code ISO 3166-1 alpha-2 by which the country of issue may be identified. Nevertheless, Greece may use the prefix ‘EL’.
+     * @dataProvider provideBrCo9Success
      */
-    public function brCo9(): void
+    public function brCo9_success(string $value): void
     {
-        $this->markTestSkipped('@todo');
+        $vatIdentifier = new VatIdentifier($value);
+
+        $this->assertInstanceOf(VatIdentifier::class, $vatIdentifier);
+        $this->assertSame($value, $vatIdentifier->getValue());
+    }
+
+    public static function provideBrCo9Success(): \Generator
+    {
+        yield 'BR-CO-9 Success #1' => [
+            'value' => 'IT123456789',
+        ];
+        yield 'BR-CO-9 Success #2' => [
+            'value' => 'EL987654321',
+        ];
+        yield 'BR-CO-9 Success #3' => [
+            'value' => 'NL-967611265',
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-CO-9 : The Seller VAT identifier (BT-31), the Seller tax representative VAT identifier (BT-63) and the Buyer VAT identifier (BT-48) shall have a prefix in accordance with ISO code ISO 3166-1 alpha-2 by which the country of issue may be identified. Nevertheless, Greece may use the prefix ‘EL’.
+     * @dataProvider provideBrCo9Error
+     */
+    public function brCo9_error(string $value): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatIdentifier($value);
+    }
+
+    public static function provideBrCo9Error(): \Generator
+    {
+        yield 'BR-CO-9 Error #1' => [
+            'value' => 'A123456789',
+        ];
+        yield 'BR-CO-9 Error #2' => [
+            'value' => '987654321',
+        ];
+        yield 'BR-CO-9 Error #3' => [
+            'value' => '967611265',
+        ];
     }
 
     /**
@@ -337,13 +379,34 @@ class BusinessRulesConditionsTest extends TestCase
 
     public static function provideBrCo10Success(): \Generator
     {
-        yield 'One invoice line with positive amount' => ['total' => 100, 'lines' => [100.00]];
-        yield 'One invoice line with negative amount' => ['total' => -100, 'lines' => [-100.00]];
-        yield 'One invoice line with amount equal to 0 (float)' => ['total' => 0, 'lines' => [0.00]];
-        yield 'One invoice line with amount equal to 0 (int)' => ['total' => 0, 'lines' => [0]];
-        yield 'Two invoice lines with two positives numbers and positive total' => ['total' => 200, 'lines' => [110.00, 90.00]];
-        yield 'Two invoice lines with one positive number / one negative number and positive total' => ['total' => 20, 'lines' => [110.00, -90.00]];
-        yield 'Two invoice lines with one positive number / one negative number and negative total' => ['total' => -20, 'lines' => [-110.00, 90.00]];
+        yield 'One invoice line with positive amount' => [
+            'total' => 100,
+            'linesAmount' => [100.00]
+        ];
+        yield 'One invoice line with negative amount' => [
+            'total' => -100,
+            'linesAmount' => [-100.00]
+        ];
+        yield 'One invoice line with amount equal to 0 (float)' => [
+            'total' => 0,
+            'linesAmount' => [0.00]
+        ];
+        yield 'One invoice line with amount equal to 0 (int)' => [
+            'total' => 0,
+            'linesAmount' => [0]
+        ];
+        yield 'Two invoice lines with two positives numbers and positive total' => [
+            'total' => 200,
+            'linesAmount' => [110.00, 90.00]
+        ];
+        yield 'Two invoice lines with one positive number / one negative number and positive total' => [
+            'total' => 20,
+            'linesAmount' => [110.00, -90.00]
+        ];
+        yield 'Two invoice lines with one positive number / one negative number and negative total' => [
+            'total' => -20,
+            'linesAmount' => [-110.00, 90.00]
+        ];
     }
 
     /**
@@ -403,8 +466,14 @@ class BusinessRulesConditionsTest extends TestCase
 
     public static function provideBrCo10Error(): \Generator
     {
-        yield 'Error with two invoice lines' => [200.01, [110.00, 90.00]];
-        yield 'Error with one invoice lines' => [-91, [-90.00]];
+        yield 'Error with two invoice lines' => [
+            'total' => 200.01,
+            'linesAmount' => [110.00, 90.00]
+        ];
+        yield 'Error with one invoice lines' => [
+            'total' => -91,
+            'linesAmount' => [-90.00]
+        ];
     }
 
     /**
