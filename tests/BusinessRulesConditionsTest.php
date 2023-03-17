@@ -359,7 +359,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-10 : Sum of Invoice line net amount (BT-106) = ∑ Invoice line net amount (BT-131).
      * @dataProvider provideBrCo10Success
-     * @param array<int, int> $linesAmount
+     * @param array<int, InvoiceLine> $invoiceLines
      */
     public function brCo10_success(DocumentTotals $documentTotals, array $invoiceLines): void
     {
@@ -567,7 +567,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-10 : Sum of Invoice line net amount (BT-106) = ∑ Invoice line net amount (BT-131).
      * @dataProvider provideBrCo10Error
-     * @param array<int, int> $linesAmount
+     * @param array<int, InvoiceLine> $invoiceLines
      */
     public function brCo10_error(DocumentTotals $documentTotals, array $invoiceLines): void
     {
@@ -658,6 +658,8 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-11 : Sum of allowances on document level (BT-107) = ∑ Document level allowance amount (BT-92).
      * @dataProvider provideBrCo11Success
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
      */
     public function brCo11_success(DocumentTotals $documentTotals, array $invoiceLines, array $documentLevelAllowances): void
     {
@@ -772,6 +774,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-11 : Sum of allowances on document level (BT-107) = ∑ Document level allowance amount (BT-92).
      * @dataProvider provideBrCo11Error
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
      */
     public function brCo11_error(DocumentTotals $documentTotals, array $documentLevelAllowances): void
     {
@@ -850,6 +853,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-12 : Sum of charges on document level (BT-108) = ∑ Document level charge amount (BT-99).
      * @dataProvider provideBrCo12Success
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
      */
     public function brCo12_success(DocumentTotals $documentTotals, array $documentLevelCharges): void
     {
@@ -942,6 +946,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-12 : Sum of charges on document level (BT-108) = ∑ Document level charge amount (BT-99).
      * @dataProvider provideBrCo12Error
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
      */
     public function brCo12_error(DocumentTotals $documentTotals, array $documentLevelCharges): void
     {
@@ -1020,8 +1025,10 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-13 : Invoice total amount without VAT (BT-109) = ∑ Invoice line net amount (BT-131) - Sum of allowances on document level (BT-107) + Sum of charges on document level (BT-108).
      * @dataProvider provideBrCo13Success
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     * @param array<int, InvoiceLine> $invoiceLines
      */
-    public function brCo13_success(DocumentTotals $documentTotals, array $vatBreakdown, array $invoiceLines): void
+    public function brCo13_success(DocumentTotals $documentTotals, array $vatBreakdowns, array $invoiceLines): void
     {
         // TODO : error cases
 
@@ -1042,7 +1049,7 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             $documentTotals,
-            $vatBreakdown,
+            $vatBreakdowns,
             $invoiceLines,
             null,
             null,
@@ -1165,6 +1172,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-14 : Invoice total VAT amount (BT-110) = ∑ VAT category tax amount (BT-117).
      * @dataProvider provideBrCo14Success
+     * @param array<int, VatBreakdown> $vatBreakdowns
      */
     public function brCo14_success(DocumentTotals $documentTotals, array $vatBreakdowns): void
     {
@@ -1269,6 +1277,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-14 : Invoice total VAT amount (BT-110) = ∑ VAT category tax amount (BT-117).
      * @dataProvider provideBrCo14Error
+     * @param array<int, VatBreakdown> $vatBreakdowns
      */
     public function brCo14_error(DocumentTotals $documentTotals, array $vatBreakdowns): void
     {

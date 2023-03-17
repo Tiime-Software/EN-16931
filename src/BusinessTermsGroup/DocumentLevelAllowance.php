@@ -95,7 +95,7 @@ class DocumentLevelAllowance
 
     public function setBaseAmount(?float $baseAmount): self
     {
-        $this->baseAmount = $baseAmount ? new Amount($baseAmount) : $baseAmount;
+        $this->baseAmount = \is_float($baseAmount) ? new Amount($baseAmount) : null;
 
         return $this;
     }
@@ -107,7 +107,7 @@ class DocumentLevelAllowance
 
     public function setPercentage(?float $percentage): self
     {
-        $this->percentage = $percentage ? new Percentage($percentage) : $percentage;
+        $this->percentage = \is_float($percentage) ? new Percentage($percentage) : null;
 
         return $this;
     }
@@ -131,7 +131,7 @@ class DocumentLevelAllowance
 
     public function setVatRate(?float $vatRate): self
     {
-        $this->vatRate = $vatRate ? new Percentage($vatRate) : $vatRate;
+        $this->vatRate = \is_float($vatRate) ? new Percentage($vatRate) : null;
 
         return $this;
     }

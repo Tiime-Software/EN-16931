@@ -165,7 +165,7 @@ class DocumentTotals
 
     public function setPaidAmount(?float $paidAmount): self
     {
-        $this->paidAmount = $paidAmount ? new Amount($paidAmount) : $paidAmount;
+        $this->paidAmount = \is_float($paidAmount) ? new Amount($paidAmount) : null;
 
         return $this;
     }
@@ -177,7 +177,7 @@ class DocumentTotals
 
     public function setRoundingAmount(?float $roundingAmount): self
     {
-        $this->roundingAmount = $roundingAmount ? new Amount($roundingAmount) : $roundingAmount;
+        $this->roundingAmount = \is_float($roundingAmount) ? new Amount($roundingAmount) : null;
 
         return $this;
     }

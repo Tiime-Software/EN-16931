@@ -339,7 +339,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, array<string, array<int, InvoiceLine>>>
+     * @return array<string, array<string, array<int, InvoiceLine>|DocumentTotals>>
      */
     public static function provideBR16InvoiceLines(): array
     {

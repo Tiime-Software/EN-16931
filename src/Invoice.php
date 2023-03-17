@@ -208,6 +208,8 @@ class Invoice
     /**
      * @param array<int, VatBreakdown> $vatBreakdowns
      * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
      */
     public function __construct(
         InvoiceIdentifier $number,
