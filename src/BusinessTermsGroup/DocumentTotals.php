@@ -136,13 +136,6 @@ class DocumentTotals
         return $this->invoiceTotalAmountWithoutVat->getValueRounded();
     }
 
-    public function setInvoiceTotalAmountWithoutVat(float $invoiceTotalAmountWithoutVat): self
-    {
-        $this->invoiceTotalAmountWithoutVat = new Amount($invoiceTotalAmountWithoutVat);
-
-        return $this;
-    }
-
     public function getInvoiceTotalVatAmount(): ?float
     {
         return $this->invoiceTotalVatAmount?->getValueRounded();
