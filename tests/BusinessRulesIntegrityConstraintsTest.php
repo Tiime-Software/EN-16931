@@ -77,7 +77,13 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -90,7 +96,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             )],
             null,
             null,
-            null,
+            new \DateTimeImmutable(),
             null,
             [],
             []
@@ -243,7 +249,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     public function br14MandatoryTotalAmountWithVat(): void
     {
         $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
-        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
+        $this->assertEquals(20, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
     }
 
     /**
@@ -252,7 +258,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br15MandatoryAmountDueForPayment(): void
     {
-        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
+        $this->assertEquals(20, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
     }
 
     /**
@@ -296,7 +302,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      * @dataProvider provideBR16InvoiceLines
      * @param array<int, InvoiceLine> $lines
      */
-    public function br16CaseWithLines(array $lines): void
+    public function br16CaseWithLines(DocumentTotals $documentTotals, array $lines): void
     {
         $invoice = new Invoice(
             new InvoiceIdentifier('34'),
@@ -313,12 +319,12 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
+            $documentTotals,
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             $lines,
             null,
             null,
-            null,
+            new \DateTimeImmutable(),
             null,
             [],
             []
@@ -339,6 +345,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         return [
             'single line' => [
+                'documentTotals' =>
+                    new DocumentTotals(
+                        10,
+                        10,
+                        30,
+                        30,
+                        invoiceTotalVatAmount: 20
+                    ),
                 'lines' => [
                     new InvoiceLine(
                         new InvoiceLineIdentifier('value'),
@@ -352,6 +366,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 ]
             ],
             'multiple lines' => [
+                'documentTotals' =>
+                    new DocumentTotals(
+                        20,
+                        20,
+                        40,
+                        40,
+                        invoiceTotalVatAmount: 20
+                    ),
                 'lines' => [
                     new InvoiceLine(
                         new InvoiceLineIdentifier('value'),
@@ -1164,7 +1186,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             $currencyCode,
-            new DocumentTotals(0, 0, 0, 0, $vatAmount),
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                $vatAmount,
+                invoiceTotalVatAmount: 20
+            ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
@@ -1177,7 +1206,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             )],
             null,
             null,
-            null,
+            new \DateTimeImmutable(),
             null,
             [],
             []
