@@ -88,25 +88,32 @@ class DocumentTotals
         $this->invoiceTotalAmountWithVat = new Amount($invoiceTotalAmountWithVat);
         $this->amountDueForPayment = new Amount($amountDueForPayment);
 
-        $this->invoiceTotalVatAmountInAccountingCurrency = $invoiceTotalVatAmountInAccountingCurrency !== null ? new Amount($invoiceTotalVatAmountInAccountingCurrency) : $invoiceTotalVatAmountInAccountingCurrency;
-        $this->invoiceTotalVatAmount = $invoiceTotalVatAmount !== null ? new Amount($invoiceTotalVatAmount) : $invoiceTotalVatAmount;
+        $this->invoiceTotalVatAmountInAccountingCurrency = $invoiceTotalVatAmountInAccountingCurrency !== null ?
+            new Amount($invoiceTotalVatAmountInAccountingCurrency) : $invoiceTotalVatAmountInAccountingCurrency;
+        $this->invoiceTotalVatAmount = $invoiceTotalVatAmount !== null ?
+            new Amount($invoiceTotalVatAmount) : $invoiceTotalVatAmount;
         $this->paidAmount = $paidAmount !== null ? new Amount($paidAmount) : $paidAmount;
         $this->roundingAmount = $roundingAmount !== null ? new Amount($roundingAmount) : $roundingAmount;
-        $this->sumOfAllowancesOnDocumentLevel = $sumOfAllowancesOnDocumentLevel !== null ? new Amount($sumOfAllowancesOnDocumentLevel) : $sumOfAllowancesOnDocumentLevel;
-        $this->sumOfChargesOnDocumentLevel = $sumOfChargesOnDocumentLevel !== null ? new Amount($sumOfChargesOnDocumentLevel) : $sumOfChargesOnDocumentLevel;
+        $this->sumOfAllowancesOnDocumentLevel = $sumOfAllowancesOnDocumentLevel !== null ?
+            new Amount($sumOfAllowancesOnDocumentLevel) : $sumOfAllowancesOnDocumentLevel;
+        $this->sumOfChargesOnDocumentLevel = $sumOfChargesOnDocumentLevel !== null ?
+            new Amount($sumOfChargesOnDocumentLevel) : $sumOfChargesOnDocumentLevel;
 
-        $BT109_plus_BT110 = $this->invoiceTotalAmountWithoutVat->add($this->invoiceTotalVatAmount ?? new Amount(0.00), Amount::DECIMALS);
+        $BT109_plus_BT110 = $this->invoiceTotalAmountWithoutVat
+            ->add($this->invoiceTotalVatAmount ?? new Amount(0.00), Amount::DECIMALS);
+
         if ($this->invoiceTotalAmountWithVat->getValueRounded() !== $BT109_plus_BT110) {
             throw new \Exception('@todo : BR-CO-15');
         }
 
-        $BT112_minus_BT113 = $this->invoiceTotalAmountWithVat->subtract($this->paidAmount ?? new Amount(0.00));
-        $BT112_BT113_plus_BT114 = (new DecimalNumber($BT112_minus_BT113))->add($this->roundingAmount ?? new Amount(0.00), Amount::DECIMALS);
+        $BT112_minus_BT113 = $this->invoiceTotalAmountWithVat
+            ->subtract($this->paidAmount ?? new Amount(0.00));
+        $BT112_BT113_plus_BT114 = (new DecimalNumber($BT112_minus_BT113))
+            ->add($this->roundingAmount ?? new Amount(0.00), Amount::DECIMALS);
+
         if ($this->amountDueForPayment->getValueRounded() !== $BT112_BT113_plus_BT114) {
             throw new \Exception('@todo : BR-CO-16');
         }
-
-
     }
 
     public function getSumOfInvoiceLineNetAmount(): float

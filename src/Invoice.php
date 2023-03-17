@@ -237,15 +237,21 @@ class Invoice
                 $this->vatBreakdowns[] = $vatBreakdown;
 
                 $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
-                    $totalVatCategoryTaxAmountVatBreakdowns->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
+                    $totalVatCategoryTaxAmountVatBreakdowns
+                        ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
                 );
             }
         }
 
-        $totalVatCategoryTaxAmountVatBreakdowns = round($totalVatCategoryTaxAmountVatBreakdowns->getValue(), Amount::DECIMALS);
+        $totalVatCategoryTaxAmountVatBreakdowns = round(
+            $totalVatCategoryTaxAmountVatBreakdowns->getValue(),
+            Amount::DECIMALS
+        );
+
         if (
             count($this->vatBreakdowns) > 0
-            && $totalVatCategoryTaxAmountVatBreakdowns !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
+            && $totalVatCategoryTaxAmountVatBreakdowns
+                !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-14');
         }
@@ -279,11 +285,12 @@ class Invoice
                 new Amount($documentTotals->getSumOfAllowancesOnDocumentLevel()) :
                 new Amount(0.00)
         );
-        $totalBT131_BT107_plus_BT108 = (new DecimalNumber($totalBT131_minus_BT107))->add(
-            $documentTotals->getSumOfChargesOnDocumentLevel() ?
-                new Amount($documentTotals->getSumOfChargesOnDocumentLevel()) :
-                new Amount(0.00), Amount::DECIMALS
-        );
+
+        $documentTotalsSumOfChargesOnDocumentLevel = $documentTotals->getSumOfChargesOnDocumentLevel() ?
+            new Amount($documentTotals->getSumOfChargesOnDocumentLevel()) : new Amount(0.00);
+        $totalBT131_BT107_plus_BT108 = (new DecimalNumber($totalBT131_minus_BT107))
+            ->add($documentTotalsSumOfChargesOnDocumentLevel);
+
         if (
             count($this->invoiceLines) > 0
             && $documentTotals->getInvoiceTotalAmountWithoutVat() !== $totalBT131_BT107_plus_BT108
@@ -328,7 +335,8 @@ class Invoice
         $totalAmountDocumentLevelAllowances = round($totalAmountDocumentLevelAllowances->getValue(), Amount::DECIMALS);
         if (
             count($this->documentLevelAllowances) > 0
-            && $totalAmountDocumentLevelAllowances !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+            && $totalAmountDocumentLevelAllowances
+                !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-11');
         }
@@ -348,7 +356,8 @@ class Invoice
         $totalDocumentLevelCharges = round($totalDocumentLevelCharges->getValue(), Amount::DECIMALS);
         if (
             count($this->documentLevelCharges) > 0
-            && $totalDocumentLevelCharges !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+            && $totalDocumentLevelCharges
+                !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-12');
         }

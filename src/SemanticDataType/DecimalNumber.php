@@ -6,7 +6,7 @@ class DecimalNumber implements Number
 {
     public function __construct(private readonly float $value, private readonly ?int $decimals = null)
     {
-        if(
+        if (
             $this->decimals !== null
             && !preg_match(sprintf('/^-?\d+(\.\d{1,%s})?$/', $decimals), (string) $value)
         ) {
