@@ -95,7 +95,6 @@ class DocumentTotals
         $this->sumOfAllowancesOnDocumentLevel = $sumOfAllowancesOnDocumentLevel !== null ? new Amount($sumOfAllowancesOnDocumentLevel) : $sumOfAllowancesOnDocumentLevel;
         $this->sumOfChargesOnDocumentLevel = $sumOfChargesOnDocumentLevel !== null ? new Amount($sumOfChargesOnDocumentLevel) : $sumOfChargesOnDocumentLevel;
 
-
         $BT109_plus_BT110 = $this->invoiceTotalAmountWithoutVat->add($this->invoiceTotalVatAmount ?? new Amount(0.00), Amount::DECIMALS);
         if ($this->invoiceTotalAmountWithVat->getValueRounded() !== $BT109_plus_BT110) {
             throw new \Exception('@todo : BR-CO-15');

@@ -15,38 +15,46 @@ class IntegerNumber implements Number
 
     public function add(Number $number, ?int $decimals = null): float
     {
-        if (null === $decimals) {
-            return $this->getValue() + $number->getValue();
+        $result = (float) bcadd((string) $this->getValue(), (string) $number->getValue(), Number::BC_MATH_ROUNDING);
+
+        if (null !== $decimals) {
+            return round($result, $decimals);
         }
 
-        return round($this->getValue() + $number->getValue(), $decimals ?? 0);
+        return $result;
     }
 
     public function subtract(Number $number, ?int $decimals = null): float
     {
-        if (null === $decimals) {
-            return $this->getValue() - $number->getValue();
+        $result = (float) bcsub((string) $this->getValue(), (string) $number->getValue(), Number::BC_MATH_ROUNDING);
+
+        if (null !== $decimals) {
+            return round($result, $decimals);
         }
 
-        return round($this->getValue() - $number->getValue(), $decimals ?? 0);
+        return $result;
     }
 
     public function multiply(Number $number, ?int $decimals = null): float
     {
-        if (null === $decimals) {
-            return $this->getValue() * $number->getValue();
+        $result = (float) bcmul((string) $this->getValue(), (string) $number->getValue(), Number::BC_MATH_ROUNDING);
+
+        if (null !== $decimals) {
+            return round($result, $decimals);
         }
 
-        return round($this->getValue() * $number->getValue(), $decimals ?? 0);
+        return $result;
     }
 
     public function divide(Number $number, ?int $decimals = null): float
     {
-        if (null === $decimals) {
-            return $this->getValue() / $number->getValue();
+        $result = (float) bcdiv((string) $this->getValue(), (string) $number->getValue(), Number::BC_MATH_ROUNDING);
+
+        if (null !== $decimals) {
+            return round($result, $decimals);
         }
 
-        return round($this->getValue() / $number->getValue(), $decimals ?? 0);
+        return $result;
     }
 
     public function __toString(): string

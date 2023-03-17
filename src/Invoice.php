@@ -240,10 +240,10 @@ class Invoice
             }
         }
 
-        $totalVatBreakdowns = new Amount($totalVatBreakdowns->getValue());
+        $totalVatBreakdowns = round($totalVatBreakdowns->getValue(), Amount::DECIMALS);
         if (
             count($this->vatBreakdowns) > 0
-            && $totalVatBreakdowns->getValueRounded() !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
+            && $totalVatBreakdowns !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-14');
         }
@@ -293,10 +293,10 @@ class Invoice
             }
         }
 
-        $totalDocumentLevelAllowances = new Amount($totalDocumentLevelAllowances->getValue());
+        $totalDocumentLevelAllowances = round($totalDocumentLevelAllowances->getValue(), Amount::DECIMALS);
         if (
             count($this->documentLevelAllowances) > 0
-            && $totalDocumentLevelAllowances->getValueRounded() !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+            && $totalDocumentLevelAllowances !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-11');
         }
@@ -313,15 +313,13 @@ class Invoice
             }
         }
 
-        $totalDocumentLevelCharges = new Amount($totalDocumentLevelCharges->getValue());
+        $totalDocumentLevelCharges = round($totalDocumentLevelCharges->getValue(), Amount::DECIMALS);
         if (
             count($this->documentLevelCharges) > 0
-            && $totalDocumentLevelCharges->getValueRounded() !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+            && $totalDocumentLevelCharges !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-12');
         }
-
-
 
         $this->number = $number;
         $this->issueDate = $issueDate;

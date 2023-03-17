@@ -865,14 +865,71 @@ class BusinessRulesConditionsTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @testdox BR-CO-13 : Invoice total amount without VAT (BT-109) = ∑ Invoice line net amount (BT-131) - Sum of allowances on document level (BT-107) + Sum of charges on document level (BT-108).
-     */
-    public function brCo13(): void
-    {
-        $this->markTestSkipped('@todo');
-    }
+//    /**
+//     * @test
+//     * @testdox BR-CO-13 : Invoice total amount without VAT (BT-109) = ∑ Invoice line net amount (BT-131) - Sum of allowances on document level (BT-107) + Sum of charges on document level (BT-108).
+//     * @dataProvider provideBrCo13Success
+//     */
+//    public function brCo13_success(DocumentTotals $documentTotals, array $invoiceLines): void
+//    {
+//        $invoice = (new Invoice(
+//            new InvoiceIdentifier('34'),
+//            new \DateTimeImmutable(),
+//            InvoiceTypeCode::COMMERCIAL_INVOICE,
+//            CurrencyCode::EURO,
+//            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+//                ->setBusinessProcessType('A1'),
+//            new Seller(
+//                'John Doe',
+//                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+//                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+//                null,
+//                null
+//            ),
+//            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+//            null,
+//            $documentTotals,
+//            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+//            $invoiceLines,
+//            null,
+//            null,
+//            new \DateTimeImmutable(),
+//            null,
+//            [],
+//            []
+//        ));
+//
+//        $this->assertInstanceOf(Invoice::class, $invoice);
+//    }
+//
+//    public static function provideBrCo13Success(): \Generator
+//    {
+////                                                                                                        somme des remises                   somme des charges ou frais
+////        (DocumentTotals) invoiceTotalAmountWithoutVat = (∑ (InvoiceLine) netAmount) - (DocumentsTotal) sumOfAllowancesOnDocumentLevel + (DocumentTotals) sumOfChargesOnDocumentLevel
+//
+//        yield 'BR-CO-13 Success #1' => [
+//            'documentTotals' =>
+//                new DocumentTotals(
+//                    1000,
+//                    1000,
+//                    0,
+//                    0,
+//                    sumOfAllowancesOnDocumentLevel: 0,
+//                    sumOfChargesOnDocumentLevel: 0
+//                ),
+//            'invoiceLines' => [
+//                new InvoiceLine(
+//                    new InvoiceLineIdentifier("1"),
+//                    1,
+//                    UnitOfMeasurement::BOX_REC21,
+//                    1000,
+//                    new PriceDetails(12),
+//                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+//                    new ItemInformation("A thing"),
+//                )
+//            ]
+//        ];
+//    }
 
     /**
      * @test
@@ -1233,6 +1290,8 @@ class BusinessRulesConditionsTest extends TestCase
         ?float $vatCategoryRate
     ): void
     {
+        var_dump('ICI');
+
         $vatBreakdown = new VatBreakdown(
             $vatCategoryTaxableAmount,
             $vatCategoryTaxAmount,

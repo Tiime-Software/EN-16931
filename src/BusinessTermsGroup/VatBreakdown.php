@@ -88,7 +88,7 @@ class VatBreakdown
 
         $BT119_divided_100 = ($this->vatCategoryRate ?? new Percentage(0.00))->divide(new IntegerNumber(100));
         $BT119_100_multiply_BT117 = $this->vatCategoryTaxableAmount->multiply(new DecimalNumber($BT119_divided_100), Amount::DECIMALS);
-        if ($this->vatCategoryTaxAmount->getValue() !== $BT119_100_multiply_BT117) {
+        if ($this->vatCategoryTaxAmount->getValueRounded() !== $BT119_100_multiply_BT117) {
             throw new \Exception('@todo : BR-CO-17');
         }
     }
