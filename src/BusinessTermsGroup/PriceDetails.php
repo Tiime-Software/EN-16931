@@ -3,6 +3,10 @@
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\UnitOfMeasurement;
+use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\Percentage;
+use Tiime\EN16931\SemanticDataType\Quantity;
+use Tiime\EN16931\SemanticDataType\UnitPriceAmount;
 
 /**
  * BG-29
@@ -16,28 +20,28 @@ class PriceDetails
      * The price of an item, exclusive of VAT, after subtracting item price discount.
      *
      */
-    private float $itemNetPrice;
+    private UnitPriceAmount $itemNetPrice;
 
     /**
      * BT-147
      * The total discount subtracted from the Item gross price to calculate the Item net price.
      *
      */
-    private ?float $itemPriceDiscount;
+    private ?UnitPriceAmount $itemPriceDiscount;
 
     /**
      * BT-148
      * The unit price, exclusive of VAT, before subtracting Item price discount.
      *
      */
-    private ?float $itemGrossPrice;
+    private ?UnitPriceAmount $itemGrossPrice;
 
     /**
      * BT-149
      * The number of item units to which the price applies.
      *
      */
-    private ?float $itemPriceBaseQuantity;
+    private ?Quantity $itemPriceBaseQuantity;
 
     /**
      * BT-150
@@ -52,7 +56,7 @@ class PriceDetails
             throw new \Exception('@todo');
         }
 
-        $this->itemNetPrice = $itemNetPrice;
+        $this->itemNetPrice = new UnitPriceAmount($itemNetPrice);
         $this->itemPriceDiscount = null;
         $this->itemGrossPrice = null;
         $this->itemPriceBaseQuantity = null;
@@ -61,31 +65,31 @@ class PriceDetails
 
     public function getItemNetPrice(): float
     {
-        return $this->itemNetPrice;
+        return $this->itemNetPrice->getValueRounded();
     }
 
     public function setItemNetPrice(float $itemNetPrice): self
     {
-        $this->itemNetPrice = $itemNetPrice;
+        $this->itemNetPrice = new UnitPriceAmount($itemNetPrice);
 
         return $this;
     }
 
     public function getItemPriceDiscount(): ?float
     {
-        return $this->itemPriceDiscount;
+        return $this->itemPriceDiscount?->getValueRounded();
     }
 
     public function setItemPriceDiscount(?float $itemPriceDiscount): self
     {
-        $this->itemPriceDiscount = $itemPriceDiscount;
+        $this->itemPriceDiscount = \is_float($itemPriceDiscount) ? new UnitPriceAmount($itemPriceDiscount) : null;
 
         return $this;
     }
 
     public function getItemGrossPrice(): ?float
     {
-        return $this->itemGrossPrice;
+        return $this->itemGrossPrice?->getValueRounded();
     }
 
     public function setItemGrossPrice(?float $itemGrossPrice): self
@@ -94,19 +98,19 @@ class PriceDetails
             throw new \Exception('@todo');
         }
 
-        $this->itemGrossPrice = $itemGrossPrice;
+        $this->itemGrossPrice = \is_float($itemGrossPrice) ? new UnitPriceAmount($itemGrossPrice) : null;
 
         return $this;
     }
 
     public function getItemPriceBaseQuantity(): ?float
     {
-        return $this->itemPriceBaseQuantity;
+        return $this->itemPriceBaseQuantity?->getValueRounded();
     }
 
     public function setItemPriceBaseQuantity(?float $itemPriceBaseQuantity): self
     {
-        $this->itemPriceBaseQuantity = $itemPriceBaseQuantity;
+        $this->itemPriceBaseQuantity = \is_float($itemPriceBaseQuantity) ? new Quantity($itemPriceBaseQuantity) : null;
 
         return $this;
     }
