@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\VatCategory;
@@ -7,9 +9,7 @@ use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\SemanticDataType\Amount;
 use Tiime\EN16931\SemanticDataType\DecimalNumber;
 use Tiime\EN16931\SemanticDataType\IntegerNumber;
-use Tiime\EN16931\SemanticDataType\IntNumber;
 use Tiime\EN16931\SemanticDataType\Percentage;
-use Tiime\EN16931\SemanticDataType\SemanticDataType;
 
 /**
  * BG-23

@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
-use Tiime\EN16931\DataType\AllowanceReasonCode;
 use Tiime\EN16931\DataType\ChargeReasonCode;
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\SemanticDataType\Amount;

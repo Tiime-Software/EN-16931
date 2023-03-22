@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\UnitOfMeasurement;
-use Tiime\EN16931\SemanticDataType\Amount;
-use Tiime\EN16931\SemanticDataType\Percentage;
 use Tiime\EN16931\SemanticDataType\Quantity;
 use Tiime\EN16931\SemanticDataType\UnitPriceAmount;
 

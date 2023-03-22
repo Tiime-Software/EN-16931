@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931;
 
 use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
@@ -31,7 +33,6 @@ use Tiime\EN16931\DataType\Reference\SalesOrderReference;
 use Tiime\EN16931\DataType\Reference\TenderOrLotReference;
 use Tiime\EN16931\SemanticDataType\Amount;
 use Tiime\EN16931\SemanticDataType\DecimalNumber;
-use Tiime\EN16931\SemanticDataType\IntegerNumber;
 
 class Invoice
 {
