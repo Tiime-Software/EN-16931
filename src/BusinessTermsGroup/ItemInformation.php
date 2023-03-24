@@ -50,6 +50,8 @@ class ItemInformation
     private ?StandardItemIdentifier $standardIdentifier;
 
     /**
+     * BT-158
+     *
      * @var array<int, ItemClassificationIdentifier>
      */
     private array $classificationIdentifiers;
@@ -62,7 +64,12 @@ class ItemInformation
      */
     private ?CountryAlpha2Code $itemCountryOfOrigin;
 
-    /** @var array<int, ItemAttribute> */
+    /**
+     * BG-32
+     * A group of business terms providing information about properties of the goods and services invoiced.
+     *
+     * @var array<int, ItemAttribute>
+     */
     private array $itemAttributes;
 
     public function __construct(string $name)

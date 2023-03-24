@@ -91,22 +91,47 @@ class InvoiceLine
      */
     private ?string $buyerAccountingReference;
 
+    /**
+     * BG-26
+     * A group of business terms providing information about the period relevant for the Invoice line.
+     */
     private ?InvoiceLinePeriod $period;
 
     /**
+     * BG-27
+     * A group of business terms providing information about allowances applicable to the individual Invoice line.
+     *
      * @var array<int, InvoiceLineAllowance>
      */
     private array $allowances;
 
     /**
+     * BG-28
+     * A group of business terms providing information about charges and taxes other than VAT applicable to
+     * the individual Invoice line.
+     *
      * @var array<int, InvoiceLineCharge>
      */
     private array $charges;
 
+    /**
+     * BG-29
+     * A group of business terms providing information about the price applied for
+     * the goods and services invoiced on the Invoice line.
+     */
     private PriceDetails $priceDetails;
 
+    /**
+     * BG-30
+     * A group of business terms providing information about the VAT applicable for
+     * the goods and services invoiced on the Invoice line.
+     */
     private LineVatInformation $lineVatInformation;
 
+    /**
+     * BG-31
+     * A group of business terms providing information about the goods and services invoiced.
+     */
     private ItemInformation $itemInformation;
 
 

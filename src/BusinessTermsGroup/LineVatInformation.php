@@ -8,7 +8,7 @@ use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\SemanticDataType\Percentage;
 
 /**
- * BG-50
+ * BG-30
  * A group of business terms providing information about the VAT applicable for
  * the goods and services invoiced on the Invoice line.
  */

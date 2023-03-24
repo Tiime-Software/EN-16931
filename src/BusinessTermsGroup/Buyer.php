@@ -53,11 +53,13 @@ class Buyer
 
     /**
      * BG-8
+     * A group of business terms providing information about the postal address for the Buyer.
      */
     private BuyerPostalAddress $address;
 
     /**
      * BG-9
+     * A group of business terms providing contact information relevant for the Buyer.
      */
     private ?BuyerContact $contact;
 

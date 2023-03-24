@@ -71,8 +71,16 @@ class Seller
      */
     private ?ElectronicAddressIdentifier $electronicAddress;
 
+    /**
+     * BG-5
+     * A group of business terms providing information about the address of the Seller.
+     */
     private SellerPostalAddress $address;
 
+    /**
+     * BG-6
+     * A group of business terms providing contact information about the Seller.
+     */
     private ?SellerContact $contact;
 
     /**

@@ -156,52 +156,109 @@ class Invoice
     private ?string $paymentTerms;
 
     /**
+     * BG-1
+     * A group of business terms providing textual notes that are relevant for the invoice,
+     * together with an indication of the note subject.
+     *
      * @var array<int, InvoiceNote>
      */
     private array $invoiceNote;
 
+    /**
+     * BG-2
+     * A group of business terms providing information on the business process and rules applicable to the Invoice document.
+     */
     private ProcessControl $processControl;
 
     /**
+     * BG-3
+     * A group of business terms providing information on one or more preceding Invoices.
+     *
      * @var array<int, PrecedingInvoice>
      */
     private array $precedingInvoices;
 
+    /**
+     * BG-4
+     * A group of business terms providing information about the Seller.
+     */
     private Seller $seller;
 
+    /**
+     * BG-7
+     * A group of business terms providing information about the Buyer.
+     */
     private Buyer $buyer;
 
+    /**
+     * BG-10
+     * A group of business terms providing information about the Payee, i.e. the role that receives the payment.
+     */
     private ?Payee $payee;
 
+    /**
+     * BG-11
+     * A group of business terms providing information about the Seller's tax representative.
+     */
     private ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty;
 
+    /**
+     * BG-13
+     * A group of business terms providing information about where and when the goods and services invoiced are delivered.
+     */
     private ?DeliveryInformation $deliveryInformation;
 
+    /**
+     * BG-16
+     * A group of business terms providing information about the payment.
+     */
     private ?PaymentInstructions $paymentInstructions;
 
     /**
+     * BG-20
+     * A group of business terms providing information about allowances applicable to the Invoice as a whole.
+     *
      * @var array<int, DocumentLevelAllowance>
      */
     private array $documentLevelAllowances;
 
     /**
+     * BG-21
+     * A group of business terms providing information about charges and taxes other than VAT,
+     * applicable to the Invoice as a whole.
+     *
      * @var array<int, DocumentLevelCharge>
      */
     private array $documentLevelCharges;
 
+    /**
+     * BG-22
+     * A group of business terms providing the monetary totals for the Invoice.
+     */
     private DocumentTotals $documentTotals;
 
     /**
+     * BG-23
+     * A group of business terms providing information about VAT breakdown by different
+     * categories, rates and exemption reasons.
+     *
      * @var array<int, VatBreakdown>
      */
     private array $vatBreakdowns;
 
     /**
+     * BG-24
+     * A group of business terms providing information about additional supporting documents substantiating
+     * the claims made in the Invoice.
+     *
      * @var array<int, AdditionalSupportingDocument>
      */
     private array $additionalSupportingDocuments;
 
     /**
+     * BG-25
+     * A group of business terms providing information on individual Invoice lines.
+     *
      * @var array<int, InvoiceLine>
      */
     private array $invoiceLines;

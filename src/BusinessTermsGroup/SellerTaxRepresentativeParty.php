@@ -24,6 +24,10 @@ class SellerTaxRepresentativeParty
      */
     private VatIdentifier $vatIdentifier;
 
+    /**
+     * BG-12
+     * A group of business terms providing information about the postal address for the tax representative party.
+     */
     private SellerTaxRepresentativePostalAddress $address;
 
     public function __construct(
