@@ -166,7 +166,8 @@ class Invoice
 
     /**
      * BG-2
-     * A group of business terms providing information on the business process and rules applicable to the Invoice document.
+     * A group of business terms providing information on the business process and rules applicable to the Invoice
+     * document.
      */
     private ProcessControl $processControl;
 
@@ -204,7 +205,8 @@ class Invoice
 
     /**
      * BG-13
-     * A group of business terms providing information about where and when the goods and services invoiced are delivered.
+     * A group of business terms providing information about where and when the goods and services invoiced are
+     * delivered.
      */
     private ?DeliveryInformation $deliveryInformation;
 

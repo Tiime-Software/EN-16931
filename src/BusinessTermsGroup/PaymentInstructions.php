@@ -42,7 +42,8 @@ class PaymentInstructions
 
     /**
      * BG-18
-     * A group of business terms providing information about card used for payment contemporaneous with invoice issuance.
+     * A group of business terms providing information about card used for payment contemporaneous with invoice
+     * issuance.
      */
     private ?PaymentCardInformation $paymentCardInformation;
 
