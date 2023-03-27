@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 /**
@@ -28,6 +30,10 @@ class InvoiceLinePeriod
             && $startDate > $endDate
         ) {
             throw new \Exception('@todo');
+        }
+
+        if (null === $startDate && null === $endDate) {
+            throw new \Exception('@todo : BR-CO-20');
         }
 
         $this->startDate = $startDate;

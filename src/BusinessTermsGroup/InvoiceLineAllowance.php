@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\AllowanceReasonCode;
+use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\Percentage;
 
 /**
  * BG-27
@@ -14,21 +18,21 @@ class InvoiceLineAllowance
      * BT-136
      * The amount of an allowance, without VAT.
      */
-    private float $amount;
+    private Amount $amount;
 
     /**
      * BT-137
      * The base amount that may be used, in conjunction with the Invoice line allowance percentage,
      * to calculate the Invoice line allowance amount.
      */
-    private ?float $baseAmount;
+    private ?Amount $baseAmount;
 
     /**
      * BT-138
      * The percentage that may be used, in conjunction with the Invoice line allowance base amount,
      * to calculate the Invoice line allowance amount.
      */
-    private ?float $percentage;
+    private ?Percentage $percentage;
 
     /**
      * BT-139
@@ -44,11 +48,11 @@ class InvoiceLineAllowance
 
     public function __construct(float $amount, ?string $reason = null, ?AllowanceReasonCode $reasonCode = null)
     {
-        if (!is_string($reason) && !$reasonCode instanceof AllowanceReasonCode) {
+        if ((!is_string($reason) || empty($reason)) && !$reasonCode instanceof AllowanceReasonCode) {
             throw new \Exception('@todo');
         }
 
-        $this->amount = $amount;
+        $this->amount = new Amount($amount);
         $this->baseAmount = null;
         $this->percentage = null;
         $this->reason = $reason;
@@ -57,36 +61,36 @@ class InvoiceLineAllowance
 
     public function getAmount(): float
     {
-        return $this->amount;
+        return $this->amount->getValueRounded();
     }
 
     public function setAmount(float $amount): self
     {
-        $this->amount = $amount;
+        $this->amount = new Amount($amount);
 
         return $this;
     }
 
     public function getBaseAmount(): ?float
     {
-        return $this->baseAmount;
+        return $this->baseAmount?->getValueRounded();
     }
 
     public function setBaseAmount(?float $baseAmount): self
     {
-        $this->baseAmount = $baseAmount;
+        $this->baseAmount = \is_float($baseAmount) ? new Amount($baseAmount) : null;
 
         return $this;
     }
 
     public function getPercentage(): ?float
     {
-        return $this->percentage;
+        return $this->percentage?->getValueRounded();
     }
 
     public function setPercentage(?float $percentage): self
     {
-        $this->percentage = $percentage;
+        $this->percentage = \is_float($percentage) ? new Percentage($percentage) : null;
 
         return $this;
     }
@@ -96,31 +100,8 @@ class InvoiceLineAllowance
         return $this->reason;
     }
 
-    public function setReason(?string $reason): self
-    {
-        if (!is_string($reason) && !$this->reasonCode instanceof AllowanceReasonCode) {
-            throw new \Exception('@todo');
-        }
-
-
-        $this->reason = $reason;
-
-        return $this;
-    }
-
     public function getReasonCode(): ?AllowanceReasonCode
     {
         return $this->reasonCode;
-    }
-
-    public function setReasonCode(?AllowanceReasonCode $reasonCode): self
-    {
-        if (!is_string($this->reason) && !$reasonCode instanceof AllowanceReasonCode) {
-            throw new \Exception('@todo');
-        }
-
-        $this->reasonCode = $reasonCode;
-
-        return $this;
     }
 }

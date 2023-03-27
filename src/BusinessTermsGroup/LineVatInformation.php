@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\SemanticDataType\Percentage;
 
 /**
- * BG-50
+ * BG-30
  * A group of business terms providing information about the VAT applicable for
  * the goods and services invoiced on the Invoice line.
  */
@@ -23,7 +26,7 @@ class LineVatInformation
      * BT-152
      * The VAT rate, represented as percentage that applies to the invoiced item.
      */
-    private ?float $invoicedItemVatRate;
+    private ?Percentage $invoicedItemVatRate;
 
     public function __construct(VatCategory $invoicedItemVatCategoryCode)
     {
@@ -44,12 +47,12 @@ class LineVatInformation
 
     public function getInvoicedItemVatRate(): ?float
     {
-        return $this->invoicedItemVatRate;
+        return $this->invoicedItemVatRate?->getValueRounded();
     }
 
     public function setInvoicedItemVatRate(?float $invoicedItemVatRate): self
     {
-        $this->invoicedItemVatRate = $invoicedItemVatRate;
+        $this->invoicedItemVatRate = \is_float($invoicedItemVatRate) ? new Percentage($invoicedItemVatRate) : null;
 
         return $this;
     }

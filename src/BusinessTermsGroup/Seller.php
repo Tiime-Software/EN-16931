@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
@@ -69,15 +71,43 @@ class Seller
      */
     private ?ElectronicAddressIdentifier $electronicAddress;
 
+    /**
+     * BG-5
+     * A group of business terms providing information about the address of the Seller.
+     */
     private SellerPostalAddress $address;
 
+    /**
+     * BG-6
+     * A group of business terms providing contact information about the Seller.
+     */
     private ?SellerContact $contact;
 
-    public function __construct(string $name, SellerPostalAddress $address)
-    {
+    /**
+     * @param array<int, SellerIdentifier> $identifiers
+     */
+    public function __construct(
+        string $name,
+        SellerPostalAddress $address,
+        array $identifiers,
+        ?LegalRegistrationIdentifier $legalRegistrationIdentifier,
+        ?VatIdentifier $vatIdentifier,
+    ) {
         $this->name = $name;
         $this->address = $address;
+        $this->legalRegistrationIdentifier = $legalRegistrationIdentifier;
+        $this->vatIdentifier = $vatIdentifier;
+
         $this->identifiers = [];
+        foreach ($identifiers as $identifier) {
+            if ($identifier instanceof SellerIdentifier) {
+                $this->identifiers[] = $identifier;
+            }
+        }
+
+        if (empty($this->identifiers) && null === $legalRegistrationIdentifier && null === $vatIdentifier) {
+            throw new \Exception('@todo');
+        }
     }
 
     public function getName(): string

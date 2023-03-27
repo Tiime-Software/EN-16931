@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\Identifier\InvoiceLineIdentifier;
 use Tiime\EN16931\DataType\Identifier\ObjectIdentifier;
 use Tiime\EN16931\DataType\Reference\PurchaseOrderLineReference;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
+use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\Quantity;
 
 /**
  * BG-25
@@ -53,7 +57,7 @@ class InvoiceLine
      *
      * Quantité d'articles (biens ou services) facturée prise en compte dans la ligne de Facture.
      */
-    private float $invoicedQuantity;
+    private Quantity $invoicedQuantity;
 
     /**
      * BT-130
@@ -69,7 +73,7 @@ class InvoiceLine
      *
      * Montant total de la ligne de Facture.
      */
-    private float $netAmount;
+    private Amount $netAmount;
 
     /**
      * BT-132
@@ -87,22 +91,47 @@ class InvoiceLine
      */
     private ?string $buyerAccountingReference;
 
+    /**
+     * BG-26
+     * A group of business terms providing information about the period relevant for the Invoice line.
+     */
     private ?InvoiceLinePeriod $period;
 
     /**
+     * BG-27
+     * A group of business terms providing information about allowances applicable to the individual Invoice line.
+     *
      * @var array<int, InvoiceLineAllowance>
      */
     private array $allowances;
 
     /**
+     * BG-28
+     * A group of business terms providing information about charges and taxes other than VAT applicable to
+     * the individual Invoice line.
+     *
      * @var array<int, InvoiceLineCharge>
      */
     private array $charges;
 
+    /**
+     * BG-29
+     * A group of business terms providing information about the price applied for
+     * the goods and services invoiced on the Invoice line.
+     */
     private PriceDetails $priceDetails;
 
+    /**
+     * BG-30
+     * A group of business terms providing information about the VAT applicable for
+     * the goods and services invoiced on the Invoice line.
+     */
     private LineVatInformation $lineVatInformation;
 
+    /**
+     * BG-31
+     * A group of business terms providing information about the goods and services invoiced.
+     */
     private ItemInformation $itemInformation;
 
 
@@ -117,9 +146,9 @@ class InvoiceLine
         ItemInformation $itemInformation,
     ) {
         $this->identifier = $identifier;
-        $this->invoicedQuantity = $invoicedQuantity;
+        $this->invoicedQuantity = new Quantity($invoicedQuantity);
         $this->invoicedQuantityUnitOfMeasureCode = $invoicedQuantityUnitOfMeasureCode;
-        $this->netAmount = $netAmount;
+        $this->netAmount = new Amount($netAmount);
         $this->priceDetails = $priceDetails;
         $this->lineVatInformation = $lineVatInformation;
         $this->itemInformation = $itemInformation;
@@ -163,14 +192,7 @@ class InvoiceLine
 
     public function getInvoicedQuantity(): float
     {
-        return $this->invoicedQuantity;
-    }
-
-    public function setInvoicedQuantity(float $invoicedQuantity): self
-    {
-        $this->invoicedQuantity = $invoicedQuantity;
-
-        return $this;
+        return $this->invoicedQuantity->getValueRounded();
     }
 
     public function getInvoicedQuantityUnitOfMeasureCode(): UnitOfMeasurement
@@ -188,16 +210,8 @@ class InvoiceLine
 
     public function getNetAmount(): float
     {
-        return $this->netAmount;
+        return $this->netAmount->getValueRounded();
     }
-
-    public function setNetAmount(float $netAmount): self
-    {
-        $this->netAmount = $netAmount;
-
-        return $this;
-    }
-
 
     public function getReferencedPurchaseOrderLineReference(): ?PurchaseOrderLineReference
     {

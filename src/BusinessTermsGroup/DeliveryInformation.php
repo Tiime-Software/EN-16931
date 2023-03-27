@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\Identifier\LocationIdentifier;
@@ -28,8 +30,17 @@ class DeliveryInformation
      */
     private ?\DateTimeInterface $actualDeliveryDate;
 
+    /**
+     * BG-14
+     * A group of business terms providing information on the invoice period.
+     */
     private ?InvoicingPeriod $invoicingPeriod;
 
+    /**
+     * BG-15
+     * A group of business terms providing information about the address to which
+     * goods and services invoiced were or are delivered.
+     */
     private ?DeliverToAddress $deliverToAddress;
 
     public function __construct()

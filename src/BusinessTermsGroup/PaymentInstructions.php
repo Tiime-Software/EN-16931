@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931\BusinessTermsGroup;
 
 use Tiime\EN16931\DataType\PaymentMeansCode;
@@ -31,12 +33,24 @@ class PaymentInstructions
     private ?string $remittanceInformation;
 
     /**
+     * BG-17
+     * A group of business terms to specify credit transfer payments.
+     *
      * @var array<int, CreditTransfer>
      */
     private array $creditTransfers;
 
+    /**
+     * BG-18
+     * A group of business terms providing information about card used for payment contemporaneous with invoice
+     * issuance.
+     */
     private ?PaymentCardInformation $paymentCardInformation;
 
+    /**
+     * BG-19
+     * A group of business terms to specify a direct debit.
+     */
     private ?DirectDebit $directDebit;
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tiime\EN16931;
 
 use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
@@ -29,6 +31,8 @@ use Tiime\EN16931\DataType\Reference\PurchaseOrderReference;
 use Tiime\EN16931\DataType\Reference\ReceivingAdviceReference;
 use Tiime\EN16931\DataType\Reference\SalesOrderReference;
 use Tiime\EN16931\DataType\Reference\TenderOrLotReference;
+use Tiime\EN16931\SemanticDataType\Amount;
+use Tiime\EN16931\SemanticDataType\DecimalNumber;
 
 class Invoice
 {
@@ -152,52 +156,111 @@ class Invoice
     private ?string $paymentTerms;
 
     /**
+     * BG-1
+     * A group of business terms providing textual notes that are relevant for the invoice,
+     * together with an indication of the note subject.
+     *
      * @var array<int, InvoiceNote>
      */
     private array $invoiceNote;
 
+    /**
+     * BG-2
+     * A group of business terms providing information on the business process and rules applicable to the Invoice
+     * document.
+     */
     private ProcessControl $processControl;
 
     /**
+     * BG-3
+     * A group of business terms providing information on one or more preceding Invoices.
+     *
      * @var array<int, PrecedingInvoice>
      */
     private array $precedingInvoices;
 
+    /**
+     * BG-4
+     * A group of business terms providing information about the Seller.
+     */
     private Seller $seller;
 
+    /**
+     * BG-7
+     * A group of business terms providing information about the Buyer.
+     */
     private Buyer $buyer;
 
+    /**
+     * BG-10
+     * A group of business terms providing information about the Payee, i.e. the role that receives the payment.
+     */
     private ?Payee $payee;
 
+    /**
+     * BG-11
+     * A group of business terms providing information about the Seller's tax representative.
+     */
     private ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty;
 
+    /**
+     * BG-13
+     * A group of business terms providing information about where and when the goods and services invoiced are
+     * delivered.
+     */
     private ?DeliveryInformation $deliveryInformation;
 
+    /**
+     * BG-16
+     * A group of business terms providing information about the payment.
+     */
     private ?PaymentInstructions $paymentInstructions;
 
     /**
+     * BG-20
+     * A group of business terms providing information about allowances applicable to the Invoice as a whole.
+     *
      * @var array<int, DocumentLevelAllowance>
      */
     private array $documentLevelAllowances;
 
     /**
+     * BG-21
+     * A group of business terms providing information about charges and taxes other than VAT,
+     * applicable to the Invoice as a whole.
+     *
      * @var array<int, DocumentLevelCharge>
      */
     private array $documentLevelCharges;
 
+    /**
+     * BG-22
+     * A group of business terms providing the monetary totals for the Invoice.
+     */
     private DocumentTotals $documentTotals;
 
     /**
+     * BG-23
+     * A group of business terms providing information about VAT breakdown by different
+     * categories, rates and exemption reasons.
+     *
      * @var array<int, VatBreakdown>
      */
     private array $vatBreakdowns;
 
     /**
+     * BG-24
+     * A group of business terms providing information about additional supporting documents substantiating
+     * the claims made in the Invoice.
+     *
      * @var array<int, AdditionalSupportingDocument>
      */
     private array $additionalSupportingDocuments;
 
     /**
+     * BG-25
+     * A group of business terms providing information on individual Invoice lines.
+     *
      * @var array<int, InvoiceLine>
      */
     private array $invoiceLines;
@@ -205,6 +268,8 @@ class Invoice
     /**
      * @param array<int, VatBreakdown> $vatBreakdowns
      * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
      */
     public function __construct(
         InvoiceIdentifier $number,
@@ -217,13 +282,38 @@ class Invoice
         ?CurrencyCode $vatAccountingCurrencyCode,
         DocumentTotals $documentTotals,
         array $vatBreakdowns,
-        array $invoiceLines
+        array $invoiceLines,
+        ?\DateTimeInterface $valueAddedTaxPointDate,
+        ?DateCode2005 $valueAddedTaxPointDateCode,
+        ?\DateTimeInterface $paymentDueDate,
+        ?string $paymentTerms,
+        array $documentLevelAllowances,
+        array $documentLevelCharges
     ) {
         $this->vatBreakdowns = [];
+        $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(0);
         foreach ($vatBreakdowns as $vatBreakdown) {
             if ($vatBreakdown instanceof VatBreakdown) {
                 $this->vatBreakdowns[] = $vatBreakdown;
+
+                $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
+                    $totalVatCategoryTaxAmountVatBreakdowns
+                        ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
+                );
             }
+        }
+
+        $totalVatCategoryTaxAmountVatBreakdowns = round(
+            $totalVatCategoryTaxAmountVatBreakdowns->getValue(),
+            Amount::DECIMALS
+        );
+
+        if (
+            count($this->vatBreakdowns) > 0
+            && $totalVatCategoryTaxAmountVatBreakdowns
+                !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
+        ) {
+            throw new \Exception('@todo : BR-CO-14');
         }
 
         if (empty($this->vatBreakdowns)) {
@@ -231,10 +321,41 @@ class Invoice
         }
 
         $this->invoiceLines = [];
+        $totalNetAmountInvoiceLines = new DecimalNumber(0);
         foreach ($invoiceLines as $invoiceLine) {
             if ($invoiceLine instanceof InvoiceLine) {
                 $this->invoiceLines[] = $invoiceLine;
+
+                $totalNetAmountInvoiceLines = new DecimalNumber(
+                    $totalNetAmountInvoiceLines->add(new DecimalNumber($invoiceLine->getNetAmount()))
+                );
             }
+        }
+
+        if (
+            count($this->invoiceLines) > 0
+            && $documentTotals->getSumOfInvoiceLineNetAmount() !== $totalNetAmountInvoiceLines->getValueRounded()
+        ) {
+            throw new \Exception('@todo : BR-CO-10');
+        }
+
+
+        $totalBT131_minus_BT107 = $totalNetAmountInvoiceLines->subtract(
+            $documentTotals->getSumOfAllowancesOnDocumentLevel() ?
+                new Amount($documentTotals->getSumOfAllowancesOnDocumentLevel()) :
+                new Amount(0.00)
+        );
+
+        $documentTotalsSumOfChargesOnDocumentLevel = $documentTotals->getSumOfChargesOnDocumentLevel() ?
+            new Amount($documentTotals->getSumOfChargesOnDocumentLevel()) : new Amount(0.00);
+        $totalBT131_BT107_plus_BT108 = (new DecimalNumber($totalBT131_minus_BT107))
+            ->add($documentTotalsSumOfChargesOnDocumentLevel);
+
+        if (
+            count($this->invoiceLines) > 0
+            && $documentTotals->getInvoiceTotalAmountWithoutVat() !== $totalBT131_BT107_plus_BT108
+        ) {
+            throw new \Exception('@todo : BR-CO-13');
         }
 
         if (empty($this->invoiceLines)) {
@@ -248,21 +369,77 @@ class Invoice
             throw new \Exception('@todo');
         }
 
+        if (
+            $valueAddedTaxPointDate instanceof \DateTimeInterface
+            && $valueAddedTaxPointDateCode instanceof DateCode2005
+        ) {
+            throw new \Exception('@todo : BR-CO-3');
+        }
+
+        if ($documentTotals->getAmountDueForPayment() > 0 && null === $paymentDueDate && empty($paymentTerms)) {
+            throw new \Exception('@todo : BR-CO-25');
+        }
+
+        $totalAmountDocumentLevelAllowances = new DecimalNumber(0);
+        $this->documentLevelAllowances = [];
+        foreach ($documentLevelAllowances as $documentLevelAllowance) {
+            if ($documentLevelAllowance instanceof DocumentLevelAllowance) {
+                $this->documentLevelAllowances[] = $documentLevelAllowance;
+
+                $totalAmountDocumentLevelAllowances = new DecimalNumber(
+                    $totalAmountDocumentLevelAllowances->add(new DecimalNumber($documentLevelAllowance->getAmount()))
+                );
+            }
+        }
+
+        $totalAmountDocumentLevelAllowances = round($totalAmountDocumentLevelAllowances->getValue(), Amount::DECIMALS);
+        if (
+            count($this->documentLevelAllowances) > 0
+            && $totalAmountDocumentLevelAllowances
+                !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+        ) {
+            throw new \Exception('@todo : BR-CO-11');
+        }
+
+        $totalDocumentLevelCharges = new DecimalNumber(0);
+        $this->documentLevelCharges = [];
+        foreach ($documentLevelCharges as $documentLevelCharge) {
+            if ($documentLevelCharge instanceof DocumentLevelCharge) {
+                $this->documentLevelCharges[] = $documentLevelCharge;
+
+                $totalDocumentLevelCharges = new DecimalNumber(
+                    $totalDocumentLevelCharges->add(new DecimalNumber($documentLevelCharge->getAmount()))
+                );
+            }
+        }
+
+        $totalDocumentLevelCharges = round($totalDocumentLevelCharges->getValue(), Amount::DECIMALS);
+        if (
+            count($this->documentLevelCharges) > 0
+            && $totalDocumentLevelCharges
+                !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+        ) {
+            throw new \Exception('@todo : BR-CO-12');
+        }
+
         $this->number = $number;
         $this->issueDate = $issueDate;
         $this->typeCode = $typeCode;
         $this->invoiceNote = [];
         $this->currencyCode = $currencyCode;
         $this->vatAccountingCurrencyCode = $vatAccountingCurrencyCode;
+        $this->valueAddedTaxPointDate = $valueAddedTaxPointDate;
+        $this->valueAddedTaxPointDateCode = $valueAddedTaxPointDateCode;
         $this->processControl = $processControl;
         $this->seller = $seller;
         $this->buyer = $buyer;
         $this->documentTotals = $documentTotals;
+        $this->paymentDueDate = $paymentDueDate;
+        $this->paymentTerms = $paymentTerms;
 
         $this->buyerReference = null;
         $this->deliveryInformation = null;
         $this->paymentInstructions = null;
-        $this->documentLevelAllowances = [];
         $this->documentLevelCharges = [];
         $this->additionalSupportingDocuments = [];
     }
@@ -297,35 +474,14 @@ class Invoice
         return $this->valueAddedTaxPointDate;
     }
 
-    public function setValueAddedTaxPointDate(?\DateTimeInterface $valueAddedTaxPointDate): self
-    {
-        $this->valueAddedTaxPointDate = $valueAddedTaxPointDate;
-
-        return $this;
-    }
-
     public function getValueAddedTaxPointDateCode(): ?DateCode2005
     {
         return $this->valueAddedTaxPointDateCode;
     }
 
-    public function setValueAddedTexPointDateCode(?DateCode2005 $valueAddedTaxPointDateCode): self
-    {
-        $this->valueAddedTaxPointDateCode = $valueAddedTaxPointDateCode;
-
-        return $this;
-    }
-
     public function getPaymentDueDate(): ?\DateTimeInterface
     {
         return $this->paymentDueDate;
-    }
-
-    public function setPaymentDueDate(?\DateTimeInterface $paymentDueDate): self
-    {
-        $this->paymentDueDate = $paymentDueDate;
-
-        return $this;
     }
 
     public function getBuyerReference(): ?string
@@ -444,13 +600,6 @@ class Invoice
     public function getPaymentTerms(): ?string
     {
         return $this->paymentTerms;
-    }
-
-    public function setPaymentTerms(?string $paymentTerms): self
-    {
-        $this->paymentTerms = $paymentTerms;
-
-        return $this;
     }
 
     /**

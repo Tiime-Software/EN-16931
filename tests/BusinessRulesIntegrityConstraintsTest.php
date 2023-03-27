@@ -29,6 +29,7 @@ use Tiime\EN16931\DataType\ElectronicAddressScheme;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\ItemClassificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\PaymentAccountIdentifier;
+use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\StandardItemIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\InternationalCodeDesignator;
@@ -67,11 +68,23 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             CurrencyCode::EURO,
             (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
                 ->setBusinessProcessType('A1'),
-            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                invoiceTotalVatAmount: 20
+            ),
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
@@ -80,7 +93,13 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD),
                 new ItemInformation("A thing"),
-            )]
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            []
         ))
             ->setBuyerReference("SERVEXEC")
             ->addIncludedNote(
@@ -230,7 +249,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     public function br14MandatoryTotalAmountWithVat(): void
     {
         $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
-        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
+        $this->assertEquals(20, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
     }
 
     /**
@@ -239,7 +258,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br15MandatoryAmountDueForPayment(): void
     {
-        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
+        $this->assertEquals(20, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
     }
 
     /**
@@ -256,11 +275,23 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             InvoiceTypeCode::COMMERCIAL_INVOICE,
             CurrencyCode::EURO,
             new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::MINIMUM)),
-            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(0, 0, 0, 0),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [],
+            null,
+            null,
+            null,
+            null,
+            [],
             []
         );
     }
@@ -271,7 +302,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      * @dataProvider provideBR16InvoiceLines
      * @param array<int, InvoiceLine> $lines
      */
-    public function br16CaseWithLines(array $lines): void
+    public function br16CaseWithLines(DocumentTotals $documentTotals, array $lines): void
     {
         $invoice = new Invoice(
             new InvoiceIdentifier('34'),
@@ -279,12 +310,24 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             InvoiceTypeCode::COMMERCIAL_INVOICE,
             CurrencyCode::EURO,
             new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::MINIMUM)),
-            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
-            new DocumentTotals(0, 0, 0, 0),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
-            $lines
+            $documentTotals,
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            $lines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            []
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -296,12 +339,20 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, array<string, array<int, InvoiceLine>>>
+     * @return array<string, array<string, array<int, InvoiceLine>|DocumentTotals>>
      */
     public static function provideBR16InvoiceLines(): array
     {
         return [
             'single line' => [
+                'documentTotals' =>
+                    new DocumentTotals(
+                        10,
+                        10,
+                        30,
+                        30,
+                        invoiceTotalVatAmount: 20
+                    ),
                 'lines' => [
                     new InvoiceLine(
                         new InvoiceLineIdentifier('value'),
@@ -315,6 +366,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 ]
             ],
             'multiple lines' => [
+                'documentTotals' =>
+                    new DocumentTotals(
+                        20,
+                        20,
+                        40,
+                        40,
+                        invoiceTotalVatAmount: 20
+                    ),
                 'lines' => [
                     new InvoiceLine(
                         new InvoiceLineIdentifier('value'),
@@ -359,7 +418,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
             'Freddie Hines',
-            new VatIdentifier('vatId'),
+            new VatIdentifier('FR'),
             new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
         );
 
@@ -374,7 +433,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
             'Freddie Hines',
-            new VatIdentifier('vatId'),
+            new VatIdentifier('FR'),
             new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
         );
 
@@ -915,9 +974,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br45MandatoryVatCategoryTaxableAmount(): void
     {
-        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00);
 
-        $this->assertEquals(5, $vatBreakdown->getVatCategoryTaxableAmount());
+        $this->assertEquals(100, $vatBreakdown->getVatCategoryTaxableAmount());
     }
 
     /**
@@ -926,9 +985,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br46MandatoryVatCategoryTaxAmount(): void
     {
-        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00);
 
-        $this->assertEquals(1, $vatBreakdown->getVatCategoryTaxAmount());
+        $this->assertEquals(20, $vatBreakdown->getVatCategoryTaxAmount());
     }
 
     /**
@@ -937,7 +996,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br47MandatoryVatCategoryCode(): void
     {
-        $vatBreakdown = new VatBreakdown(5, 1, VatCategory::STANDARD, 0.2);
+        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00);
 
         $this->assertInstanceOf(VatCategory::class, $vatBreakdown->getVatCategoryCode());
         $this->assertSame(VatCategory::STANDARD, $vatBreakdown->getVatCategoryCode());
@@ -948,10 +1007,12 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      * @testdox BR-48 [case with coherent vat category & rate] : Each vat breakdown shall have a vat category rate except if the invoice is not subject to vat
      * @dataProvider provideBR48SuccessfulCases
      */
-    public function br48SuccessfulCases(VatCategory $vatCategory, ?float $vatRate): void
+    public function br48SuccessfulCases(float $vatCategoryTaxableAmount, float $vatCategoryTaxAmount, VatCategory $vatCategory, ?float $vatRate): void
     {
-        $vatBreakdown = new VatBreakdown(5, 1, $vatCategory, $vatRate);
+        $vatBreakdown = new VatBreakdown($vatCategoryTaxableAmount, $vatCategoryTaxAmount, $vatCategory, $vatRate);
 
+        $this->assertSame($vatCategoryTaxableAmount, $vatBreakdown->getVatCategoryTaxableAmount());
+        $this->assertSame($vatCategoryTaxAmount, $vatBreakdown->getVatCategoryTaxAmount());
         $this->assertSame($vatCategory, $vatBreakdown->getVatCategoryCode());
         $this->assertSame($vatRate, $vatBreakdown->getVatCategoryRate());
     }
@@ -963,10 +1024,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         return [
             'subject to vat with rate' => [
+                'vatCategoryTaxableAmount' => 100.00,
+                'vatCategoryTaxAmount' => 20.00,
                 'vatCategory' => VatCategory::STANDARD,
-                'vatRate' => 0.2,
+                'vatRate' => 20.00,
             ],
             'not subject to vat without rate' => [
+                'vatCategoryTaxableAmount' => 0.00,
+                'vatCategoryTaxAmount' => 0.00,
                 'vatCategory' => VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX,
                 'vatRate' => null,
             ],
@@ -982,7 +1047,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new VatBreakdown(5, 0, $vatCategory, $vatRate);
+        new VatBreakdown(100, 20, $vatCategory, $vatRate);
     }
 
     /**
@@ -1112,11 +1177,24 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             CurrencyCode::EURO,
             (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
                 ->setBusinessProcessType('A1'),
-            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             $currencyCode,
-            new DocumentTotals(0, 0, 0, 0, $vatAmount),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            new DocumentTotals(
+                0,
+                0,
+                20,
+                20,
+                $vatAmount,
+                invoiceTotalVatAmount: 20
+            ),
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
@@ -1125,7 +1203,13 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD),
                 new ItemInformation("A thing"),
-            )]
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            []
         );
 
         $this->assertSame($currencyCode, $invoice->getVatAccountingCurrencyCode());
@@ -1165,11 +1249,17 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             CurrencyCode::EURO,
             (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
                 ->setBusinessProcessType('A1'),
-            new Seller('John Doe', new SellerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             $currencyCode,
             new DocumentTotals(0, 0, 0, 0, $vatAmount),
-            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 0.2)],
+            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
@@ -1178,7 +1268,13 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD),
                 new ItemInformation("A thing"),
-            )]
+            )],
+            null,
+            null,
+            null,
+            null,
+            [],
+            []
         );
     }
 
@@ -1232,12 +1328,12 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $sellerTaxRepresentativeParty = new SellerTaxRepresentativeParty(
             'name',
-            new VatIdentifier('123'),
+            new VatIdentifier('FR'),
             new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
         );
 
         $this->assertInstanceOf(VatIdentifier::class, $sellerTaxRepresentativeParty->getVatIdentifier());
-        $this->assertSame('123', $sellerTaxRepresentativeParty->getVatIdentifier()->value);
+        $this->assertSame('FR', $sellerTaxRepresentativeParty->getVatIdentifier()->getValue());
     }
 
     /**
