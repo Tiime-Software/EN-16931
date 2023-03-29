@@ -78,7 +78,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -130,7 +130,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             new \DateTimeImmutable(),
@@ -182,7 +182,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -236,7 +236,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             new \DateTimeImmutable(),
@@ -260,7 +260,7 @@ class BusinessRulesConditionsTest extends TestCase
             UnitOfMeasurement::CENTILITRE_REC20,
             10,
             new PriceDetails(10),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation('item')
         );
 
@@ -434,7 +434,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     -100.00,
                     new PriceDetails(100),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -453,7 +453,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     0.00,
                     new PriceDetails(12),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -472,7 +472,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     0,
                     new PriceDetails(100),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -491,7 +491,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     110.00,
                     new PriceDetails(110),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -500,7 +500,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     90.00,
                     new PriceDetails(90),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -519,7 +519,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     110.00,
                     new PriceDetails(110),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -528,7 +528,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     -90.00,
                     new PriceDetails(90),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -547,7 +547,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     -110.00,
                     new PriceDetails(110),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -556,7 +556,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     90.00,
                     new PriceDetails(90),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -618,7 +618,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     110.00,
                     new PriceDetails(12),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -627,7 +627,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     90.00,
                     new PriceDetails(12),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -647,7 +647,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     -90.00,
                     new PriceDetails(12),
-                    new LineVatInformation(VatCategory::STANDARD),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -1780,7 +1780,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -1826,7 +1826,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -2174,7 +2174,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -2246,7 +2246,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -2309,7 +2309,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -2401,7 +2401,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,

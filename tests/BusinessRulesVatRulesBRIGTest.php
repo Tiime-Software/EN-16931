@@ -46,7 +46,7 @@ class BusinessRulesVatRulesBRIGTest extends TestCase
         yield 'BR-IG-5 Success #1' => [
             'invoicedItemVatRate' => 0,
         ];
-        yield 'BR-IG-5 Success #1' => [
+        yield 'BR-IG-5 Success #2' => [
             'invoicedItemVatRate' => 10,
         ];
     }

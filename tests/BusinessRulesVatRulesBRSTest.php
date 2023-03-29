@@ -36,7 +36,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS1(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -47,7 +47,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS2(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -58,7 +58,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS3(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -69,7 +69,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS4(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -125,7 +125,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS6(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -135,7 +135,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS7(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -148,7 +148,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS8(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -159,7 +159,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS9(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 
     /**
@@ -169,6 +169,6 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS10(): void
     {
-
+        $this->markTestSkipped('@todo');
     }
 }

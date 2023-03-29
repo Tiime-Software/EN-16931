@@ -32,7 +32,10 @@ class LineVatInformation
         VatCategory $invoicedItemVatCategoryCode,
         ?float $invoicedItemVatRate = null,
     ) {
-        if ($invoicedItemVatCategoryCode === VatCategory::STANDARD && $invoicedItemVatRate <= 0) {
+        if (
+            $invoicedItemVatCategoryCode === VatCategory::STANDARD
+            && (null === $invoicedItemVatRate || $invoicedItemVatRate <= 0.0)
+        ) {
             throw new \Exception('@todo : BR-genericVAT-5');
         }
 
@@ -47,21 +50,21 @@ class LineVatInformation
                     VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
                 ]
             )
-            && $invoicedItemVatRate != 0
+            && $invoicedItemVatRate !== 0.0
         ) {
             throw new \Exception('@todo : BR-genericVAT-5');
         }
 
         if (
             $invoicedItemVatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
-            && $invoicedItemVatRate !== null
+            && null !== $invoicedItemVatRate
         ) {
             throw new \Exception('@todo : BR-genericVAT-5');
         }
 
         if (
             in_array($invoicedItemVatCategoryCode, [VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA])
-            && $invoicedItemVatRate < 0
+            && ($invoicedItemVatRate < 0.0 || null === $invoicedItemVatRate)
         ) {
             throw new \Exception('@todo : BR-genericVAT-5');
         }

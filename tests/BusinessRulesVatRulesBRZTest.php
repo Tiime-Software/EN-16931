@@ -58,7 +58,7 @@ class BusinessRulesVatRulesBRZTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new LineVatInformation(VatCategory::ZERO_RATED_GOODS, 0);
+        new LineVatInformation(VatCategory::ZERO_RATED_GOODS, $invoicedItemVatRate);
     }
 
     public static function provideBrZ5Error(): \Generator
