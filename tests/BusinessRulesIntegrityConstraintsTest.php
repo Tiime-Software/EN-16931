@@ -91,7 +91,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -360,7 +360,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         UnitOfMeasurement::CENTILITRE_REC20,
                         10,
                         new PriceDetails(10),
-                        new LineVatInformation(VatCategory::STANDARD),
+                        new LineVatInformation(VatCategory::STANDARD, 20),
                         new ItemInformation('item')
                     )
                 ]
@@ -381,7 +381,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         UnitOfMeasurement::CENTILITRE_REC20,
                         10,
                         new PriceDetails(10),
-                        new LineVatInformation(VatCategory::STANDARD),
+                        new LineVatInformation(VatCategory::STANDARD, 20),
                         new ItemInformation('item')
                     ),
                     new InvoiceLine(
@@ -390,7 +390,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         UnitOfMeasurement::CENTILITRE_REC20,
                         10,
                         new PriceDetails(10),
-                        new LineVatInformation(VatCategory::STANDARD),
+                        new LineVatInformation(VatCategory::STANDARD, 20),
                         new ItemInformation('item2')
                     )
                 ]
@@ -474,7 +474,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation("A thing"),
         );
 
@@ -494,7 +494,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation("A thing"),
         );
 
@@ -514,7 +514,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation("A thing"),
         );
 
@@ -533,7 +533,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation("A thing"),
         );
 
@@ -552,7 +552,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation("A thing"),
         );
 
@@ -571,7 +571,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD),
+            new LineVatInformation(VatCategory::STANDARD, 20),
             new ItemInformation("A thing"),
         );
 
@@ -1201,7 +1201,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -1266,7 +1266,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD),
+                new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
             )],
             null,

@@ -28,9 +28,50 @@ class LineVatInformation
      */
     private ?Percentage $invoicedItemVatRate;
 
-    public function __construct(VatCategory $invoicedItemVatCategoryCode)
-    {
+    public function __construct(
+        VatCategory $invoicedItemVatCategoryCode,
+        ?float $invoicedItemVatRate = null,
+    ) {
+        if (
+            $invoicedItemVatCategoryCode === VatCategory::STANDARD
+            && (null === $invoicedItemVatRate || $invoicedItemVatRate <= 0.0)
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-5');
+        }
+
+        if (
+            in_array(
+                $invoicedItemVatCategoryCode,
+                [
+                    VatCategory::ZERO_RATED_GOODS,
+                    VatCategory::EXEMPT_FROM_TAX,
+                    VatCategory::VAT_REVERSE_CHARGE,
+                    VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED,
+                    VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
+                ]
+            )
+            && $invoicedItemVatRate !== 0.0
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-5');
+        }
+
+        if (
+            $invoicedItemVatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
+            && null !== $invoicedItemVatRate
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-5');
+        }
+
+        if (
+            in_array($invoicedItemVatCategoryCode, [VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA])
+            && ($invoicedItemVatRate < 0.0 || null === $invoicedItemVatRate)
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-5');
+        }
+
         $this->invoicedItemVatCategoryCode = $invoicedItemVatCategoryCode;
+        $this->invoicedItemVatRate = $invoicedItemVatRate !== null ?
+            new Percentage($invoicedItemVatRate) : $invoicedItemVatRate;
     }
 
     public function getInvoicedItemVatCategoryCode(): VatCategory
@@ -38,22 +79,8 @@ class LineVatInformation
         return $this->invoicedItemVatCategoryCode;
     }
 
-    public function setInvoicedItemVatCategoryCode(VatCategory $invoicedItemVatCategoryCode): self
-    {
-        $this->invoicedItemVatCategoryCode = $invoicedItemVatCategoryCode;
-
-        return $this;
-    }
-
     public function getInvoicedItemVatRate(): ?float
     {
         return $this->invoicedItemVatRate?->getValueRounded();
-    }
-
-    public function setInvoicedItemVatRate(?float $invoicedItemVatRate): self
-    {
-        $this->invoicedItemVatRate = \is_float($invoicedItemVatRate) ? new Percentage($invoicedItemVatRate) : null;
-
-        return $this;
     }
 }
