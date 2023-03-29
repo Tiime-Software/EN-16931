@@ -46,8 +46,8 @@ class LineVatInformation
                     VatCategory::ZERO_RATED_GOODS,
                     VatCategory::EXEMPT_FROM_TAX,
                     VatCategory::VAT_REVERSE_CHARGE,
+                    VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES,
                     VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED,
-                    VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
                 ]
             )
             && $invoicedItemVatRate !== 0.0
