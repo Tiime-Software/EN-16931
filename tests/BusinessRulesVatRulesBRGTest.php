@@ -36,7 +36,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
      */
     public function brG5_success(?float $invoicedItemVatRate): void
     {
-        $lineVatInformation = new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, $invoicedItemVatRate);
+        $lineVatInformation = new LineVatInformation(VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, $invoicedItemVatRate);
 
         $this->assertInstanceOf(LineVatInformation::class, $lineVatInformation);
     }
@@ -58,7 +58,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, $invoicedItemVatRate);
+        new LineVatInformation(VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, $invoicedItemVatRate);
     }
 
     public static function provideBrG5Error(): \Generator

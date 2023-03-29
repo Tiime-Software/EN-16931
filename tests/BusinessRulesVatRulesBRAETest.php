@@ -36,7 +36,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
      */
     public function brAE5_success(?float $invoicedItemVatRate): void
     {
-        $lineVatInformation = new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, $invoicedItemVatRate);
+        $lineVatInformation = new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, $invoicedItemVatRate);
 
         $this->assertInstanceOf(LineVatInformation::class, $lineVatInformation);
     }
@@ -58,7 +58,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, $invoicedItemVatRate);
+        new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, $invoicedItemVatRate);
     }
 
     public static function provideBrAE5Error(): \Generator
