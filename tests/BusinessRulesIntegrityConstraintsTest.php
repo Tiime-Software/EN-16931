@@ -794,7 +794,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br36MandatoryDocumentLevelChargeAmount(): void
     {
-        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank');
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
 
         $this->assertEquals(1, $charge->getAmount());
     }
@@ -805,7 +805,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br37MandatoryDocumentLevelChargeVatCategoryCode(): void
     {
-        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank');
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
 
         $this->assertSame(VatCategory::STANDARD, $charge->getVatCategoryCode());
     }
@@ -818,7 +818,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelCharge(1, VatCategory::STANDARD);
+        new DocumentLevelCharge(1, VatCategory::STANDARD, vatRate: 20);
     }
 
     /**
@@ -828,7 +828,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br38CasesWithReasonAndCodeCombinations(?string $reason, ?ChargeReasonCode $reasonCode): void
     {
-        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, $reason, $reasonCode);
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
 
         $this->assertSame($reason, $charge->getReason());
         $this->assertSame($reasonCode, $charge->getReasonCode());
