@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -117,6 +118,52 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             'vatRate' => -10,
         ];
         yield 'BR-IC-6 Error #3' => [
+            'vatRate' => null,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-7 : In a Document level charge (BG-21) where the Document level charge VAT category code (BT-102)
+     * is "Intra-community supply" the Document level charge VAT rate (BT-103) shall be 0 (zero).
+     * @dataProvider provideBrIC7Success
+     */
+    public function brIC7_success(?float $vatRate): void
+    {
+        $documentLevelCharge = new DocumentLevelCharge(1, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 'Hoobastank', vatRate: $vatRate);
+
+        $this->assertInstanceOf(DocumentLevelCharge::class, $documentLevelCharge);
+    }
+
+    public static function provideBrIC7Success(): \Generator
+    {
+        yield 'BR-IC-7 Success #1' => [
+            'vatRate' => 0,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-7 : In a Document level charge (BG-21) where the Document level charge VAT category code (BT-102)
+     * is "Intra-community supply" the Document level charge VAT rate (BT-103) shall be 0 (zero).
+     * @dataProvider provideBrIC7Error
+     */
+    public function brIC7_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelCharge(1, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrIC7Error(): \Generator
+    {
+        yield 'BR-IC-7 Error #1' => [
+            'vatRate' => 10,
+        ];
+        yield 'BR-IC-7 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-IC-7 Error #3' => [
             'vatRate' => null,
         ];
     }

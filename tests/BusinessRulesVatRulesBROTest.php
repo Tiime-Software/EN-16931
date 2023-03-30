@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -101,6 +102,44 @@ class BusinessRulesVatRulesBROTest extends TestCase
             'vatRate' => -10,
         ];
         yield 'BR-O-6 Error #3' => [
+            'vatRate' => 0,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-7 : A Document level charge (BG-21) where the VAT category code (BT-102) is "Not subject to VAT"
+     * shall not contain a Document level charge VAT rate (BT-103).
+     */
+    public function brO7_success(): void
+    {
+        $documentLevelCharge = new DocumentLevelCharge(1, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, 'Hoobastank');
+
+        $this->assertInstanceOf(DocumentLevelCharge::class, $documentLevelCharge);
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-7 : A Document level charge (BG-21) where the VAT category code (BT-102) is "Not subject to VAT"
+     * shall not contain a Document level charge VAT rate (BT-103).
+     * @dataProvider provideBrO7Error
+     */
+    public function brO7_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelCharge(1, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrO7Error(): \Generator
+    {
+        yield 'BR-O-7 Error #1' => [
+            'vatRate' => 10,
+        ];
+        yield 'BR-O-7 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-O-7 Error #3' => [
             'vatRate' => 0,
         ];
     }

@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -169,10 +170,46 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      * @test
      * @testdox BR-S-7 : In a Document level charge (BG-21) where the Document level charge VAT category code (BT-102)
      * is "Standard rated" the Document level charge VAT rate (BT-103) shall be greater than zero.
+     * @dataProvider provideBrS7Success
      */
-    public function brS7(): void
+    public function brS7_success(?float $vatRate): void
     {
-        $this->markTestSkipped('@todo');
+        $documentLevelCharge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank', vatRate: $vatRate);
+
+        $this->assertInstanceOf(DocumentLevelCharge::class, $documentLevelCharge);
+    }
+
+    public static function provideBrS7Success(): \Generator
+    {
+        yield 'BR-S-7 Success #1' => [
+            'vatRate' => 10,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-S-7 : In a Document level charge (BG-21) where the Document level charge VAT category code (BT-102)
+     * is "Standard rated" the Document level charge VAT rate (BT-103) shall be greater than zero.
+     * @dataProvider provideBrS7Error
+     */
+    public function brS7_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrS7Error(): \Generator
+    {
+        yield 'BR-S-7 Error #1' => [
+            'vatRate' => 0,
+        ];
+        yield 'BR-S-7 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-S-7 Error #3' => [
+            'vatRate' => null,
+        ];
     }
 
     /**

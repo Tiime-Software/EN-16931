@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -117,6 +118,53 @@ class BusinessRulesVatRulesBRZTest extends TestCase
             'vatRate' => -10,
         ];
         yield 'BR-Z-6 Error #3' => [
+            'vatRate' => null,
+        ];
+    }
+
+
+    /**
+     * @test
+     * @testdox BR-Z-7 : In a Document level charge (BG-21) where the Document level charge VAT category code (BT-102)
+     * is "Zero rated" the Document level charge VAT rate (BT-103) shall be 0 (zero).
+     * @dataProvider provideBrZ7Success
+     */
+    public function brZ7_success(?float $vatRate): void
+    {
+        $documentLevelCharge = new DocumentLevelCharge(1, VatCategory::ZERO_RATED_GOODS, 'Hoobastank', vatRate: $vatRate);
+
+        $this->assertInstanceOf(DocumentLevelCharge::class, $documentLevelCharge);
+    }
+
+    public static function provideBrZ7Success(): \Generator
+    {
+        yield 'BR-Z-7 Success #1' => [
+            'vatRate' => 0,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-Z-7 : In a Document level charge (BG-21) where the Document level charge VAT category code (BT-102)
+     * is "Zero rated" the Document level charge VAT rate (BT-103) shall be 0 (zero).
+     * @dataProvider provideBrZ7Error
+     */
+    public function brZ7_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelCharge(1, VatCategory::ZERO_RATED_GOODS, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrZ7Error(): \Generator
+    {
+        yield 'BR-Z-7 Error #1' => [
+            'vatRate' => 10,
+        ];
+        yield 'BR-Z-7 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-Z-7 Error #3' => [
             'vatRate' => null,
         ];
     }
