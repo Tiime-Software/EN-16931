@@ -727,7 +727,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br31MandatoryDocumentLevelAllowanceAmount(): void
     {
-        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank');
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
 
         $this->assertEquals(1, $allowance->getAmount());
     }
@@ -738,7 +738,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br32MandatoryDocumentLevelAllowanceVatCategoryCode(): void
     {
-        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank');
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
 
         $this->assertSame(VatCategory::STANDARD, $allowance->getVatCategoryCode());
     }
@@ -751,7 +751,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelAllowance(1, VatCategory::STANDARD);
+        new DocumentLevelAllowance(1, VatCategory::STANDARD, vatRate: 20);
     }
 
     /**
@@ -761,7 +761,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br33CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCode $reasonCode): void
     {
-        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, $reason, $reasonCode);
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
 
         $this->assertSame($reason, $allowance->getReason());
         $this->assertSame($reasonCode, $allowance->getReasonCode());

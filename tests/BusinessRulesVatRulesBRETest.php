@@ -5,6 +5,7 @@ namespace Tests\Tiime\EN16931;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -71,6 +72,52 @@ class BusinessRulesVatRulesBRETest extends TestCase
         ];
         yield 'BR-E-5 Error #3' => [
             'invoicedItemVatRate' => null,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-E-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
+     * (BT-95) is "Exempt from VAT", the Document level allowance VAT rate (BT-96) shall be 0 (zero).
+     * @dataProvider provideBrE6Success
+     */
+    public function brE6_success(?float $vatRate): void
+    {
+        $documentLevelAllowance = new DocumentLevelAllowance(1, VatCategory::EXEMPT_FROM_TAX, 'Hoobastank', vatRate: $vatRate);
+
+        $this->assertInstanceOf(DocumentLevelAllowance::class, $documentLevelAllowance);
+    }
+
+    public static function provideBrE6Success(): \Generator
+    {
+        yield 'BR-E-6 Success #1' => [
+            'vatRate' => 0,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-E-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
+     * (BT-95) is "Exempt from VAT", the Document level allowance VAT rate (BT-96) shall be 0 (zero).
+     * @dataProvider provideBrE6Error
+     */
+    public function brE6_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelAllowance(1, VatCategory::EXEMPT_FROM_TAX, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrE6Error(): \Generator
+    {
+        yield 'BR-E-6 Error #1' => [
+            'vatRate' => 10,
+        ];
+        yield 'BR-E-6 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-E-6 Error #3' => [
+            'vatRate' => null,
         ];
     }
 }

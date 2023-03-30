@@ -5,6 +5,7 @@ namespace Tests\Tiime\EN16931;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -71,6 +72,52 @@ class BusinessRulesVatRulesBRIGTest extends TestCase
         ];
         yield 'BR-IG-5 Error #2' => [
             'invoicedItemVatRate' => null,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IG-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
+     * (BT-95) is "IGIC" the Document level allowance VAT rate (BT-96) shall be 0 (zero) or greater than zero.
+     * @dataProvider provideBrIG6Success
+     */
+    public function brIG6_success(?float $vatRate): void
+    {
+        $documentLevelAllowance = new DocumentLevelAllowance(1, VatCategory::CANARY_ISLANDS, 'Hoobastank', vatRate: $vatRate);
+
+        $this->assertInstanceOf(DocumentLevelAllowance::class, $documentLevelAllowance);
+    }
+
+    public static function provideBrIG6Success(): \Generator
+    {
+        yield 'BR-IG-6 Success #1' => [
+            'invoicedItemVatRate' => 0,
+        ];
+        yield 'BR-IG-6 Success #2' => [
+            'invoicedItemVatRate' => 10,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IG-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
+     * (BT-95) is "IGIC" the Document level allowance VAT rate (BT-96) shall be 0 (zero) or greater than zero.
+     * @dataProvider provideBrIG6Error
+     */
+    public function brIG6_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelAllowance(1, VatCategory::CANARY_ISLANDS, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrIG6Error(): \Generator
+    {
+        yield 'BR-IG-6 Error #1' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-IG-6 Error #2' => [
+            'vatRate' => null,
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Tiime\EN16931;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -63,6 +64,44 @@ class BusinessRulesVatRulesBROTest extends TestCase
         ];
         yield 'BR-O-5 Error #3' => [
             'invoicedItemVatRate' => 0,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-6 : A Document level allowance (BG-20) where VAT category code (BT-95) is "Not subject to VAT"
+     * shall not contain a Document level allowance VAT rate (BT-96).
+     */
+    public function brO6_success(): void
+    {
+        $documentLevelAllowance = new DocumentLevelAllowance(1, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, 'Hoobastank');
+
+        $this->assertInstanceOf(DocumentLevelAllowance::class, $documentLevelAllowance);
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-6 : A Document level allowance (BG-20) where VAT category code (BT-95) is "Not subject to VAT"
+     * shall not contain a Document level allowance VAT rate (BT-96).
+     * @dataProvider provideBrO6Error
+     */
+    public function brO6_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelAllowance(1, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrO6Error(): \Generator
+    {
+        yield 'BR-O-6 Error #1' => [
+            'vatRate' => 10,
+        ];
+        yield 'BR-O-6 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-O-6 Error #3' => [
+            'vatRate' => 0,
         ];
     }
 }

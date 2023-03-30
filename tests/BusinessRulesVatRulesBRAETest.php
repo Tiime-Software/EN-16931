@@ -5,6 +5,7 @@ namespace Tests\Tiime\EN16931;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
@@ -71,6 +72,52 @@ class BusinessRulesVatRulesBRAETest extends TestCase
         ];
         yield 'BR-AE-5 Error #3' => [
             'invoicedItemVatRate' => null,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-AE-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
+     * (BT-95) is "Reverse charge" the Document level allowance VAT rate (BT96) shall be 0 (zero).
+     * @dataProvider provideBrAE6Success
+     */
+    public function brAE6_success(?float $vatRate): void
+    {
+        $documentLevelAllowance = new DocumentLevelAllowance(1, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: $vatRate);
+
+        $this->assertInstanceOf(DocumentLevelAllowance::class, $documentLevelAllowance);
+    }
+
+    public static function provideBrAE6Success(): \Generator
+    {
+        yield 'BR-AE-6 Success #1' => [
+            'vatRate' => 0,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-AE-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
+     * (BT-95) is "Reverse charge" the Document level allowance VAT rate (BT96) shall be 0 (zero).
+     * @dataProvider provideBrAE6Error
+     */
+    public function brAE6_error(?float $vatRate): void
+    {
+        $this->expectException(\Exception::class);
+
+        new DocumentLevelAllowance(1, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: $vatRate);
+    }
+
+    public static function provideBrAE6Error(): \Generator
+    {
+        yield 'BR-AE-6 Error #1' => [
+            'vatRate' => 10,
+        ];
+        yield 'BR-AE-6 Error #2' => [
+            'vatRate' => -10,
+        ];
+        yield 'BR-AE-6 Error #3' => [
+            'vatRate' => null,
         ];
     }
 }

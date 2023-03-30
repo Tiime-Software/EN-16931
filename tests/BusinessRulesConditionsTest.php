@@ -716,7 +716,7 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
             ]
         ];
         yield 'BR-CO-11 Success #2' => [
@@ -740,7 +740,7 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
             ]
         ];
         yield 'BR-CO-11 Success #3' => [
@@ -764,8 +764,8 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD),
-                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20),
+                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
             ]
         ];
     }
@@ -829,7 +829,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfAllowancesOnDocumentLevel: 1000.00
                 ),
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(0.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(0.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
             ]
         ];
         yield 'BR-CO-11 Error #2' => [
@@ -843,8 +843,8 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfAllowancesOnDocumentLevel: 1000.00
                 ),
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD),
-                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20),
+                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
             ]
         ];
     }
@@ -1928,7 +1928,7 @@ class BusinessRulesConditionsTest extends TestCase
      */
     public function brCo21_success(?string $reason, ?AllowanceReasonCode $reasonCode): void
     {
-        $documentLevelAllowance = new DocumentLevelAllowance(14, VatCategory::STANDARD, $reason, $reasonCode);
+        $documentLevelAllowance = new DocumentLevelAllowance(14, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
 
         $this->assertInstanceOf(DocumentLevelAllowance::class, $documentLevelAllowance);
         $this->assertEquals($reason, $documentLevelAllowance->getReason());
@@ -1960,7 +1960,7 @@ class BusinessRulesConditionsTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelAllowance(14, VatCategory::STANDARD, $reason, $reasonCode);
+        new DocumentLevelAllowance(14, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
     }
 
     public static function provideBrCo21_error(): \Generator
