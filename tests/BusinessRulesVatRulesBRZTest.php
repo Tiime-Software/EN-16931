@@ -168,4 +168,39 @@ class BusinessRulesVatRulesBRZTest extends TestCase
             'vatRate' => null,
         ];
     }
+
+    /**
+     * @test
+     * @testdox BR-Z-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where VAT category code
+     * (BT-118) is "Zero rated" shall equal 0 (zero).
+     */
+    public function brZ9_success(): void
+    {
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::ZERO_RATED_GOODS, 0);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    /**
+     * @test
+     * @testdox BR-Z-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where VAT category code
+     * (BT-118) is "Zero rated" shall equal 0 (zero).
+     * @dataProvider provideBrZ9Error
+     */
+    public function brZ9_error(float $vatCategoryTaxAmount): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::ZERO_RATED_GOODS, 0);
+    }
+
+    public static function provideBrZ9Error(): \Generator
+    {
+        yield 'BR-Z-9 Error #1' => [
+            'vatCategoryTaxAmount' => 10,
+        ];
+        yield 'BR-Z-9 Error #2' => [
+            'vatCategoryTaxAmount' => -10,
+        ];
+    }
 }

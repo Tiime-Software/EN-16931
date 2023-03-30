@@ -78,6 +78,23 @@ class VatBreakdown
             throw new \Exception('@todo');
         }
 
+        if (
+            in_array(
+                $vatCategoryCode,
+                [
+                    VatCategory::ZERO_RATED_GOODS,
+                    VatCategory::EXEMPT_FROM_TAX,
+                    VatCategory::VAT_REVERSE_CHARGE,
+                    VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES,
+                    VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED,
+                    VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
+                ]
+            )
+            && $vatCategoryTaxAmount !== 0.0
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-9');
+        }
+
         $this->vatCategoryTaxableAmount = new Amount($vatCategoryTaxableAmount);
         $this->vatCategoryTaxAmount = new Amount($vatCategoryTaxAmount);
         $this->vatCategoryCode = $vatCategoryCode;

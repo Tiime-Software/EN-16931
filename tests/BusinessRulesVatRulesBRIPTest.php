@@ -76,21 +76,6 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
         ];
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * @test
      * @testdox BR-IP-6 : In a Document level allowance (BG-20) where the Document level allowance VAT category code
@@ -181,5 +166,16 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
         yield 'BR-IP-7 Error #2' => [
             'vatRate' => null,
         ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IP-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where VAT category code
+     * (BT-118) is "IPSI" shall equal the VAT category taxable amount (BT-116) multiplied by the VAT category rate
+     * (BT-119).
+     */
+    public function brIP9(): void
+    {
+        $this->assertTrue(true, 'Same as BR-CO-17');
     }
 }

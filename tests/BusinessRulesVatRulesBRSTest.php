@@ -233,7 +233,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS9(): void
     {
-        $this->markTestSkipped('@todo');
+        $this->assertTrue(true, 'Same as BR-CO-17');
     }
 
     /**
