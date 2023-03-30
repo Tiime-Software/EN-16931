@@ -908,7 +908,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 100
                 ),
             'documentLevelCharges' => [
-                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
             ]
         ];
         yield 'BR-CO-12 Success #2' => [
@@ -922,7 +922,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 0
                 ),
             'documentLevelCharges' => [
-                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
             ]
         ];
         yield 'BR-CO-12 Success #3' => [
@@ -936,8 +936,8 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 60
                 ),
             'documentLevelCharges' => [
-                new DocumentLevelCharge(10, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING),
-                new DocumentLevelCharge(50, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+                new DocumentLevelCharge(10, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20),
+                new DocumentLevelCharge(50, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
             ]
         ];
     }
@@ -1001,7 +1001,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 1000
                 ),
             'documentLevelCharges' => [
-                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
             ]
         ];
         yield 'BR-CO-12 Error #2' => [
@@ -1015,8 +1015,8 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 1000
                 ),
             'documentLevelCharges' => [
-                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING),
-                new DocumentLevelCharge(1000, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING)
+                new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20),
+                new DocumentLevelCharge(1000, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
             ]
         ];
     }
@@ -1982,7 +1982,7 @@ class BusinessRulesConditionsTest extends TestCase
      */
     public function brCo22_success(?string $reason, ?ChargeReasonCode $reasonCode): void
     {
-        $documentLevelCharge = new DocumentLevelCharge(14, VatCategory::STANDARD, $reason, $reasonCode);
+        $documentLevelCharge = new DocumentLevelCharge(14, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
 
         $this->assertInstanceOf(DocumentLevelCharge::class, $documentLevelCharge);
         $this->assertEquals($reason, $documentLevelCharge->getReason());

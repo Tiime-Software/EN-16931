@@ -64,17 +64,55 @@ class DocumentLevelCharge
         float $amount,
         VatCategory $vatCategoryCode,
         ?string $reason = null,
-        ?ChargeReasonCode $reasonCode = null
+        ?ChargeReasonCode $reasonCode = null,
+        ?float $vatRate = null
     ) {
         if ((!is_string($reason) || empty($reason)) && !$reasonCode instanceof ChargeReasonCode) {
             throw new \Exception('@todo');
         }
 
+        if (
+            $vatCategoryCode === VatCategory::STANDARD
+            && (null === $vatRate || $vatRate <= 0.0)
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-7');
+        }
+
+        if (
+            in_array(
+                $vatCategoryCode,
+                [
+                    VatCategory::ZERO_RATED_GOODS,
+                    VatCategory::EXEMPT_FROM_TAX,
+                    VatCategory::VAT_REVERSE_CHARGE,
+                    VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES,
+                    VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED,
+                ]
+            )
+            && $vatRate !== 0.0
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-7');
+        }
+
+        if (
+            $vatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
+            && null !== $vatRate
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-7');
+        }
+
+        if (
+            in_array($vatCategoryCode, [VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA])
+            && ($vatRate < 0.0 || null === $vatRate)
+        ) {
+            throw new \Exception('@todo : BR-genericVAT-7');
+        }
+
+        $this->vatRate = $vatRate !== null ? new Percentage($vatRate) : $vatRate;
         $this->amount = new Amount($amount);
         $this->baseAmount = null;
         $this->percentage = null;
         $this->vatCategoryCode = $vatCategoryCode;
-        $this->vatRate = null;
         $this->reason = $reason;
         $this->reasonCode = $reasonCode;
     }
