@@ -143,4 +143,39 @@ class BusinessRulesVatRulesBROTest extends TestCase
             'vatRate' => 0,
         ];
     }
+
+    /**
+     * @test
+     * @testdox BR-O-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
+     * (BT-118) is “Not subject to VAT” shall be 0 (zero).
+     */
+    public function brO9_success(): void
+    {
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
+     * (BT-118) is “Not subject to VAT” shall be 0 (zero).
+     * @dataProvider provideBrO9Error
+     */
+    public function brO9_error(float $vatCategoryTaxAmount): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX);
+    }
+
+    public static function provideBrO9Error(): \Generator
+    {
+        yield 'BR-O-9 Error #1' => [
+            'vatCategoryTaxAmount' => 10,
+        ];
+        yield 'BR-O-9 Error #2' => [
+            'vatCategoryTaxAmount' => -10,
+        ];
+    }
 }

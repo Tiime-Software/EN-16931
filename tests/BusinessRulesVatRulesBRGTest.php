@@ -167,4 +167,39 @@ class BusinessRulesVatRulesBRGTest extends TestCase
             'vatRate' => null,
         ];
     }
+
+    /**
+     * @test
+     * @testdox BR-G-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
+     * (BT-118) is “Export outside the EU” shall be 0 (zero).
+     */
+    public function brG9_success(): void
+    {
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    /**
+     * @test
+     * @testdox BR-G-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
+     * (BT-118) is “Export outside the EU” shall be 0 (zero).
+     * @dataProvider provideBrG9Error
+     */
+    public function brG9_error(float $vatCategoryTaxAmount): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0);
+    }
+
+    public static function provideBrG9Error(): \Generator
+    {
+        yield 'BR-G-9 Error #1' => [
+            'vatCategoryTaxAmount' => 10,
+        ];
+        yield 'BR-G-9 Error #2' => [
+            'vatCategoryTaxAmount' => -10,
+        ];
+    }
 }

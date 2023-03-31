@@ -167,4 +167,39 @@ class BusinessRulesVatRulesBRAETest extends TestCase
             'vatRate' => null,
         ];
     }
+
+    /**
+     * @test
+     * @testdox BR-AE-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
+     * (BT-118) is “Reverse charge” shall be 0 (zero).
+     */
+    public function brAE9_success(): void
+    {
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::VAT_REVERSE_CHARGE, 0);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    /**
+     * @test
+     * @testdox BR-AE-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
+     * (BT-118) is “Reverse charge” shall be 0 (zero).
+     * @dataProvider provideBrAE9Error
+     */
+    public function brAE9_error(float $vatCategoryTaxAmount): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::VAT_REVERSE_CHARGE, 0);
+    }
+
+    public static function provideBrAE9Error(): \Generator
+    {
+        yield 'BR-AE-9 Error #1' => [
+            'vatCategoryTaxAmount' => 10,
+        ];
+        yield 'BR-AE-9 Error #2' => [
+            'vatCategoryTaxAmount' => -10,
+        ];
+    }
 }
