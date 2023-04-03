@@ -330,67 +330,69 @@ class Invoice
         $this->vatBreakdowns = [];
         $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(0);
         foreach ($vatBreakdowns as $vatBreakdown) {
-            if ($vatBreakdown instanceof VatBreakdown) {
-                $this->vatBreakdowns[] = $vatBreakdown;
+            if (!$vatBreakdown instanceof VatBreakdown) {
+                throw new \TypeError();
+            }
 
-                $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
-                    $totalVatCategoryTaxAmountVatBreakdowns
-                        ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
-                );
+            $this->vatBreakdowns[] = $vatBreakdown;
 
-                /** BR-S-1 */
-                if (!$hasBT118VatCategoryStandard && $vatBreakdown->getVatCategoryCode() === VatCategory::STANDARD) {
-                    $hasBT118VatCategoryStandard = true;
-                }
+            $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
+                $totalVatCategoryTaxAmountVatBreakdowns
+                    ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
+            );
+            
+            /** BR-S-1 */
+            if (!$hasBT118VatCategoryStandard && $vatBreakdown->getVatCategoryCode() === VatCategory::STANDARD) {
+                $hasBT118VatCategoryStandard = true;
+            }
 
-                /** BR-Z-1 */
-                if ($vatBreakdown->getVatCategoryCode() === VatCategory::ZERO_RATED_GOODS) {
-                    $countBT118VatCategoryZeroRatedGoods++;
-                }
+            /** BR-Z-1 */
+            if ($vatBreakdown->getVatCategoryCode() === VatCategory::ZERO_RATED_GOODS) {
+                $countBT118VatCategoryZeroRatedGoods++;
+            }
 
-                /** BR-E-1 */
-                if ($vatBreakdown->getVatCategoryCode() === VatCategory::EXEMPT_FROM_TAX) {
-                    $countBT118VatCategoryExemptFromTax++;
-                }
+            /** BR-E-1 */
+            if ($vatBreakdown->getVatCategoryCode() === VatCategory::EXEMPT_FROM_TAX) {
+                $countBT118VatCategoryExemptFromTax++;
+            }
 
-                /** BR-AE-1 */
-                if ($vatBreakdown->getVatCategoryCode() === VatCategory::VAT_REVERSE_CHARGE) {
-                    $countBT118VatCategoryReverseCharge++;
-                }
+            /** BR-AE-1 */
+            if ($vatBreakdown->getVatCategoryCode() === VatCategory::VAT_REVERSE_CHARGE) {
+                $countBT118VatCategoryReverseCharge++;
+            }
 
-                /** BR-IC-1 */
-                if (
-                    $vatBreakdown->getVatCategoryCode()
-                    === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
-                ) {
-                    $countBT118VatCategoryIntraCommunitySupply++;
-                }
+            /** BR-IC-1 */
+            if (
+                $vatBreakdown->getVatCategoryCode()
+                === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
+            ) {
+                $countBT118VatCategoryIntraCommunitySupply++;
+            }
 
-                /** BR-G-1 */
-                if ($vatBreakdown->getVatCategoryCode() === VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED) {
-                    $countBT118VatCategoryExportOutsideEU++;
-                }
+            /** BR-G-1 */
+            if ($vatBreakdown->getVatCategoryCode() === VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED) {
+                $countBT118VatCategoryExportOutsideEU++;
+            }
 
-                /** BR-O-1 */
-                if ($vatBreakdown->getVatCategoryCode() === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
-                    $countBT118VatCategoryNotSubjectToVat++;
-                }
+            /** BR-O-1 */
+            if ($vatBreakdown->getVatCategoryCode() === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+                $countBT118VatCategoryNotSubjectToVat++;
+            }
 
-                /** BR-IG-1 */
-                if (
-                    !$hasBT118VatCategoryCanaryIslands
-                    && $vatBreakdown->getVatCategoryCode() === VatCategory::CANARY_ISLANDS
-                ) {
-                    $hasBT118VatCategoryCanaryIslands = true;
-                }
+            /** BR-IG-1 */
+            if (
+                !$hasBT118VatCategoryCanaryIslands
+                && $vatBreakdown->getVatCategoryCode() === VatCategory::CANARY_ISLANDS
+            ) {
+                $hasBT118VatCategoryCanaryIslands = true;
+            }
 
-                /** BR-IP-1 */
-                if (
-                    !$hasBT118VatCategoryCeutaMelilla
-                    && $vatBreakdown->getVatCategoryCode() === VatCategory::CEUTA_AND_MELILLA
-                ) {
-                    $hasBT118VatCategoryCeutaMelilla = true;
-                }
+            /** BR-IP-1 */
+            if (
+                !$hasBT118VatCategoryCeutaMelilla
+                && $vatBreakdown->getVatCategoryCode() === VatCategory::CEUTA_AND_MELILLA
+            ) {
+                $hasBT118VatCategoryCeutaMelilla = true;
             }
         }
 
@@ -790,8 +792,11 @@ class Invoice
         $this->buyerReference = null;
         $this->deliveryInformation = null;
         $this->paymentInstructions = null;
-        $this->documentLevelCharges = [];
         $this->additionalSupportingDocuments = [];
+
+        foreach ($vatBreakdowns as $vatBreakdown) {
+            $this->checkVatBreakdownTaxableAmountCoherence($vatBreakdown);
+        }
     }
 
     public function getNumber(): InvoiceIdentifier
@@ -1086,5 +1091,99 @@ class Invoice
         }
 
         return $this;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function checkVatBreakdownTaxableAmountCoherence(VatBreakdown $vatBreakdown): void
+    {
+        $vatCategoryCode = $vatBreakdown->getVatCategoryCode();
+        $positiveRateCategories = [VatCategory::STANDARD, VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA];
+
+        $vatRate = 0;
+
+        if (in_array($vatCategoryCode, $positiveRateCategories)) {
+            $vatRate = $vatBreakdown->getVatCategoryRate();
+        }
+
+        if ($vatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+            $vatRate = null;
+        }
+
+        $invoiceLinesNetSum = $this->getInvoiceLinesNetSumPerVatCategory($vatCategoryCode, $vatRate);
+        $chargesSum = $this->getDocumentLevelChargesSumPerVatCategory($vatCategoryCode, $vatRate);
+        $allowancesSum = $this->getDocumentLevelAllowancesSumPerVatCategory($vatCategoryCode, $vatRate);
+
+        $computedSum = new Amount((new DecimalNumber($invoiceLinesNetSum->add($chargesSum)))->subtract($allowancesSum));
+
+        if ($computedSum->getValueRounded() !== $vatBreakdown->getVatCategoryTaxableAmount()) {
+            throw new \Exception('@todo BR-genericVAT-8');
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getInvoiceLinesNetSumPerVatCategory(
+        VatCategory $vatCategoryCode,
+        ?float $vatRate = null
+    ): DecimalNumber {
+        $sum = new DecimalNumber(0);
+
+        foreach ($this->invoiceLines as $invoiceLine) {
+            $vatInformation = $invoiceLine->getLineVatInformation();
+
+            if (
+                $vatInformation->getInvoicedItemVatCategoryCode() === $vatCategoryCode
+                && $vatInformation->getInvoicedItemVatRate() === $vatRate
+            ) {
+                $sum = new DecimalNumber($sum->add(new Amount($invoiceLine->getNetAmount())));
+            }
+        }
+
+        return $sum;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getDocumentLevelChargesSumPerVatCategory(
+        VatCategory $vatCategoryCode,
+        ?float $vatRate = null
+    ): DecimalNumber {
+        $sum = new DecimalNumber(0);
+
+        foreach ($this->documentLevelCharges as $charge) {
+            if (
+                $charge->getVatCategoryCode() === $vatCategoryCode
+                && $charge->getVatRate() === $vatRate
+            ) {
+                $sum = new DecimalNumber($sum->add(new Amount($charge->getAmount())));
+            }
+        }
+
+        return $sum;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getDocumentLevelAllowancesSumPerVatCategory(
+        VatCategory $vatCategoryCode,
+        ?float $vatRate = null
+    ): DecimalNumber {
+        $sum = new DecimalNumber(0);
+
+        foreach ($this->documentLevelAllowances as $allowance) {
+            if (
+                $allowance->getVatCategoryCode() === $vatCategoryCode
+                && $allowance->getVatRate() === $vatRate
+            ) {
+                $sum = new DecimalNumber($sum->add(new Amount($allowance->getAmount())));
+            }
+        }
+
+        return $sum;
     }
 }

@@ -78,10 +78,10 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
+                100,
+                100,
+                120,
+                120,
                 invoiceTotalVatAmount: 20
             ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
@@ -89,9 +89,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
-                new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD, 20),
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::STANDARD, 20.00),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -229,7 +229,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     public function br12MandatoryInvoiceLineNetAmount(): void
     {
         $this->assertIsFloat($this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
-        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
+        $this->assertEquals(100, $this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
     }
 
     /**
@@ -239,7 +239,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     public function br13MandatoryTotalAmountWithoutVat(): void
     {
         $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
-        $this->assertEquals(0, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
+        $this->assertEquals(100, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
     }
 
     /**
@@ -249,7 +249,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     public function br14MandatoryTotalAmountWithVat(): void
     {
         $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
-        $this->assertEquals(20, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
+        $this->assertEquals(120, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
     }
 
     /**
@@ -258,7 +258,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br15MandatoryAmountDueForPayment(): void
     {
-        $this->assertEquals(20, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
+        $this->assertEquals(120, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
     }
 
     /**
@@ -320,7 +320,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             $documentTotals,
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(10, 2, VatCategory::STANDARD, 20.00)],
             $lines,
             null,
             null,
@@ -349,9 +349,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                     new DocumentTotals(
                         10,
                         10,
-                        30,
-                        30,
-                        invoiceTotalVatAmount: 20
+                        12,
+                        12,
+                        invoiceTotalVatAmount: 2
                     ),
                 'lines' => [
                     new InvoiceLine(
@@ -368,18 +368,18 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             'multiple lines' => [
                 'documentTotals' =>
                     new DocumentTotals(
-                        20,
-                        20,
-                        40,
-                        40,
-                        invoiceTotalVatAmount: 20
+                        10,
+                        10,
+                        12,
+                        12,
+                        invoiceTotalVatAmount: 2
                     ),
                 'lines' => [
                     new InvoiceLine(
                         new InvoiceLineIdentifier('value'),
                         1,
                         UnitOfMeasurement::CENTILITRE_REC20,
-                        10,
+                        5,
                         new PriceDetails(10),
                         new LineVatInformation(VatCategory::STANDARD, 20),
                         new ItemInformation('item')
@@ -388,7 +388,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         new InvoiceLineIdentifier('value2'),
                         1,
                         UnitOfMeasurement::CENTILITRE_REC20,
-                        10,
+                        5,
                         new PriceDetails(10),
                         new LineVatInformation(VatCategory::STANDARD, 20),
                         new ItemInformation('item2')
@@ -1187,10 +1187,10 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             $currencyCode,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
+                100,
+                100,
+                120,
+                120,
                 $vatAmount,
                 invoiceTotalVatAmount: 20
             ),
@@ -1199,7 +1199,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                100,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),

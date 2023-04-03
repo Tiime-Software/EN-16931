@@ -65,18 +65,18 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
-                invoiceTotalVatAmount: 20
+                12,
+                12,
+                14.4,
+                14.4,
+                invoiceTotalVatAmount: 2.4
             ),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                12,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
@@ -117,18 +117,18 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
-                invoiceTotalVatAmount: 20
+                12,
+                12,
+                14.4,
+                14.4,
+                invoiceTotalVatAmount: 2.4
             ),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                12,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
@@ -169,18 +169,18 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
-                invoiceTotalVatAmount: 20
+                12,
+                12,
+                14.4,
+                14.4,
+                invoiceTotalVatAmount: 2.4
             ),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(12, 2.4, VatCategory::STANDARD, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                12,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
@@ -359,9 +359,10 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-10 : Sum of Invoice line net amount (BT-106) = ∑ Invoice line net amount (BT-131).
      * @dataProvider provideBrCo10Success
+     * @param array<int, VatBreakdown> $vatBreakdowns
      * @param array<int, InvoiceLine> $invoiceLines
      */
-    public function brCo10_success(DocumentTotals $documentTotals, array $invoiceLines): void
+    public function brCo10_success(DocumentTotals $documentTotals, array $vatBreakdowns, array $invoiceLines): void
     {
         $invoice = (new Invoice(
             new InvoiceIdentifier('34'),
@@ -380,7 +381,7 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             $documentTotals,
-            [new VatBreakdown(0, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
+            $vatBreakdowns,
             $invoiceLines,
             null,
             null,
@@ -408,6 +409,7 @@ class BusinessRulesConditionsTest extends TestCase
                 100,
                 100,
             ),
+            'vatBreakdowns' => [new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -424,9 +426,11 @@ class BusinessRulesConditionsTest extends TestCase
             'documentTotals' => new DocumentTotals(
                 -100,
                 -100,
-                -100,
-                -100
+                -120,
+                -120,
+                invoiceTotalVatAmount: -20
             ),
+            'vatBreakdowns' => [new VatBreakdown(-100, -20, VatCategory::STANDARD, 20.0)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -446,6 +450,7 @@ class BusinessRulesConditionsTest extends TestCase
                 0,
                 0
             ),
+            'vatBreakdowns' => [new VatBreakdown(0, 0, VatCategory::STANDARD, 20.0)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -465,6 +470,7 @@ class BusinessRulesConditionsTest extends TestCase
                 0,
                 0
             ),
+            'vatBreakdowns' => [new VatBreakdown(0, 0, VatCategory::STANDARD, 20.0)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -481,9 +487,11 @@ class BusinessRulesConditionsTest extends TestCase
             'documentTotals' => new DocumentTotals(
                 200,
                 200,
-                200,
-                200
+                240,
+                240,
+                invoiceTotalVatAmount: 40
             ),
+            'vatBreakdowns' => [new VatBreakdown(200, 40, VatCategory::STANDARD, 20.0)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -509,9 +517,11 @@ class BusinessRulesConditionsTest extends TestCase
             'documentTotals' => new DocumentTotals(
                 20,
                 20,
-                20,
-                20
+                24,
+                24,
+                invoiceTotalVatAmount: 4
             ),
+            'vatBreakdowns' => [new VatBreakdown(20, 4, VatCategory::STANDARD, 20)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -537,9 +547,11 @@ class BusinessRulesConditionsTest extends TestCase
             'documentTotals' => new DocumentTotals(
                 -20,
                 -20,
-                -20,
-                -20,
+                -24,
+                -24,
+                invoiceTotalVatAmount:-4
             ),
+            'vatBreakdowns' => [new VatBreakdown(-20, -4, VatCategory::STANDARD, 20)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -658,10 +670,11 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-11 : Sum of allowances on document level (BT-107) = ∑ Document level allowance amount (BT-92).
      * @dataProvider provideBrCo11Success
+     * @param array<int, VatBreakdown> $vatBreakdowns
      * @param array<int, InvoiceLine> $invoiceLines
      * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
      */
-    public function brCo11_success(DocumentTotals $documentTotals, array $invoiceLines, array $documentLevelAllowances): void
+    public function brCo11_success(DocumentTotals $documentTotals, array $vatBreakdowns, array $invoiceLines, array $documentLevelAllowances): void
     {
         $invoice = (new Invoice(
             new InvoiceIdentifier('34'),
@@ -680,7 +693,7 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             $documentTotals,
-            [new VatBreakdown(0, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
+            $vatBreakdowns,
             $invoiceLines,
             null,
             null,
@@ -704,6 +717,7 @@ class BusinessRulesConditionsTest extends TestCase
                     0,
                     sumOfAllowancesOnDocumentLevel: 100
                 ),
+            'vatBreakdowns' => [new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -728,6 +742,7 @@ class BusinessRulesConditionsTest extends TestCase
                     100,
                     sumOfAllowancesOnDocumentLevel: 0
                 ),
+            'vatBreakdowns' => [new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -752,6 +767,7 @@ class BusinessRulesConditionsTest extends TestCase
                     900,
                     sumOfAllowancesOnDocumentLevel: 1100.00
                 ),
+            'vatBreakdowns' => [new VatBreakdown(2000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -853,9 +869,10 @@ class BusinessRulesConditionsTest extends TestCase
      * @test
      * @testdox BR-CO-12 : Sum of charges on document level (BT-108) = ∑ Document level charge amount (BT-99).
      * @dataProvider provideBrCo12Success
+     * @param array<int, VatBreakdown> $vatBreakdowns
      * @param array<int, DocumentLevelCharge> $documentLevelCharges
      */
-    public function brCo12_success(DocumentTotals $documentTotals, array $documentLevelCharges): void
+    public function brCo12_success(DocumentTotals $documentTotals, array $vatBreakdowns, array $documentLevelCharges): void
     {
         $invoice = (new Invoice(
             new InvoiceIdentifier('34'),
@@ -874,7 +891,7 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             $documentTotals,
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            $vatBreakdowns,
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
@@ -907,6 +924,10 @@ class BusinessRulesConditionsTest extends TestCase
                     invoiceTotalVatAmount: 20,
                     sumOfChargesOnDocumentLevel: 100
                 ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00),
+            ],
             'documentLevelCharges' => [
                 new DocumentLevelCharge(100, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
             ]
@@ -916,13 +937,17 @@ class BusinessRulesConditionsTest extends TestCase
                 new DocumentTotals(
                     100,
                     100,
-                    120,
-                    120,
-                    invoiceTotalVatAmount: 20,
+                    100,
+                    100,
+                    invoiceTotalVatAmount: 0,
                     sumOfChargesOnDocumentLevel: 0
                 ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new VatBreakdown(0, 0, VatCategory::STANDARD, 20.00),
+            ],
             'documentLevelCharges' => [
-                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
+                new DocumentLevelCharge(0, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20),
             ]
         ];
         yield 'BR-CO-12 Success #3' => [
@@ -930,14 +955,18 @@ class BusinessRulesConditionsTest extends TestCase
                 new DocumentTotals(
                     100,
                     160,
-                    180,
-                    180,
-                    invoiceTotalVatAmount: 20,
+                    172,
+                    172,
+                    invoiceTotalVatAmount: 12,
                     sumOfChargesOnDocumentLevel: 60
                 ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new VatBreakdown(60, 12, VatCategory::STANDARD, 20.00),
+            ],
             'documentLevelCharges' => [
                 new DocumentLevelCharge(10, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20),
-                new DocumentLevelCharge(50, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20)
+                new DocumentLevelCharge(50, VatCategory::STANDARD, reasonCode: ChargeReasonCode::ADVERTISING, vatRate: 20),
             ]
         ];
     }
@@ -1074,7 +1103,7 @@ class BusinessRulesConditionsTest extends TestCase
                 ),
             'vatBreakdown' => [
                 new VatBreakdown(
-                    0,
+                    1000,
                     0,
                     VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
                 )
@@ -1101,7 +1130,7 @@ class BusinessRulesConditionsTest extends TestCase
                 ),
             'vatBreakdown' => [
                 new VatBreakdown(
-                    0,
+                    1500,
                     0,
                     VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
                 )
@@ -1152,7 +1181,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(12),
-                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new LineVatInformation(VatCategory::STANDARD, 50.0),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -1161,7 +1190,7 @@ class BusinessRulesConditionsTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(12),
-                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new LineVatInformation(VatCategory::STANDARD, 50.0),
                     new ItemInformation("A thing"),
                 )
             ]
@@ -1173,8 +1202,9 @@ class BusinessRulesConditionsTest extends TestCase
      * @testdox BR-CO-14 : Invoice total VAT amount (BT-110) = ∑ VAT category tax amount (BT-117).
      * @dataProvider provideBrCo14Success
      * @param array<int, VatBreakdown> $vatBreakdowns
+     * @param array<int, InvoiceLine> $invoiceLines
      */
-    public function brCo14_success(DocumentTotals $documentTotals, array $vatBreakdowns): void
+    public function brCo14_success(DocumentTotals $documentTotals, array $vatBreakdowns, array $invoiceLines): void
     {
         $invoice = (new Invoice(
             new InvoiceIdentifier('34'),
@@ -1194,15 +1224,7 @@ class BusinessRulesConditionsTest extends TestCase
             null,
             $documentTotals,
             $vatBreakdowns,
-            [new InvoiceLine(
-                new InvoiceLineIdentifier("1"),
-                1,
-                UnitOfMeasurement::BOX_REC21,
-                0,
-                new PriceDetails(12),
-                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
-                new ItemInformation("A thing"),
-            )],
+            $invoiceLines,
             null,
             null,
             new \DateTimeImmutable(),
@@ -1219,43 +1241,85 @@ class BusinessRulesConditionsTest extends TestCase
         yield 'BR-CO-14 Success #1' => [
             'documentTotals' =>
                 new DocumentTotals(
-                    0,
-                    0,
-                    250,
-                    250,
+                    1000,
+                    1000,
+                    1250,
+                    1250,
                     invoiceTotalVatAmount: 250
                 ),
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 250, VatCategory::STANDARD, 25)
-            ]
+            ],
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(12),
+                    new LineVatInformation(VatCategory::STANDARD, 25),
+                    new ItemInformation("A thing"),
+                )
+            ],
         ];
         yield 'BR-CO-14 Success #2' => [
             'documentTotals' =>
                 new DocumentTotals(
-                    0,
-                    0,
-                    400,
-                    400,
-                    invoiceTotalVatAmount: 400
+                    1600,
+                    1600,
+                    1970,
+                    1970,
+                    invoiceTotalVatAmount: 370
                 ),
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 250, VatCategory::STANDARD, 25),
-                new VatBreakdown(600, 150, VatCategory::STANDARD, 25)
-            ]
+                new VatBreakdown(600, 120, VatCategory::STANDARD, 20)
+            ],
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(12),
+                    new LineVatInformation(VatCategory::STANDARD, 25),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    600,
+                    new PriceDetails(12),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
         ];
         yield 'BR-CO-14 Success #3' => [
             'documentTotals' =>
                 new DocumentTotals(
-                    0,
-                    0,
-                    250,
-                    250,
+                    1000,
+                    1000,
+                    1250,
+                    1250,
                     invoiceTotalVatAmount: 250.0
                 ),
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 250, VatCategory::STANDARD, 25),
-                new VatBreakdown(0, 0, VatCategory::STANDARD, 0)
-            ]
+                new VatBreakdown(0, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)
+            ],
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(12),
+                    new LineVatInformation(VatCategory::STANDARD, 25),
+                    new ItemInformation("A thing"),
+                )
+            ],
         ];
         yield 'BR-CO-14 Success #4' => [
             'documentTotals' =>
@@ -1269,7 +1333,18 @@ class BusinessRulesConditionsTest extends TestCase
             'vatBreakdowns' => [
                 new VatBreakdown(0, 0, VatCategory::STANDARD, 0),
                 new VatBreakdown(0, 0.00, VatCategory::STANDARD, 0)
-            ]
+            ],
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(12),
+                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new ItemInformation("A thing"),
+                )
+            ],
         ];
     }
 
@@ -1767,10 +1842,10 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
+                100,
+                100,
+                120,
+                120,
                 invoiceTotalVatAmount: 20
             ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
@@ -1778,7 +1853,7 @@ class BusinessRulesConditionsTest extends TestCase
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                100,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
@@ -2161,9 +2236,9 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
+                100,
+                100,
+                120,
                 $amountDueForPayment,
                 invoiceTotalVatAmount: 20
             ),
@@ -2172,7 +2247,7 @@ class BusinessRulesConditionsTest extends TestCase
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                100,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
@@ -2195,19 +2270,19 @@ class BusinessRulesConditionsTest extends TestCase
     public static function provideBrCo25_success(): \Generator
     {
         yield 'Amount due for payment (BT-115) is positive and the Payment due date (BT-9) is present' => [
-            'amountDueForPayment' => 20,
+            'amountDueForPayment' => 120,
             'paymentDueDate' => new \DateTimeImmutable('2021-01-02'),
             'paymentTerms' => null
         ];
 
         yield 'Amount due for payment (BT-115) is positive and the Payment terms (BT-20) is present' => [
-            'amountDueForPayment' => 20,
+            'amountDueForPayment' => 120,
             'paymentDueDate' => null,
             'paymentTerms' => '30 JOURS NETS'
         ];
 
         yield 'Amount due for payment (BT-115) is positive, the Payment due date (BT-9) and the Payment terms (BT-20) are present' => [
-            'amountDueForPayment' => 20,
+            'amountDueForPayment' => 120,
             'paymentDueDate' => new \DateTimeImmutable('2021-01-02'),
             'paymentTerms' => '30 JOURS NETS'
         ];
@@ -2296,10 +2371,10 @@ class BusinessRulesConditionsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(
-                0,
-                0,
-                20,
-                20,
+                100,
+                100,
+                120,
+                120,
                 invoiceTotalVatAmount: 20
             ),
             [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
@@ -2307,7 +2382,7 @@ class BusinessRulesConditionsTest extends TestCase
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
-                0,
+                100,
                 new PriceDetails(12),
                 new LineVatInformation(VatCategory::STANDARD, 20),
                 new ItemInformation("A thing"),
