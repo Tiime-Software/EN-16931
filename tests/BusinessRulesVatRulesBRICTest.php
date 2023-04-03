@@ -100,15 +100,15 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(2000, 400, VatCategory::STANDARD, 20),
-                new VatBreakdown(2000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
+                new VatBreakdown(1000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
                 2000,
-                2400,
-                2400,
-                invoiceTotalVatAmount: 400,
+                2200,
+                2200,
+                invoiceTotalVatAmount: 200,
             )
         ];
     }

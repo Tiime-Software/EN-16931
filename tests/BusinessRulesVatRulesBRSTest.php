@@ -127,14 +127,14 @@ class BusinessRulesVatRulesBRSTest extends TestCase
             ],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20)
+                new VatBreakdown(900, 180, VatCategory::STANDARD, 20)
             ],
             'documentTotals' => new DocumentTotals(
                 1000,
                 900,
-                1100,
-                1100,
-                invoiceTotalVatAmount: 200,
+                1080,
+                1080,
+                invoiceTotalVatAmount: 180,
                 sumOfAllowancesOnDocumentLevel: 100,
             )
         ];
@@ -155,14 +155,14 @@ class BusinessRulesVatRulesBRSTest extends TestCase
                 new DocumentLevelCharge(100, VatCategory::STANDARD, 'Hoobastank', vatRate: 20)
             ],
             'vatBreakdowns' => [
-                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20)
+                new VatBreakdown(1100, 220, VatCategory::STANDARD, 20)
             ],
             'documentTotals' => new DocumentTotals(
                 1000,
                 1100,
-                1300,
-                1300,
-                invoiceTotalVatAmount: 200,
+                1320,
+                1320,
+                invoiceTotalVatAmount: 220,
                 sumOfChargesOnDocumentLevel: 100,
             )
         ];

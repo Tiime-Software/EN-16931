@@ -100,15 +100,15 @@ class BusinessRulesVatRulesBRGTest extends TestCase
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(2000, 400, VatCategory::STANDARD, 20),
-                new VatBreakdown(2000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
+                new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
                 2000,
-                2400,
-                2400,
-                invoiceTotalVatAmount: 400,
+                2200,
+                2200,
+                invoiceTotalVatAmount: 200,
             )
         ];
     }

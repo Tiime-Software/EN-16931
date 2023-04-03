@@ -340,7 +340,7 @@ class Invoice
                 $totalVatCategoryTaxAmountVatBreakdowns
                     ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
             );
-            
+
             /** BR-S-1 */
             if (!$hasBT118VatCategoryStandard && $vatBreakdown->getVatCategoryCode() === VatCategory::STANDARD) {
                 $hasBT118VatCategoryStandard = true;
