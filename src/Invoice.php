@@ -31,6 +31,7 @@ use Tiime\EN16931\DataType\Reference\PurchaseOrderReference;
 use Tiime\EN16931\DataType\Reference\ReceivingAdviceReference;
 use Tiime\EN16931\DataType\Reference\SalesOrderReference;
 use Tiime\EN16931\DataType\Reference\TenderOrLotReference;
+use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\SemanticDataType\Amount;
 use Tiime\EN16931\SemanticDataType\DecimalNumber;
 
@@ -293,14 +294,16 @@ class Invoice
         $this->vatBreakdowns = [];
         $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(0);
         foreach ($vatBreakdowns as $vatBreakdown) {
-            if ($vatBreakdown instanceof VatBreakdown) {
-                $this->vatBreakdowns[] = $vatBreakdown;
-
-                $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
-                    $totalVatCategoryTaxAmountVatBreakdowns
-                        ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
-                );
+            if (!$vatBreakdown instanceof VatBreakdown) {
+                throw new \TypeError();
             }
+
+            $this->vatBreakdowns[] = $vatBreakdown;
+
+            $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
+                $totalVatCategoryTaxAmountVatBreakdowns
+                    ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
+            );
         }
 
         $totalVatCategoryTaxAmountVatBreakdowns = round(
@@ -440,8 +443,11 @@ class Invoice
         $this->buyerReference = null;
         $this->deliveryInformation = null;
         $this->paymentInstructions = null;
-        $this->documentLevelCharges = [];
         $this->additionalSupportingDocuments = [];
+
+        foreach ($vatBreakdowns as $vatBreakdown) {
+            $this->checkVatBreakdownTaxableAmountCoherence($vatBreakdown);
+        }
     }
 
     public function getNumber(): InvoiceIdentifier
@@ -736,5 +742,99 @@ class Invoice
         }
 
         return $this;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function checkVatBreakdownTaxableAmountCoherence(VatBreakdown $vatBreakdown): void
+    {
+        $vatCategoryCode = $vatBreakdown->getVatCategoryCode();
+        $positiveRateCategories = [VatCategory::STANDARD, VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA];
+
+        $vatRate = 0;
+
+        if (in_array($vatCategoryCode, $positiveRateCategories)) {
+            $vatRate = $vatBreakdown->getVatCategoryRate();
+        }
+
+        if ($vatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+            $vatRate = null;
+        }
+
+        $invoiceLinesNetSum = $this->getInvoiceLinesNetSumPerVatCategory($vatCategoryCode, $vatRate);
+        $chargesSum = $this->getDocumentLevelChargesSumPerVatCategory($vatCategoryCode, $vatRate);
+        $allowancesSum = $this->getDocumentLevelAllowancesSumPerVatCategory($vatCategoryCode, $vatRate);
+
+        $computedSum = new Amount((new DecimalNumber($invoiceLinesNetSum->add($chargesSum)))->subtract($allowancesSum));
+
+        if ($computedSum->getValueRounded() !== $vatBreakdown->getVatCategoryTaxableAmount()) {
+            throw new \Exception('@todo BR-genericVAT-8');
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getInvoiceLinesNetSumPerVatCategory(
+        VatCategory $vatCategoryCode,
+        ?float $vatRate = null
+    ): DecimalNumber {
+        $sum = new DecimalNumber(0);
+
+        foreach ($this->invoiceLines as $invoiceLine) {
+            $vatInformation = $invoiceLine->getLineVatInformation();
+
+            if (
+                $vatInformation->getInvoicedItemVatCategoryCode() === $vatCategoryCode
+                && $vatInformation->getInvoicedItemVatRate() === $vatRate
+            ) {
+                $sum = new DecimalNumber($sum->add(new Amount($invoiceLine->getNetAmount())));
+            }
+        }
+
+        return $sum;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getDocumentLevelChargesSumPerVatCategory(
+        VatCategory $vatCategoryCode,
+        ?float $vatRate = null
+    ): DecimalNumber {
+        $sum = new DecimalNumber(0);
+
+        foreach ($this->documentLevelCharges as $charge) {
+            if (
+                $charge->getVatCategoryCode() === $vatCategoryCode
+                && $charge->getVatRate() === $vatRate
+            ) {
+                $sum = new DecimalNumber($sum->add(new Amount($charge->getAmount())));
+            }
+        }
+
+        return $sum;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getDocumentLevelAllowancesSumPerVatCategory(
+        VatCategory $vatCategoryCode,
+        ?float $vatRate = null
+    ): DecimalNumber {
+        $sum = new DecimalNumber(0);
+
+        foreach ($this->documentLevelAllowances as $allowance) {
+            if (
+                $allowance->getVatCategoryCode() === $vatCategoryCode
+                && $allowance->getVatRate() === $vatRate
+            ) {
+                $sum = new DecimalNumber($sum->add(new Amount($allowance->getAmount())));
+            }
+        }
+
+        return $sum;
     }
 }

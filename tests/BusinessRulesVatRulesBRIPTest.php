@@ -170,6 +170,452 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
 
     /**
      * @test
+     * @testdox BR-IP-8 : For each different value of VAT category rate (BT-119) where the VAT category code (BT118) is
+     * "IPSI", the VAT category taxable amount (BT-116) in a VAT breakdown (BG-23) shall equal the sum of Invoice line
+     * net amounts (BT-131) plus the sum of document level charge amounts (BT-99) minus the sum of document level
+     * allowance amounts (BT-92) where the VAT category code (BT-151, BT-102, BT-95) is “IPSI” and the VAT rate
+     * (BT-152, BT-103, BT-96) equals the VAT category rate (BT-119).
+     *
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     * @param array<int, InvoiceLine> $lines
+     * @param array<int, DocumentLevelAllowance> $allowances
+     * @param array<int, DocumentLevelCharge> $charges
+     *
+     * @dataProvider provideBrIP8Success
+     */
+    public function brIP8_success(
+        DocumentTotals $totals,
+        array $vatBreakdowns,
+        array $lines,
+        array $allowances,
+        array $charges,
+    ): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $totals,
+            $vatBreakdowns,
+            $lines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $allowances,
+            $charges
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIP8Success(): \Generator
+    {
+        yield "single invoice line" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                120,
+                120,
+                invoiceTotalVatAmount: 20
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20)
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    100,
+                    new PriceDetails(100),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [],
+        ];
+
+        yield "multiple invoice lines w/ same rate" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                120,
+                120,
+                invoiceTotalVatAmount: 20
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20)
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(50),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(50),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [],
+        ];
+
+        yield "multiple invoice lines w/ different rates" => [
+            'totals' => new DocumentTotals(
+                200,
+                200,
+                230,
+                230,
+                invoiceTotalVatAmount: 30
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 10, VatCategory::CEUTA_AND_MELILLA, 10)
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    100,
+                    new PriceDetails(100),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    100,
+                    new PriceDetails(100),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 10),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [],
+        ];
+
+        yield "single allowance" => [
+            'totals' => new DocumentTotals(
+                0,
+                -100,
+                -120,
+                -120,
+                invoiceTotalVatAmount: -20,
+                sumOfAllowancesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(-100, -20, VatCategory::CEUTA_AND_MELILLA, 20),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
+            ],
+            'charges' => [],
+        ];
+
+        yield "multiple allowances" => [
+            'totals' => new DocumentTotals(
+                0,
+                -100,
+                -120,
+                -120,
+                invoiceTotalVatAmount: -20,
+                sumOfAllowancesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(-100, -20, VatCategory::CEUTA_AND_MELILLA, 20),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
+            ],
+            'charges' => [],
+        ];
+
+        yield "single charge" => [
+            'totals' => new DocumentTotals(
+                0,
+                100,
+                120,
+                120,
+                invoiceTotalVatAmount: 20,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [
+                new DocumentLevelCharge(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+            ],
+        ];
+
+        yield "multiple charges" => [
+            'totals' => new DocumentTotals(
+                0,
+                100,
+                120,
+                120,
+                invoiceTotalVatAmount: 20,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [
+                new DocumentLevelCharge(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+            ],
+        ];
+
+        yield "lines, allowances and charges w/ same rate" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                120,
+                120,
+                invoiceTotalVatAmount: 20,
+                sumOfAllowancesOnDocumentLevel: 100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
+            ],
+            'charges' => [
+                new DocumentLevelCharge(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+            ],
+        ];
+
+        yield "lines, allowances and charges w/ different rates" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                115,
+                115,
+                invoiceTotalVatAmount: 15,
+                sumOfAllowancesOnDocumentLevel: 100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(50, 10, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(50, 5, VatCategory::CEUTA_AND_MELILLA, 10),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 10),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 10)
+            ],
+            'charges' => [
+                new DocumentLevelCharge(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 10),
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IP-8 : For each different value of VAT category rate (BT-119) where the VAT category code (BT118) is
+     * "IPSI", the VAT category taxable amount (BT-116) in a VAT breakdown (BG-23) shall equal the sum of Invoice line
+     * net amounts (BT-131) plus the sum of document level charge amounts (BT-99) minus the sum of document level
+     * allowance amounts (BT-92) where the VAT category code (BT-151, BT-102, BT-95) is “IPSI” and the VAT rate
+     * (BT-152, BT-103, BT-96) equals the VAT category rate (BT-119).
+     *
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     * @param array<int, InvoiceLine> $lines
+     * @param array<int, DocumentLevelAllowance> $allowances
+     * @param array<int, DocumentLevelCharge> $charges
+     *
+     * @dataProvider provideBrIP8Error
+     */
+    public function brIP8_error(
+        DocumentTotals $totals,
+        array $vatBreakdowns,
+        array $lines,
+        array $allowances,
+        array $charges,
+    ): void {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $totals,
+            $vatBreakdowns,
+            $lines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $allowances,
+            $charges
+        );
+    }
+
+    public static function provideBrIP8Error(): \Generator
+    {
+        yield "errored taxable amount" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                120,
+                120,
+                invoiceTotalVatAmount: 20,
+                sumOfAllowancesOnDocumentLevel: 100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(50, 10, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 10, VatCategory::CEUTA_AND_MELILLA, 10),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    100,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+            ],
+            'charges' => [
+                new DocumentLevelCharge(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+            ],
+        ];
+    }
+
+    /**
+     * @test
      * @testdox BR-IP-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where VAT category code
      * (BT-118) is "IPSI" shall equal the VAT category taxable amount (BT-116) multiplied by the VAT category rate
      * (BT-119).
