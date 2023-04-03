@@ -717,7 +717,9 @@ class BusinessRulesConditionsTest extends TestCase
                     0,
                     sumOfAllowancesOnDocumentLevel: 100
                 ),
-            'vatBreakdowns' => [new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
+            'vatBreakdowns' => [
+                new VatBreakdown(0, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)
+            ],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -730,7 +732,7 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(100, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, reasonCode: AllowanceReasonCode::STANDARD)
             ]
         ];
         yield 'BR-CO-11 Success #2' => [
@@ -742,7 +744,9 @@ class BusinessRulesConditionsTest extends TestCase
                     100,
                     sumOfAllowancesOnDocumentLevel: 0
                 ),
-            'vatBreakdowns' => [new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)
+            ],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
@@ -755,33 +759,36 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, reasonCode: AllowanceReasonCode::STANDARD)
             ]
         ];
         yield 'BR-CO-11 Success #3' => [
             'documentTotals' =>
                 new DocumentTotals(
                     2000,
-                    900,
-                    900,
-                    900,
-                    sumOfAllowancesOnDocumentLevel: 1100.00
+                    1000,
+                    1200,
+                    1200,
+                    invoiceTotalVatAmount: 200,
+                    sumOfAllowancesOnDocumentLevel: 1000.00
                 ),
-            'vatBreakdowns' => [new VatBreakdown(2000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)],
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20)
+            ],
             'invoiceLines' => [
                 new InvoiceLine(
                     new InvoiceLineIdentifier("1"),
                     1,
                     UnitOfMeasurement::BOX_REC21,
                     2000,
-                    new PriceDetails(12),
-                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new PriceDetails(2000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'documentLevelAllowances' => [
                 new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20),
-                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(900.0, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
             ]
         ];
     }
@@ -1331,8 +1338,7 @@ class BusinessRulesConditionsTest extends TestCase
                     invoiceTotalVatAmount: 00
                 ),
             'vatBreakdowns' => [
-                new VatBreakdown(0, 0, VatCategory::STANDARD, 0),
-                new VatBreakdown(0, 0.00, VatCategory::STANDARD, 0)
+                new VatBreakdown(0, 0, VatCategory::STANDARD, 20),
             ],
             'invoiceLines' => [
                 new InvoiceLine(
@@ -1340,8 +1346,8 @@ class BusinessRulesConditionsTest extends TestCase
                     1,
                     UnitOfMeasurement::BOX_REC21,
                     0,
-                    new PriceDetails(12),
-                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
                     new ItemInformation("A thing"),
                 )
             ],

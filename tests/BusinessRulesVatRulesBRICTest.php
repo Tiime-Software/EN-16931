@@ -32,6 +32,171 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 {
     /**
      * @test
+     * @testdox BR-IC-1 : An Invoice that contains an Invoice line (BG-25), a Document level allowance (BG-20) or a
+     * Document level charge (BG-21) where the VAT category code (BT-151, BT-95 or BT-102) is “Intra-community supply”
+     * shall contain in the VAT breakdown (BG-23) exactly one VAT category code (BT-118) equal with "Intra-community
+     * supply".
+     * @dataProvider provideBrIC1Success
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     */
+    public function brIC1_success(array $invoiceLines, array $documentLevelAllowances, array $documentLevelCharges, array $vatBreakdowns, DocumentTotals $documentTotal): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotal,
+            $vatBreakdowns,
+            $invoiceLines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            $documentLevelCharges
+        );
+
+        $this->assertInstanceOf(Invoice::class,  $invoice);
+    }
+
+    public static function provideBrIC1Success(): \Generator
+    {
+        yield 'BR-IC-1 Success #1' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
+                new VatBreakdown(1000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+            ],
+            'documentTotals' => new DocumentTotals(
+                2000,
+                2000,
+                2200,
+                2200,
+                invoiceTotalVatAmount: 200,
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-1 : An Invoice that contains an Invoice line (BG-25), a Document level allowance (BG-20) or a
+     * Document level charge (BG-21) where the VAT category code (BT-151, BT-95 or BT-102) is “Intra-community supply”
+     * shall contain in the VAT breakdown (BG-23) exactly one VAT category code (BT-118) equal with "Intra-community
+     * supply".
+     * @dataProvider provideBrIC1Error
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     */
+    public function brIC1_error(array $invoiceLines, array $documentLevelAllowances, array $documentLevelCharges, array $vatBreakdowns, DocumentTotals $documentTotal): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotal,
+            $vatBreakdowns,
+            $invoiceLines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            $documentLevelCharges
+        );
+    }
+
+    public static function provideBrIC1Error(): \Generator
+    {
+        yield 'BR-IC-1 Error #1' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [
+                new VatBreakdown(2000, 400, VatCategory::STANDARD, 20)
+            ],
+            'documentTotals' => new DocumentTotals(
+                2000,
+                2000,
+                2400,
+                2400,
+                invoiceTotalVatAmount: 400,
+            )
+        ];
+    }
+
+    /**
+     * @test
      * @testdox BR-IC-5 : In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is
      * "Intracommunity supply" the Invoiced item VAT rate (BT-152) shall be 0 (zero).
      * @dataProvider provideBrIC5Success

@@ -32,6 +32,168 @@ class BusinessRulesVatRulesBROTest extends TestCase
 {
     /**
      * @test
+     * @testdox BR-O-1 : An Invoice that contains an Invoice line (BG-25), a Document level allowance (BG-20) or a
+     * Document level charge (BG-21) where the VAT category code (BT-151, BT-95 or BT-102) is “Not subject to VAT”
+     * shall contain exactly one VAT breakdown group (BG-23) with the VAT category code (BT-118) equal to "Not subject
+     * to VAT".
+     * @dataProvider provideBrO1Success
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     */
+    public function brO1_success(array $invoiceLines, array $documentLevelAllowances, array $documentLevelCharges, array $vatBreakdowns, DocumentTotals $documentTotal): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotal,
+            $vatBreakdowns,
+            $invoiceLines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            $documentLevelCharges
+        );
+
+        $this->assertInstanceOf(Invoice::class,  $invoice);
+    }
+
+    public static function provideBrO1Success(): \Generator
+    {
+        yield 'BR-O-1 Success #1' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
+                new VatBreakdown(1000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)
+            ],
+            'documentTotals' => new DocumentTotals(
+                2000,
+                2000,
+                2200,
+                2200,
+                invoiceTotalVatAmount: 200,
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-1 :
+     * @dataProvider provideBrO1Error
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     */
+    public function brO1_error(array $invoiceLines, array $documentLevelAllowances, array $documentLevelCharges, array $vatBreakdowns, DocumentTotals $documentTotal): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotal,
+            $vatBreakdowns,
+            $invoiceLines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            $documentLevelCharges
+        );
+    }
+
+    public static function provideBrO1Error(): \Generator
+    {
+        yield 'BR-O-1 Error #1' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [
+                new VatBreakdown(2000, 400, VatCategory::STANDARD, 20)
+            ],
+            'documentTotals' => new DocumentTotals(
+                2000,
+                2000,
+                2400,
+                2400,
+                invoiceTotalVatAmount: 400,
+            )
+        ];
+    }
+
+    /**
+     * @test
      * @testdox BR-O-5 : An Invoice line (BG-25) where the VAT category code (BT-151) is "Not subject to VAT" shall not
      * contain an Invoiced item VAT rate (BT-152).
      */
