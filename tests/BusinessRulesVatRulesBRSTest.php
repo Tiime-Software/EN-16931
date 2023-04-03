@@ -16,6 +16,7 @@ use Tiime\EN16931\BusinessTermsGroup\ProcessControl;
 use Tiime\EN16931\BusinessTermsGroup\Seller;
 use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
+use Tiime\EN16931\DataType\AllowanceReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -35,10 +36,215 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      * @testdox BR-S-1 : An Invoice that contains an Invoice line (BG-25), a Document level allowance (BG-20) or a
      * Document level charge (BG-21) where the VAT category code (BT-151, BT-95 or BT102) is “Standard rated” shall
      * contain in the VAT breakdown (BG-23) at least one VAT category code (BT-118) equal with "Standard rated".
+     * @dataProvider provideBrS1Success
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
+     * @param array<int, VatBreakdown> $vatBreakdowns
      */
-    public function brS1(): void
+    public function brS1_success(array $invoiceLines, array $documentLevelAllowances, array $documentLevelCharges, array $vatBreakdowns, DocumentTotals $documentTotal): void
     {
-        $this->markTestSkipped('@todo');
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotal,
+            $vatBreakdowns,
+            $invoiceLines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            $documentLevelCharges
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrS1Success(): \Generator
+    {
+        yield 'BR-S-1 Success #1' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A2"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    2000,
+                    new PriceDetails(2000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [
+                new VatBreakdown(3000, 600, VatCategory::STANDARD, 20)
+            ],
+            'documentTotals' => new DocumentTotals(
+                3000,
+                3000,
+                3600,
+                3600,
+                invoiceTotalVatAmount: 600,
+            )
+        ];
+        yield 'BR-S-1 Success #2' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [
+                new DocumentLevelAllowance(100, VatCategory::STANDARD, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+            ],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20)
+            ],
+            'documentTotals' => new DocumentTotals(
+                1000,
+                900,
+                1100,
+                1100,
+                invoiceTotalVatAmount: 200,
+                sumOfAllowancesOnDocumentLevel: 100,
+            )
+        ];
+        yield 'BR-S-1 Success #3' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [
+                new DocumentLevelCharge(100, VatCategory::STANDARD, 'Hoobastank', vatRate: 20)
+            ],
+            'vatBreakdowns' => [
+                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20)
+            ],
+            'documentTotals' => new DocumentTotals(
+                1000,
+                1100,
+                1300,
+                1300,
+                invoiceTotalVatAmount: 200,
+                sumOfChargesOnDocumentLevel: 100,
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-S-1 : An Invoice that contains an Invoice line (BG-25), a Document level allowance (BG-20) or a
+     * Document level charge (BG-21) where the VAT category code (BT-151, BT-95 or BT102) is “Standard rated” shall
+     * contain in the VAT breakdown (BG-23) at least one VAT category code (BT-118) equal with "Standard rated".
+     * @dataProvider provideBrS1Error
+     * @param array<int, InvoiceLine> $invoiceLines
+     * @param array<int, DocumentLevelAllowance> $documentLevelAllowances
+     * @param array<int, DocumentLevelCharge> $documentLevelCharges
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     */
+    public function brS1_error(array $invoiceLines, array $documentLevelAllowances, array $documentLevelCharges, array $vatBreakdowns, DocumentTotals $documentTotal): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $documentTotal,
+            $vatBreakdowns,
+            $invoiceLines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $documentLevelAllowances,
+            $documentLevelCharges
+        );
+    }
+
+    public static function provideBrS1Error(): \Generator
+    {
+        yield 'BR-S-1 Error #1' => [
+            'invoiceLines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    1000,
+                    new PriceDetails(1000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                ),
+            ],
+            'documentLevelAllowances' => [],
+            'documentLevelCharges' => [],
+            'vatBreakdowns' => [],
+            'documentTotals' => new DocumentTotals(
+                2000,
+                2000,
+                2400,
+                2400,
+                invoiceTotalVatAmount: 400,
+            )
+        ];
     }
 
     /**
