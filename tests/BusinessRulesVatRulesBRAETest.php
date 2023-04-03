@@ -170,6 +170,375 @@ class BusinessRulesVatRulesBRAETest extends TestCase
 
     /**
      * @test
+     * @testdox BR-AE-8 : In a VAT breakdown (BG-23) where the VAT category code (BT-118) is "Reverse charge"
+     * the VAT category taxable amount (BT-116) shall equal the sum of Invoice line net amounts (BT-131) minus the sum
+     * of Document level allowance amounts (BT-92) plus the sum of Document level charge amounts (BT-99) where the VAT
+     * category codes (BT151, BT-95, BT-102) are “Reverse charge".
+     *
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     * @param array<int, InvoiceLine> $lines
+     * @param array<int, DocumentLevelAllowance> $allowances
+     * @param array<int, DocumentLevelCharge> $charges
+     *
+     * @dataProvider provideBrAE8Success
+     */
+    public function brAE8_success(
+        DocumentTotals $totals,
+        array $vatBreakdowns,
+        array $lines,
+        array $allowances,
+        array $charges,
+    ): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $totals,
+            $vatBreakdowns,
+            $lines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $allowances,
+            $charges
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrAE8Success(): \Generator
+    {
+        yield "single invoice line" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                100,
+                100,
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0)
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    100,
+                    new PriceDetails(100),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [],
+        ];
+
+        yield "multiple invoice lines" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                100,
+                100,
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0)
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(50),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(50),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [],
+        ];
+
+        yield "single allowance" => [
+            'totals' => new DocumentTotals(
+                0,
+                -100,
+                -100,
+                -100,
+                invoiceTotalVatAmount: 0,
+                sumOfAllowancesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(-100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(100, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0)
+            ],
+            'charges' => [],
+        ];
+
+        yield "multiple allowances" => [
+            'totals' => new DocumentTotals(
+                0,
+                -100,
+                -100,
+                -100,
+                invoiceTotalVatAmount: 0,
+                sumOfAllowancesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(-100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(40, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+                new DocumentLevelAllowance(60, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0)
+            ],
+            'charges' => [],
+        ];
+
+        yield "single charge" => [
+            'totals' => new DocumentTotals(
+                0,
+                100,
+                100,
+                100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [
+                new DocumentLevelCharge(100, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+            ],
+        ];
+
+        yield "multiple charges" => [
+            'totals' => new DocumentTotals(
+                0,
+                100,
+                100,
+                100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    0,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [],
+            'charges' => [
+                new DocumentLevelCharge(40, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+                new DocumentLevelCharge(60, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+            ],
+        ];
+
+        yield "lines, allowances and charges" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                100,
+                100,
+                sumOfAllowancesOnDocumentLevel: 100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(40, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+                new DocumentLevelAllowance(60, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0)
+            ],
+            'charges' => [
+                new DocumentLevelCharge(40, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+                new DocumentLevelCharge(60, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-AE-8 : In a VAT breakdown (BG-23) where the VAT category code (BT-118) is "Reverse charge"
+     * the VAT category taxable amount (BT-116) shall equal the sum of Invoice line net amounts (BT-131) minus the sum
+     * of Document level allowance amounts (BT-92) plus the sum of Document level charge amounts (BT-99) where the VAT
+     * category codes (BT151, BT-95, BT-102) are “Reverse charge".
+     *
+     * @param array<int, VatBreakdown> $vatBreakdowns
+     * @param array<int, InvoiceLine> $lines
+     * @param array<int, DocumentLevelAllowance> $allowances
+     * @param array<int, DocumentLevelCharge> $charges
+     *
+     * @dataProvider provideBrAE8Error
+     */
+    public function brAE8_error(
+        DocumentTotals $totals,
+        array $vatBreakdowns,
+        array $lines,
+        array $allowances,
+        array $charges,
+    ): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            $totals,
+            $vatBreakdowns,
+            $lines,
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            $allowances,
+            $charges
+        );
+    }
+
+    public static function provideBrAE8Error(): \Generator
+    {
+        yield "errored taxable amount" => [
+            'totals' => new DocumentTotals(
+                100,
+                100,
+                110,
+                110,
+                invoiceTotalVatAmount: 10,
+                sumOfAllowancesOnDocumentLevel: 100,
+                sumOfChargesOnDocumentLevel: 100
+            ),
+            'vatBreakdowns' => [
+                new VatBreakdown(50, 10, VatCategory::STANDARD, 20),
+                new VatBreakdown(50, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+            ],
+            'lines' => [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                ),
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    50,
+                    new PriceDetails(0),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            'allowances' => [
+                new DocumentLevelAllowance(100, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+            ],
+            'charges' => [
+                new DocumentLevelCharge(100, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+            ],
+        ];
+    }
+
+    /**
+     * @test
      * @testdox BR-AE-9 : The VAT category tax amount (BT-117) in a VAT breakdown (BG-23) where the VAT category code
      * (BT-118) is “Reverse charge” shall be 0 (zero).
      */
