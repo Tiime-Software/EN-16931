@@ -606,9 +606,9 @@ class Invoice
         /** BR-IC-2 */
         if (
             $hasBT151VatCategoryIntraCommunitySupply
-            && (
-                (!$seller->getVatIdentifier() && !$sellerTaxRepresentativeParty?->getVatIdentifier())
-                || !$buyer->getVatIdentifier()
+            && !(
+                ($seller->getVatIdentifier() xor $sellerTaxRepresentativeParty?->getVatIdentifier())
+                && $buyer->getVatIdentifier()
             )
         ) {
             throw new \Exception('@todo : BR-IC-2');
@@ -617,8 +617,7 @@ class Invoice
         /** BR-G-2 */
         if (
             $hasBT151VatCategoryExportOutsideEU
-            && !$seller->getVatIdentifier()
-            && !$sellerTaxRepresentativeParty?->getVatIdentifier()
+            && !($seller->getVatIdentifier() xor $sellerTaxRepresentativeParty?->getVatIdentifier())
         ) {
             throw new \Exception('@todo : BR-G-2');
         }
