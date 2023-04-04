@@ -2,13 +2,16 @@
 
 namespace Tests\Tiime\EN16931;
 
+use PHPStan\Rules\DateTimeInstantiationRule;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliveryInformation;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
+use Tiime\EN16931\BusinessTermsGroup\InvoicingPeriod;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
 use Tiime\EN16931\BusinessTermsGroup\LineVatInformation;
 use Tiime\EN16931\BusinessTermsGroup\PriceDetails;
@@ -69,7 +72,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $documentLevelAllowances,
-            $documentLevelCharges
+            $documentLevelCharges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable()),
         );
 
         $this->assertInstanceOf(Invoice::class,  $invoice);
@@ -154,7 +158,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $documentLevelAllowances,
-            $documentLevelCharges
+            $documentLevelCharges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable()),
         );
     }
 
@@ -354,8 +359,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
         array $lines,
         array $allowances,
         array $charges,
-    ): void
-    {
+    ): void {
         $invoice = new Invoice(
             new InvoiceIdentifier('1'),
             new \DateTimeImmutable(),
@@ -380,7 +384,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $allowances,
-            $charges
+            $charges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable())
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -653,7 +658,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $allowances,
-            $charges
+            $charges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable()),
         );
     }
 
@@ -798,4 +804,123 @@ class BusinessRulesVatRulesBRICTest extends TestCase
         ];
     }
 
+    /**
+     * @test
+     * @testdox BR-IC-11 :
+     * @dataProvider provideBrIC11Success
+     */
+    public function brIC11_success(DeliveryInformation $deliveryInformation): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(100, 100, 100, 100),
+            [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $deliveryInformation
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIC11Success(): \Generator
+    {
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: new \DateTimeImmutable(),
+            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+        )];
+
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: null,
+            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+        )];
+
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: new \DateTimeImmutable(),
+            invoicingPeriod: null,
+        )];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-11 :
+     * @dataProvider provideBrIC11Error
+     */
+    public function brIC11_error(?DeliveryInformation $deliveryInformation): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(100, 100, 100, 100),
+            [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $deliveryInformation
+        );
+    }
+
+    public static function provideBrIC11Error(): \Generator
+    {
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: null,
+            invoicingPeriod: null,
+        )];
+
+        yield ['deliveryInformation' => null];
+    }
 }
