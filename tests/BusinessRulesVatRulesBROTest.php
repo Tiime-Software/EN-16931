@@ -22,6 +22,8 @@ use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
 use Tiime\EN16931\DataType\Identifier\InvoiceLineIdentifier;
 use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\TaxRegistrationIdentifier;
+use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
@@ -56,7 +58,8 @@ class BusinessRulesVatRulesBROTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null
+                null,
+                new TaxRegistrationIdentifier('FR958954615')
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,

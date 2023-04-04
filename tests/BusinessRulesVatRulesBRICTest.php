@@ -22,6 +22,7 @@ use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
 use Tiime\EN16931\DataType\Identifier\InvoiceLineIdentifier;
 use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
@@ -56,9 +57,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE), new VatIdentifier('FR966666'),),
             null,
             $documentTotal,
             $vatBreakdowns,
@@ -367,9 +368,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE), new VatIdentifier('FR96666')),
             null,
             $totals,
             $vatBreakdowns,
