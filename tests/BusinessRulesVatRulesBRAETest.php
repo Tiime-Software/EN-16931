@@ -26,6 +26,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRAETest extends TestCase
@@ -100,7 +101,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
-                new VatBreakdown(1000, 0, VatCategory::VAT_REVERSE_CHARGE, 0)
+                new VatBreakdown(1000, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -393,7 +394,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0)
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -418,7 +419,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0)
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -454,7 +455,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+                new VatBreakdown(-100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -483,7 +484,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+                new VatBreakdown(-100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -512,7 +513,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -540,7 +541,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -570,7 +571,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+                new VatBreakdown(100, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -669,7 +670,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
             ),
             'vatBreakdowns' => [
                 new VatBreakdown(50, 10, VatCategory::STANDARD, 20),
-                new VatBreakdown(50, 0, VatCategory::VAT_REVERSE_CHARGE, 0),
+                new VatBreakdown(50, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -707,7 +708,13 @@ class BusinessRulesVatRulesBRAETest extends TestCase
      */
     public function brAE9_success(): void
     {
-        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::VAT_REVERSE_CHARGE, 0);
+        $vatBreakdown = new VatBreakdown(
+            1000,
+            0,
+            VatCategory::VAT_REVERSE_CHARGE,
+            0,
+            vatExemptionReasonText: 'Hoobastank'
+        );
 
         $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
     }
@@ -732,6 +739,61 @@ class BusinessRulesVatRulesBRAETest extends TestCase
         ];
         yield 'BR-AE-9 Error #2' => [
             'vatCategoryTaxAmount' => -10,
+        ];
+    }
+
+
+    /**
+     * @test
+     * @testdox BR-AE-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Reverse charge" shall have a VAT
+     * exemption reason code (BT-121), meaning "Reverse charge" or the VAT exemption reason text (BT-120) "Reverse charge"
+     * (or the equivalent standard text in another language).
+     * @dataProvider provideBrAE10Success
+     */
+    public function brAE10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::VAT_REVERSE_CHARGE, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrAE10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::REVERSE_CHARGE,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::REVERSE_CHARGE,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-AE-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Reverse charge" shall have a VAT
+     * exemption reason code (BT-121), meaning "Reverse charge" or the VAT exemption reason text (BT-120) "Reverse charge"
+     * (or the equivalent standard text in another language).
+     * @dataProvider provideBrAE10Error
+     */
+    public function brAE10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::VAT_REVERSE_CHARGE, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrAE10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
         ];
     }
 }

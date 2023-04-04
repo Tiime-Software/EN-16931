@@ -26,6 +26,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRGTest extends TestCase
@@ -101,7 +102,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
-                new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
+                new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -395,7 +396,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
+                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -420,7 +421,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
+                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -456,7 +457,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0),
+                new VatBreakdown(-100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -485,7 +486,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0),
+                new VatBreakdown(-100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -514,7 +515,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0),
+                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -542,7 +543,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0),
+                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -572,7 +573,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0),
+                new VatBreakdown(100, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -670,7 +671,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
             ),
             'vatBreakdowns' => [
                 new VatBreakdown(50, 10, VatCategory::STANDARD, 20),
-                new VatBreakdown(50, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0),
+                new VatBreakdown(50, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -708,7 +709,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
      */
     public function brG9_success(): void
     {
-        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0);
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank');
 
         $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
     }
@@ -723,7 +724,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0);
+        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank');
     }
 
     public static function provideBrG9Error(): \Generator
@@ -733,6 +734,60 @@ class BusinessRulesVatRulesBRGTest extends TestCase
         ];
         yield 'BR-G-9 Error #2' => [
             'vatCategoryTaxAmount' => -10,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-G-10 : A VAT Breakdown (BG-23) with the VAT Category code (BT-118) "Export outside the EU" shall have
+     * a VAT exemption reason code (BT-121), meaning "Export outside the EU" or the VAT exemption reason text (BT-120)
+     * "Export outside the EU" (or the equivalent standard text in another language).
+     * @dataProvider provideBrG10Success
+     */
+    public function brG10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrG10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::EXPORT_OUTSIDE_THE_EU,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::EXPORT_OUTSIDE_THE_EU,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-G-10 : A VAT Breakdown (BG-23) with the VAT Category code (BT-118) "Export outside the EU" shall have
+     * a VAT exemption reason code (BT-121), meaning "Export outside the EU" or the VAT exemption reason text (BT-120)
+     * "Export outside the EU" (or the equivalent standard text in another language).
+     * @dataProvider provideBrG10Error
+     */
+    public function brG10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrG10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
         ];
     }
 }
