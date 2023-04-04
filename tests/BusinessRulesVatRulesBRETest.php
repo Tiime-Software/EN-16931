@@ -219,12 +219,12 @@ class BusinessRulesVatRulesBRETest extends TestCase
             new DocumentTotals(
                 3000,
                 3000,
-                3600,
-                3600,
-                invoiceTotalVatAmount: 600,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 600, VatCategory::STANDARD, 20)
+                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0)
             ],
             [
                 new InvoiceLine(
@@ -233,7 +233,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     3000,
                     new PriceDetails(3000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, 0),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -378,12 +378,12 @@ class BusinessRulesVatRulesBRETest extends TestCase
             new DocumentTotals(
                 3000,
                 3000,
-                3600,
-                3600,
-                invoiceTotalVatAmount: 600,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 600, VatCategory::STANDARD, 20)
+                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0)
             ],
             [
                 new InvoiceLine(
@@ -392,7 +392,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     3000,
                     new PriceDetails(3000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, 0),
                     new ItemInformation("A thing"),
                 )
             ],
