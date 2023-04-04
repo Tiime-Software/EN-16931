@@ -15,6 +15,8 @@ use Tiime\EN16931\BusinessTermsGroup\PriceDetails;
 use Tiime\EN16931\BusinessTermsGroup\ProcessControl;
 use Tiime\EN16931\BusinessTermsGroup\Seller;
 use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
+use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
 use Tiime\EN16931\DataType\AllowanceReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
@@ -23,6 +25,7 @@ use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
 use Tiime\EN16931\DataType\Identifier\InvoiceLineIdentifier;
 use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\TaxRegistrationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
@@ -253,10 +256,208 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      * @testdox BR-S-2 : An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code
      * (BT-151) is “Standard rated” shall contain the Seller VAT Identifier (BT-31), the Seller tax registration
      * identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63).
+     * @dataProvider provideBrS2Success
      */
-    public function brS2(): void
+    public function brS2_success(Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
     {
-        $this->markTestSkipped('@todo');
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3600,
+                3600,
+                invoiceTotalVatAmount: 600,
+            ),
+            [
+                new VatBreakdown(3000, 600, VatCategory::STANDARD, 20)
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrS2Success(): \Generator
+    {
+        yield 'BR-S-2 - Only Seller VatIdentifier field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-S-2 - Only Seller TaxRegistrationIdentifier field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-S-2 - Only SellerTaxRepresentativeParty field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-S-2 - Seller VatIdentifier and Seller TaxRegistrationIdentifier fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-S-2 - Seller VatIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-S-2 - Seller TaxRegistrationIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-S-2 - Seller VatIdentifier and Seller TaxRegistrationIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR986416485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-S-2 : An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code
+     * (BT-151) is “Standard rated” shall contain the Seller VAT Identifier (BT-31), the Seller tax registration
+     * identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63).
+     */
+    public function brS2_error(): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3600,
+                3600,
+                invoiceTotalVatAmount: 600,
+            ),
+            [
+                new VatBreakdown(3000, 600, VatCategory::STANDARD, 20)
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            null
+        );
     }
 
     /**
