@@ -289,7 +289,8 @@ class Invoice
         ?\DateTimeInterface $paymentDueDate,
         ?string $paymentTerms,
         array $documentLevelAllowances,
-        array $documentLevelCharges
+        array $documentLevelCharges,
+        ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty = null
     ) {
         /** BR-S-1 */
         $hasBT151orBT95orBT102VatCategoryStandard = false;
@@ -326,6 +327,33 @@ class Invoice
         /** BR-IP-1 */
         $hasBT151orBT95orBT102VatCategoryCeutaMelilla = false;
         $hasBT118VatCategoryCeutaMelilla = false;
+
+        /** BR-S-2 */
+        $hasBT151VatCategoryStandard = false;
+
+        /** BR-Z-2 */
+        $hasBT151VatCategoryZeroRatedGoods = false;
+
+        /** BR-E-2 */
+        $hasBT151VatCategoryExemptFromTax = false;
+
+        /** BR-AE-2 */
+        $hasBT151VatCategoryReverseCharge = false;
+
+        /** BR-IC-2 */
+        $hasBT151VatCategoryIntraCommunitySupply = false;
+
+        /** BR-G-2 */
+        $hasBT151VatCategoryExportOutsideEU = false;
+
+        /** BR-O-2 */
+        $hasBT151VatCategoryNotSubjectToVat = false;
+
+        /** BR-IG-2 */
+        $hasBT151VatCategoryCanaryIslands = false;
+
+        /** BR-IP-2 */
+        $hasBT151VatCategoryCeutaMelilla = false;
 
         $this->vatBreakdowns = [];
         $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(0);
@@ -416,97 +444,201 @@ class Invoice
         $this->invoiceLines = [];
         $totalNetAmountInvoiceLines = new DecimalNumber(0);
         foreach ($invoiceLines as $invoiceLine) {
-            if ($invoiceLine instanceof InvoiceLine) {
-                $this->invoiceLines[] = $invoiceLine;
+            if (!$invoiceLine instanceof InvoiceLine) {
+                throw new \TypeError();
+            }
 
-                $totalNetAmountInvoiceLines = new DecimalNumber(
-                    $totalNetAmountInvoiceLines->add(new DecimalNumber($invoiceLine->getNetAmount()))
-                );
+            $this->invoiceLines[] = $invoiceLine;
 
-                $invoiceLineVatCategoryCode = $invoiceLine->getLineVatInformation()->getInvoicedItemVatCategoryCode();
+            $totalNetAmountInvoiceLines = new DecimalNumber(
+                $totalNetAmountInvoiceLines->add(new DecimalNumber($invoiceLine->getNetAmount()))
+            );
 
+            $invoiceLineVatCategoryCode = $invoiceLine->getLineVatInformation()->getInvoicedItemVatCategoryCode();
+
+            if ($invoiceLineVatCategoryCode === VatCategory::STANDARD) {
                 /** BR-S-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryStandard
-                    && $invoiceLineVatCategoryCode === VatCategory::STANDARD
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryStandard) {
                     $hasBT151orBT95orBT102VatCategoryStandard = true;
                 }
 
+                /** BR-S-2 */
+                if (!$hasBT151VatCategoryStandard) {
+                    $hasBT151VatCategoryStandard = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::ZERO_RATED_GOODS) {
                 /** BR-Z-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryZeroRatedGoods
-                    && $invoiceLineVatCategoryCode === VatCategory::ZERO_RATED_GOODS
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryZeroRatedGoods) {
                     $hasBT151orBT95orBT102VatCategoryZeroRatedGoods = true;
                 }
 
+                /** BR-Z-2 */
+                if (!$hasBT151VatCategoryZeroRatedGoods) {
+                    $hasBT151VatCategoryZeroRatedGoods = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::EXEMPT_FROM_TAX) {
                 /** BR-E-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryExemptFromTax
-                    && $invoiceLineVatCategoryCode === VatCategory::EXEMPT_FROM_TAX
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryExemptFromTax) {
                     $hasBT151orBT95orBT102VatCategoryExemptFromTax = true;
                 }
 
+                /** BR-E-2 */
+                if (!$hasBT151VatCategoryExemptFromTax) {
+                    $hasBT151VatCategoryExemptFromTax = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::VAT_REVERSE_CHARGE) {
                 /** BR-AE-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryReverseCharge
-                    && $invoiceLineVatCategoryCode === VatCategory::VAT_REVERSE_CHARGE
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryReverseCharge) {
                     $hasBT151orBT95orBT102VatCategoryReverseCharge = true;
                 }
 
+                /** BR-AE-2 */
+                if (!$hasBT151VatCategoryReverseCharge) {
+                    $hasBT151VatCategoryReverseCharge = true;
+                }
+            }
+
+            if (
+                $invoiceLineVatCategoryCode
+                === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
+            ) {
                 /** BR-IC-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryIntraCommunitySupply
-                    && $invoiceLineVatCategoryCode
-                        === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryIntraCommunitySupply) {
                     $hasBT151orBT95orBT102VatCategoryIntraCommunitySupply = true;
                 }
 
+                /** BR-IC-2 */
+                if (!$hasBT151VatCategoryIntraCommunitySupply) {
+                    $hasBT151VatCategoryIntraCommunitySupply = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED) {
                 /** BR-G-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryExportOutsideEU
-                    && $invoiceLineVatCategoryCode === VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryExportOutsideEU) {
                     $hasBT151orBT95orBT102VatCategoryExportOutsideEU = true;
                 }
 
+                /** BR-G-2 */
+                if (!$hasBT151VatCategoryExportOutsideEU) {
+                    $hasBT151VatCategoryExportOutsideEU = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
                 /** BR-O-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryNotSubjectToVat
-                    && $invoiceLineVatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryNotSubjectToVat) {
                     $hasBT151orBT95orBT102VatCategoryNotSubjectToVat = true;
                 }
 
+                /** BR-O-2 */
+                if (!$hasBT151VatCategoryNotSubjectToVat) {
+                    $hasBT151VatCategoryNotSubjectToVat = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::CANARY_ISLANDS) {
                 /** BR-IG-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryCanaryIslands
-                    && $invoiceLineVatCategoryCode === VatCategory::CANARY_ISLANDS
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryCanaryIslands) {
                     $hasBT151orBT95orBT102VatCategoryCanaryIslands = true;
                 }
 
+                /** BR-IG-2 */
+                if (!$hasBT151VatCategoryCanaryIslands) {
+                    $hasBT151VatCategoryCanaryIslands = true;
+                }
+            }
+
+            if ($invoiceLineVatCategoryCode === VatCategory::CEUTA_AND_MELILLA) {
                 /** BR-IP-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryCeutaMelilla
-                    && $invoiceLineVatCategoryCode === VatCategory::CEUTA_AND_MELILLA
-                ) {
+                if (!$hasBT151orBT95orBT102VatCategoryCeutaMelilla) {
                     $hasBT151orBT95orBT102VatCategoryCeutaMelilla = true;
+                }
+
+                /** BR-IP-2 */
+                if (!$hasBT151VatCategoryCeutaMelilla) {
+                    $hasBT151VatCategoryCeutaMelilla = true;
                 }
             }
         }
 
-        if (
-            count($this->invoiceLines) > 0
-            && $documentTotals->getSumOfInvoiceLineNetAmount() !== $totalNetAmountInvoiceLines->getValueRounded()
-        ) {
-            throw new \Exception('@todo : BR-CO-10');
+        if (empty($this->invoiceLines)) {
+            throw new \Exception('@todo');
         }
 
+        /** BR-[S/Z/E/IG/IP]-2 */
+        if (
+            (
+                $hasBT151VatCategoryStandard
+                || $hasBT151VatCategoryZeroRatedGoods
+                || $hasBT151VatCategoryExemptFromTax
+                || $hasBT151VatCategoryCanaryIslands
+                || $hasBT151VatCategoryCeutaMelilla
+            )
+            && !$seller->getVatIdentifier()
+            && !$seller->getTaxRegistrationIdentifier()
+            && !$sellerTaxRepresentativeParty?->getVatIdentifier()
+        ) {
+            throw new \Exception('@todo : BR-[S/Z/E/IG/IP]-2');
+        }
+
+        /** BR-AE-2 */
+        if (
+            $hasBT151VatCategoryReverseCharge
+            && (
+                (
+                    !$seller->getVatIdentifier()
+                    && !$seller->getTaxRegistrationIdentifier()
+                    && !$sellerTaxRepresentativeParty?->getVatIdentifier()
+                )
+                || (!$buyer->getLegalRegistrationIdentifier() && !$buyer->getVatIdentifier())
+            )
+        ) {
+            throw new \Exception('@todo : BR-AE-2');
+        }
+
+        /** BR-IC-2 */
+        if (
+            $hasBT151VatCategoryIntraCommunitySupply
+            && (
+                (!$seller->getVatIdentifier() && !$sellerTaxRepresentativeParty?->getVatIdentifier())
+                || !$buyer->getVatIdentifier()
+            )
+        ) {
+            throw new \Exception('@todo : BR-IC-2');
+        }
+
+        /** BR-G-2 */
+        if (
+            $hasBT151VatCategoryExportOutsideEU
+            && !$seller->getVatIdentifier()
+            && !$sellerTaxRepresentativeParty?->getVatIdentifier()
+        ) {
+            throw new \Exception('@todo : BR-G-2');
+        }
+
+        /** BR-O-2 */
+        if (
+            $hasBT151VatCategoryNotSubjectToVat
+            && (
+                $seller->getVatIdentifier()
+                || $sellerTaxRepresentativeParty?->getVatIdentifier()
+                || $buyer->getVatIdentifier()
+            )
+        ) {
+            throw new \Exception('@todo : BR-O-2');
+        }
+
+
+        if ($documentTotals->getSumOfInvoiceLineNetAmount() !== $totalNetAmountInvoiceLines->getValueRounded()) {
+            throw new \Exception('@todo : BR-CO-10');
+        }
 
         $totalBT131_minus_BT107 = $totalNetAmountInvoiceLines->subtract(
             $documentTotals->getSumOfAllowancesOnDocumentLevel() ?
@@ -519,15 +651,8 @@ class Invoice
         $totalBT131_BT107_plus_BT108 = (new DecimalNumber($totalBT131_minus_BT107))
             ->add($documentTotalsSumOfChargesOnDocumentLevel);
 
-        if (
-            count($this->invoiceLines) > 0
-            && $documentTotals->getInvoiceTotalAmountWithoutVat() !== $totalBT131_BT107_plus_BT108
-        ) {
+        if ($documentTotals->getInvoiceTotalAmountWithoutVat() !== $totalBT131_BT107_plus_BT108) {
             throw new \Exception('@todo : BR-CO-13');
-        }
-
-        if (empty($this->invoiceLines)) {
-            throw new \Exception('@todo');
         }
 
         if (
@@ -793,6 +918,7 @@ class Invoice
         $this->deliveryInformation = null;
         $this->paymentInstructions = null;
         $this->additionalSupportingDocuments = [];
+        $this->sellerTaxRepresentativeParty = $sellerTaxRepresentativeParty;
 
         foreach ($vatBreakdowns as $vatBreakdown) {
             $this->checkVatBreakdownTaxableAmountCoherence($vatBreakdown);
@@ -1013,13 +1139,6 @@ class Invoice
     public function getSellerTaxRepresentativeParty(): ?SellerTaxRepresentativeParty
     {
         return $this->sellerTaxRepresentativeParty;
-    }
-
-    public function setSellerTaxRepresentativeParty(?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): self
-    {
-        $this->sellerTaxRepresentativeParty = $sellerTaxRepresentativeParty;
-
-        return $this;
     }
 
     public function getDeliveryInformation(): ?DeliveryInformation

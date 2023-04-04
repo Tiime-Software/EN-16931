@@ -64,10 +64,16 @@ class Buyer
     private ?BuyerContact $contact;
 
 
-    public function __construct(string $name, BuyerPostalAddress $address)
-    {
+    public function __construct(
+        string $name,
+        BuyerPostalAddress $address,
+        ?VatIdentifier $vatIdentifier = null,
+        ?LegalRegistrationIdentifier $legalRegistrationIdentifier = null
+    ) {
         $this->name = $name;
         $this->address = $address;
+        $this->vatIdentifier = $vatIdentifier;
+        $this->legalRegistrationIdentifier = $legalRegistrationIdentifier;
     }
 
     public function getName(): string
@@ -111,23 +117,9 @@ class Buyer
         return $this->legalRegistrationIdentifier;
     }
 
-    public function setLegalRegistrationIdentifier(?LegalRegistrationIdentifier $legalRegistrationIdentifier): self
-    {
-        $this->legalRegistrationIdentifier = $legalRegistrationIdentifier;
-
-        return $this;
-    }
-
     public function getVatIdentifier(): ?VatIdentifier
     {
         return $this->vatIdentifier;
-    }
-
-    public function setVatIdentifier(?VatIdentifier $vatIdentifier): self
-    {
-        $this->vatIdentifier = $vatIdentifier;
-
-        return $this;
     }
 
     public function getElectronicAddress(): ?ElectronicAddressIdentifier
