@@ -6,6 +6,7 @@ namespace Tiime\EN16931;
 
 use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
+use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
 use Tiime\EN16931\BusinessTermsGroup\DeliveryInformation;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
@@ -1198,14 +1199,19 @@ class Invoice
             return;
         }
 
+        if (false === $this->deliveryInformation instanceof DeliveryInformation) {
+            throw new \Exception('@todo: BR-IC-11');
+        }
+
         if (
-            false === $this->deliveryInformation instanceof DeliveryInformation
-            || (
-                false === $this->deliveryInformation->getActualDeliveryDate() instanceof \DateTimeInterface
-                && false === $this->deliveryInformation->getInvoicingPeriod() instanceof InvoicingPeriod
-            )
+            false === $this->deliveryInformation->getActualDeliveryDate() instanceof \DateTimeInterface
+            && false === $this->deliveryInformation->getInvoicingPeriod() instanceof InvoicingPeriod
         ) {
             throw new \Exception('@todo: BR-IC-11');
+        }
+
+        if (false === $this->deliveryInformation->getDeliverToAddress() instanceof DeliverToAddress) {
+            throw new \Exception('@todo: BR-IC-12');
         }
     }
 }
