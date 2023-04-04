@@ -625,11 +625,9 @@ class Invoice
         /** BR-O-2 */
         if (
             $hasBT151VatCategoryNotSubjectToVat
-            && (
-                $seller->getVatIdentifier()
-                || $sellerTaxRepresentativeParty?->getVatIdentifier()
-                || $buyer->getVatIdentifier()
-            )
+            && $seller->getVatIdentifier()
+            && $sellerTaxRepresentativeParty?->getVatIdentifier()
+            && $buyer->getVatIdentifier()
         ) {
             throw new \Exception('@todo : BR-O-2');
         }
