@@ -198,27 +198,6 @@ class BusinessRulesVatRulesBRAETest extends TestCase
         ];
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * @test
      * @testdox BR-AE-2 : An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code
