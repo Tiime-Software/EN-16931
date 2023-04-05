@@ -30,6 +30,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRZTest extends TestCase
@@ -243,7 +244,7 @@ class BusinessRulesVatRulesBRZTest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -402,7 +403,7 @@ class BusinessRulesVatRulesBRZTest extends TestCase
             null,
             [],
             [],
-            null
+            sellerTaxRepresentativeParty: null
         );
     }
 
@@ -947,4 +948,58 @@ class BusinessRulesVatRulesBRZTest extends TestCase
             'vatCategoryTaxAmount' => -10,
         ];
     }
+
+
+    /**
+     * @test
+     * @testdox BR-Z-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Zero rated" shall not have a VAT
+     * exemption reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrZ10Success
+     */
+    public function brZ10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::ZERO_RATED_GOODS, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrZ10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-Z-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Zero rated" shall not have a VAT
+     * exemption reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrZ10Error
+     */
+    public function brZ10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::ZERO_RATED_GOODS, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrZ10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+        ];
+    }
+
 }

@@ -30,6 +30,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRETest extends TestCase
@@ -104,7 +105,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
-                new VatBreakdown(1000, 0, VatCategory::EXEMPT_FROM_TAX, 0)
+                new VatBreakdown(1000, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -243,7 +244,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -402,7 +403,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
             null,
             [],
             [],
-            null
+            sellerTaxRepresentativeParty: null
         );
     }
 
@@ -605,7 +606,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0)
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -630,7 +631,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0)
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -666,7 +667,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::EXEMPT_FROM_TAX, 0),
+                new VatBreakdown(-100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -695,7 +696,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::EXEMPT_FROM_TAX, 0),
+                new VatBreakdown(-100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -724,7 +725,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0),
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -752,7 +753,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0),
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -782,7 +783,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0),
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -880,7 +881,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
             ),
             'vatBreakdowns' => [
                 new VatBreakdown(50, 10, VatCategory::STANDARD, 20),
-                new VatBreakdown(50, 0, VatCategory::EXEMPT_FROM_TAX, 0),
+                new VatBreakdown(50, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -918,7 +919,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
      */
     public function brE9_success(): void
     {
-        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::EXEMPT_FROM_TAX, 0);
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank');
 
         $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
     }
@@ -945,4 +946,59 @@ class BusinessRulesVatRulesBRETest extends TestCase
             'vatCategoryTaxAmount' => -10,
         ];
     }
+
+    /**
+     * @test
+     * @testdox BR-E-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Exempt from VAT" shall have a VAT
+     * exemption reason code (BT-121) or a VAT exemption reason text (BT-120).
+     * @dataProvider provideBrE10Success
+     * @throws \Exception
+     */
+    public function brE10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::EXEMPT_FROM_TAX, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrE10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-E-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Exempt from VAT" shall have a VAT
+     * exemption reason code (BT-121) or a VAT exemption reason text (BT-120).
+     * @dataProvider provideBrE10Error
+     */
+    public function brE10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::EXEMPT_FROM_TAX, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrE10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
+        ];
+    }
+
+
 }

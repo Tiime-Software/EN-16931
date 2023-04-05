@@ -6,12 +6,14 @@ namespace Tiime\EN16931;
 
 use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
+use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
 use Tiime\EN16931\BusinessTermsGroup\DeliveryInformation;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceNote;
+use Tiime\EN16931\BusinessTermsGroup\InvoicingPeriod;
 use Tiime\EN16931\BusinessTermsGroup\Payee;
 use Tiime\EN16931\BusinessTermsGroup\PaymentInstructions;
 use Tiime\EN16931\BusinessTermsGroup\PrecedingInvoice;
@@ -290,6 +292,7 @@ class Invoice
         ?string $paymentTerms,
         array $documentLevelAllowances,
         array $documentLevelCharges,
+        ?DeliveryInformation $deliveryInformation = null,
         ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty = null
     ) {
         /** BR-S-1 */
@@ -910,15 +913,16 @@ class Invoice
         $this->documentTotals = $documentTotals;
         $this->paymentDueDate = $paymentDueDate;
         $this->paymentTerms = $paymentTerms;
+        $this->deliveryInformation = $deliveryInformation;
 
         $this->buyerReference = null;
-        $this->deliveryInformation = null;
         $this->paymentInstructions = null;
         $this->additionalSupportingDocuments = [];
         $this->sellerTaxRepresentativeParty = $sellerTaxRepresentativeParty;
 
         foreach ($vatBreakdowns as $vatBreakdown) {
             $this->checkVatBreakdownTaxableAmountCoherence($vatBreakdown);
+            $this->checkNeedsDeliveryInformation($vatBreakdown);
         }
     }
 
@@ -1301,5 +1305,29 @@ class Invoice
         }
 
         return $sum;
+    }
+
+    private function checkNeedsDeliveryInformation(VatBreakdown $vatBreakdown): void
+    {
+        $vatCategory = $vatBreakdown->getVatCategoryCode();
+
+        if ($vatCategory !== VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES) {
+            return;
+        }
+
+        if (false === $this->deliveryInformation instanceof DeliveryInformation) {
+            throw new \Exception('@todo: BR-IC-11');
+        }
+
+        if (
+            false === $this->deliveryInformation->getActualDeliveryDate() instanceof \DateTimeInterface
+            && false === $this->deliveryInformation->getInvoicingPeriod() instanceof InvoicingPeriod
+        ) {
+            throw new \Exception('@todo: BR-IC-11');
+        }
+
+        if (false === $this->deliveryInformation->getDeliverToAddress() instanceof DeliverToAddress) {
+            throw new \Exception('@todo: BR-IC-12');
+        }
     }
 }

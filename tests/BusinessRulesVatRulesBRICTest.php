@@ -2,13 +2,17 @@
 
 namespace Tests\Tiime\EN16931;
 
+use PHPStan\Rules\DateTimeInstantiationRule;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliveryInformation;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
+use Tiime\EN16931\BusinessTermsGroup\InvoicingPeriod;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
 use Tiime\EN16931\BusinessTermsGroup\LineVatInformation;
 use Tiime\EN16931\BusinessTermsGroup\PriceDetails;
@@ -30,6 +34,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRICTest extends TestCase
@@ -72,7 +77,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $documentLevelAllowances,
-            $documentLevelCharges
+            $documentLevelCharges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
         );
 
         $this->assertInstanceOf(Invoice::class,  $invoice);
@@ -105,7 +111,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
-                new VatBreakdown(1000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+                new VatBreakdown(1000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -157,7 +163,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $documentLevelAllowances,
-            $documentLevelCharges
+            $documentLevelCharges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
         );
     }
 
@@ -249,7 +256,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -336,7 +343,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
     }
 
@@ -527,8 +534,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
         array $lines,
         array $allowances,
         array $charges,
-    ): void
-    {
+    ): void {
         $invoice = new Invoice(
             new InvoiceIdentifier('1'),
             new \DateTimeImmutable(),
@@ -553,7 +559,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $allowances,
-            $charges
+            $charges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM))
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -569,7 +576,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -594,7 +601,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 100,
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'lines' => [
                 new InvoiceLine(
@@ -630,7 +637,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new VatBreakdown(-100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -659,7 +666,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new VatBreakdown(-100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -688,7 +695,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -716,7 +723,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -746,7 +753,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -826,7 +833,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             new \DateTimeImmutable(),
             null,
             $allowances,
-            $charges
+            $charges,
+            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
         );
     }
 
@@ -844,7 +852,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             ),
             'vatBreakdowns' => [
                 new VatBreakdown(50, 10, VatCategory::STANDARD, 20),
-                new VatBreakdown(50, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new VatBreakdown(50, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -882,7 +890,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
      */
     public function brIC9_success(): void
     {
-        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0);
+        $vatBreakdown = new VatBreakdown(1000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank');
 
         $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
     }
@@ -897,7 +905,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0);
+        new VatBreakdown(1000, $vatCategoryTaxAmount, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank');
     }
 
     public static function provideBrIC9Error(): \Generator
@@ -908,5 +916,304 @@ class BusinessRulesVatRulesBRICTest extends TestCase
         yield 'BR-IC-9 Error #2' => [
             'vatCategoryTaxAmount' => -10,
         ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-10 : A VAT Breakdown (BG-23) with the VAT Category code (BT-118) "Intra-community supply" shall have
+     * a VAT exemption reason code (BT-121), meaning "Intra-community supply" or the VAT exemption reason text (BT-120)
+     * "Intra-community supply" (or the equivalent standard text in another language).
+     * @dataProvider provideBrIC10Success
+     */
+    public function brIC10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(
+            0,
+            0,
+            VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES,
+            0,
+            $reasonText,
+            $reasonCode
+        );
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrIC10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::INTRA_COMMUNITY_SUPPLY,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::INTRA_COMMUNITY_SUPPLY,
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-10 : A VAT Breakdown (BG-23) with the VAT Category code (BT-118) "Intra-community supply" shall have
+     * a VAT exemption reason code (BT-121), meaning "Intra-community supply" or the VAT exemption reason text (BT-120)
+     * "Intra-community supply" (or the equivalent standard text in another language).
+     * @dataProvider provideBrIC10Error
+     */
+    public function brIC10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrIC10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-11 : In an Invoice with a VAT breakdown (BG-23) where the VAT category code (BT-118) is
+     * "Intra-community supply" the Actual delivery date (BT-72) or the Invoicing period (BG-14) shall not be blank.
+     * @dataProvider provideBrIC11Success
+     */
+    public function brIC11_success(DeliveryInformation $deliveryInformation): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(100, 100, 100, 100),
+            [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $deliveryInformation
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIC11Success(): \Generator
+    {
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: new \DateTimeImmutable(),
+            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
+        )];
+
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: null,
+            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
+        )];
+
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: new \DateTimeImmutable(),
+            invoicingPeriod: null,
+            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
+        )];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-11 : In an Invoice with a VAT breakdown (BG-23) where the VAT category code (BT-118) is
+     * "Intra-community supply" the Actual delivery date (BT-72) or the Invoicing period (BG-14) shall not be blank.
+     * @dataProvider provideBrIC11Error
+     */
+    public function brIC11_error(?DeliveryInformation $deliveryInformation): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(100, 100, 100, 100),
+            [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $deliveryInformation
+        );
+    }
+
+    public static function provideBrIC11Error(): \Generator
+    {
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: null,
+            invoicingPeriod: null,
+            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
+        )];
+
+        yield ['deliveryInformation' => null];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-12 : In an Invoice with a VAT breakdown (BG-23) where the VAT category code (BT-118) is
+     * "Intra-community supply" the Deliver to country code (BT-80) shall not be blank.
+     * @dataProvider provideBrIC12Success
+     */
+    public function brIC12_success(DeliveryInformation $deliveryInformation): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(100, 100, 100, 100),
+            [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $deliveryInformation
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIC12Success(): \Generator
+    {
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: new \DateTimeImmutable(),
+            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
+        )];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-12 : In an Invoice with a VAT breakdown (BG-23) where the VAT category code (BT-118) is
+     * "Intra-community supply" the Deliver to country code (BT-80) shall not be blank.
+     * @dataProvider provideBrIC12Error
+     */
+    public function brIC12_error(DeliveryInformation $deliveryInformation): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('1'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(100, 100, 100, 100),
+            [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
+            [new InvoiceLine(
+                new InvoiceLineIdentifier("1"),
+                1,
+                UnitOfMeasurement::BOX_REC21,
+                100,
+                new PriceDetails(100),
+                new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                new ItemInformation("A thing"),
+            )],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            $deliveryInformation
+        );
+    }
+
+    public static function provideBrIC12Error(): \Generator
+    {
+        yield ['deliveryInformation' => new DeliveryInformation(
+            actualDeliveryDate: new \DateTimeImmutable(),
+            invoicingPeriod: null,
+            deliverToAddress: null,
+        )];
     }
 }

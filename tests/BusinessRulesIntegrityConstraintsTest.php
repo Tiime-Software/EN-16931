@@ -1007,14 +1007,26 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      * @testdox BR-48 [case with coherent vat category & rate] : Each vat breakdown shall have a vat category rate except if the invoice is not subject to vat
      * @dataProvider provideBR48SuccessfulCases
      */
-    public function br48SuccessfulCases(float $vatCategoryTaxableAmount, float $vatCategoryTaxAmount, VatCategory $vatCategory, ?float $vatRate): void
-    {
-        $vatBreakdown = new VatBreakdown($vatCategoryTaxableAmount, $vatCategoryTaxAmount, $vatCategory, $vatRate);
+    public function br48SuccessfulCases(
+        float $vatCategoryTaxableAmount,
+        float $vatCategoryTaxAmount,
+        VatCategory $vatCategory,
+        ?float $vatRate,
+        ?string $vatExemptionReasonText = null,
+    ): void {
+        $vatBreakdown = new VatBreakdown(
+            $vatCategoryTaxableAmount,
+            $vatCategoryTaxAmount,
+            $vatCategory,
+            $vatRate,
+            vatExemptionReasonText: $vatExemptionReasonText
+        );
 
         $this->assertSame($vatCategoryTaxableAmount, $vatBreakdown->getVatCategoryTaxableAmount());
         $this->assertSame($vatCategoryTaxAmount, $vatBreakdown->getVatCategoryTaxAmount());
         $this->assertSame($vatCategory, $vatBreakdown->getVatCategoryCode());
         $this->assertSame($vatRate, $vatBreakdown->getVatCategoryRate());
+        $this->assertSame($vatExemptionReasonText, $vatBreakdown->getVatExemptionReasonText());
     }
 
     /**
@@ -1034,6 +1046,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 'vatCategoryTaxAmount' => 0.00,
                 'vatCategory' => VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX,
                 'vatRate' => null,
+                'vatExemptionReasonText' => 'Hoobastank',
             ],
         ];
     }

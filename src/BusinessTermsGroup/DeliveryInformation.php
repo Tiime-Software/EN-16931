@@ -43,13 +43,18 @@ class DeliveryInformation
      */
     private ?DeliverToAddress $deliverToAddress;
 
-    public function __construct()
-    {
-        $this->deliverToPartyName = null;
-        $this->locationIdentifier = null;
-        $this->actualDeliveryDate = null;
-        $this->invoicingPeriod = null;
-        $this->deliverToAddress = null;
+    public function __construct(
+        ?string $deliverToPartyName = null,
+        ?LocationIdentifier $locationIdentifier = null,
+        ?\DateTimeInterface $actualDeliveryDate = null,
+        ?InvoicingPeriod $invoicingPeriod = null,
+        ?DeliverToAddress $deliverToAddress = null,
+    ) {
+        $this->deliverToPartyName = $deliverToPartyName;
+        $this->locationIdentifier = $locationIdentifier;
+        $this->actualDeliveryDate = $actualDeliveryDate;
+        $this->invoicingPeriod = $invoicingPeriod;
+        $this->deliverToAddress = $deliverToAddress;
     }
 
     public function getDeliverToPartyName(): ?string
@@ -57,23 +62,9 @@ class DeliveryInformation
         return $this->deliverToPartyName;
     }
 
-    public function setDeliverToPartyName(?string $deliverToPartyName): self
-    {
-        $this->deliverToPartyName = $deliverToPartyName;
-
-        return $this;
-    }
-
     public function getLocationIdentifier(): ?LocationIdentifier
     {
         return $this->locationIdentifier;
-    }
-
-    public function setLocationIdentifier(?LocationIdentifier $locationIdentifier): self
-    {
-        $this->locationIdentifier = $locationIdentifier;
-
-        return $this;
     }
 
     public function getActualDeliveryDate(): ?\DateTimeInterface
@@ -81,34 +72,13 @@ class DeliveryInformation
         return $this->actualDeliveryDate;
     }
 
-    public function setActualDeliveryDate(?\DateTimeInterface $actualDeliveryDate): self
-    {
-        $this->actualDeliveryDate = $actualDeliveryDate;
-
-        return $this;
-    }
-
     public function getInvoicingPeriod(): ?InvoicingPeriod
     {
         return $this->invoicingPeriod;
     }
 
-    public function setInvoicingPeriod(?InvoicingPeriod $invoicingPeriod): self
-    {
-        $this->invoicingPeriod = $invoicingPeriod;
-
-        return $this;
-    }
-
     public function getDeliverToAddress(): ?DeliverToAddress
     {
         return $this->deliverToAddress;
-    }
-
-    public function setDeliverToAddress(?DeliverToAddress $deliverToAddress): self
-    {
-        $this->deliverToAddress = $deliverToAddress;
-
-        return $this;
     }
 }

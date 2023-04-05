@@ -30,6 +30,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRIGTest extends TestCase
@@ -243,7 +244,7 @@ class BusinessRulesVatRulesBRIGTest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -402,7 +403,7 @@ class BusinessRulesVatRulesBRIGTest extends TestCase
             null,
             [],
             [],
-            null
+            sellerTaxRepresentativeParty: null
         );
     }
 
@@ -999,5 +1000,57 @@ class BusinessRulesVatRulesBRIGTest extends TestCase
     public function brIG9(): void
     {
         $this->assertTrue(true, 'Same as BR-CO-17');
+    }
+
+    /**
+     * @test
+     * @testdox BR-IG-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "IGIC" shall not have a VAT exemption
+     * reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrIG10Success
+     */
+    public function brIG10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::CANARY_ISLANDS, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrIG10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IG-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "IGIC" shall not have a VAT exemption
+     * reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrIG10Error
+     */
+    public function brIG10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::CANARY_ISLANDS, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrIG10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::COUNCIL_DIRECTIVE_309,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::COUNCIL_DIRECTIVE_309,
+        ];
     }
 }

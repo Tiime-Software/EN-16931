@@ -30,6 +30,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRIPTest extends TestCase
@@ -243,7 +244,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -402,7 +403,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
             null,
             [],
             [],
-            null
+            sellerTaxRepresentativeParty: null
         );
     }
 
@@ -999,5 +1000,57 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
     public function brIP9(): void
     {
         $this->assertTrue(true, 'Same as BR-CO-17');
+    }
+
+    /**
+     * @test
+     * @testdox BR-IP-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "IPSI" shall not have a VAT exemption
+     * reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrIP10Success
+     */
+    public function brIP10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
+    }
+
+    public static function provideBrIP10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IP-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "IPSI" shall not have a VAT exemption
+     * reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrIP10Error
+     */
+    public function brIP10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrIP10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::COUNCIL_DIRECTIVE_309,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::COUNCIL_DIRECTIVE_309,
+        ];
     }
 }

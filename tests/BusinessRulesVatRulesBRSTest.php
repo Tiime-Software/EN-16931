@@ -31,6 +31,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
+use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRSTest extends TestCase
@@ -297,7 +298,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
             null,
             [],
             [],
-            $sellerTaxRepresentativeParty
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -456,7 +457,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
             null,
             [],
             [],
-            null
+            sellerTaxRepresentativeParty: null
         );
     }
 
@@ -1076,13 +1077,58 @@ class BusinessRulesVatRulesBRSTest extends TestCase
         $this->assertTrue(true, 'Same as BR-CO-17');
     }
 
+
     /**
      * @test
      * @testdox BR-S-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Standard rate" shall not have a VAT
      * exemption reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrS10Success
      */
-    public function brS10(): void
+    public function brS10_success(?string $reasonText, ?VatExoneration $reasonCode): void
     {
-        $this->markTestSkipped('@todo');
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::STANDARD, 0, $reasonText, $reasonCode);
+
+        $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
     }
+
+    public static function provideBrS10Success(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => null
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-S-10 : A VAT Breakdown (BG-23) with VAT Category code (BT-118) "Standard rate" shall not have a VAT
+     * exemption reason code (BT-121) or VAT exemption reason text (BT-120).
+     * @dataProvider provideBrS10Error
+     */
+    public function brS10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    {
+        $this->expectException(\Exception::class);
+
+        new VatBreakdown(0, 0, VatCategory::STANDARD, 0, $reasonText, $reasonCode);
+    }
+
+    public static function provideBrS10Error(): \Generator
+    {
+        yield [
+            'reasonText' => null,
+            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => null,
+        ];
+
+        yield [
+            'reasonText' => 'Hoobastank',
+            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+        ];
+    }
+
+
 }

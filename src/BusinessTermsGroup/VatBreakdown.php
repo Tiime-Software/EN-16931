@@ -73,6 +73,8 @@ class VatBreakdown
         float $vatCategoryTaxAmount,
         VatCategory $vatCategoryCode,
         ?float $vatCategoryRate = null,
+        ?string $vatExemptionReasonText = null,
+        ?VatExoneration $vatExemptionReasonCode = null,
     ) {
         if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX xor is_float($vatCategoryRate)) {
             throw new \Exception('@todo');
@@ -99,9 +101,8 @@ class VatBreakdown
         $this->vatCategoryTaxAmount = new Amount($vatCategoryTaxAmount);
         $this->vatCategoryCode = $vatCategoryCode;
         $this->vatCategoryRate = $vatCategoryRate !== null ? new Percentage($vatCategoryRate) : $vatCategoryRate;
-
-        $this->vatExemptionReasonText = null;
-        $this->vatExemptionReasonCode = null;
+        $this->vatExemptionReasonText = $vatExemptionReasonText;
+        $this->vatExemptionReasonCode = $vatExemptionReasonCode;
 
         $BT119_divided_100 = ($this->vatCategoryRate ?? new Percentage(0.00))->divide(new IntegerNumber(100));
         $BT119_100_multiply_BT117 = $this->vatCategoryTaxableAmount
@@ -110,6 +111,8 @@ class VatBreakdown
         if ($this->vatCategoryTaxAmount->getValueRounded() !== $BT119_100_multiply_BT117) {
             throw new \Exception('@todo : BR-CO-17');
         }
+
+        $this->checkExemptionReason();
     }
 
     public function getVatCategoryTaxableAmount(): float
@@ -144,22 +147,26 @@ class VatBreakdown
         return $this->vatExemptionReasonText;
     }
 
-    public function setVatExemptionReasonText(?string $vatExemptionReasonText): self
-    {
-        $this->vatExemptionReasonText = $vatExemptionReasonText;
-
-        return $this;
-    }
-
     public function getVatExemptionReasonCode(): ?VatExoneration
     {
         return $this->vatExemptionReasonCode;
     }
 
-    public function setVatExemptionReasonCode(?VatExoneration $vatExemptionReasonCode): self
+    private function checkExemptionReason(): void
     {
-        $this->vatExemptionReasonCode = $vatExemptionReasonCode;
+        $noExemptionCategories = [
+            VatCategory::STANDARD,
+            VatCategory::ZERO_RATED_GOODS,
+            VatCategory::CANARY_ISLANDS,
+            VatCategory::CEUTA_AND_MELILLA
+        ];
 
-        return $this;
+        $shallHaveExemptionReason = !in_array($this->vatCategoryCode, $noExemptionCategories);
+        $hasExemptionReason = is_string($this->vatExemptionReasonText)
+            || $this->vatExemptionReasonCode instanceof VatExoneration;
+
+        if ($shallHaveExemptionReason !== $hasExemptionReason) {
+            throw new \Exception('@todo BR-genericVAT-10');
+        }
     }
 }
