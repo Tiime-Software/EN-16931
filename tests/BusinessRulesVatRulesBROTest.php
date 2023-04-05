@@ -5,10 +5,13 @@ namespace Tests\Tiime\EN16931;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliveryInformation;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
+use Tiime\EN16931\BusinessTermsGroup\InvoicingPeriod;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
 use Tiime\EN16931\BusinessTermsGroup\LineVatInformation;
 use Tiime\EN16931\BusinessTermsGroup\PriceDetails;
@@ -89,17 +92,8 @@ class BusinessRulesVatRulesBROTest extends TestCase
                     new InvoiceLineIdentifier("A1"),
                     1,
                     UnitOfMeasurement::BOX_REC21,
-                    1000,
-                    new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
-                    new ItemInformation("A thing"),
-                ),
-                new InvoiceLine(
-                    new InvoiceLineIdentifier("A1"),
-                    1,
-                    UnitOfMeasurement::BOX_REC21,
-                    1000,
-                    new PriceDetails(1000),
+                    2000,
+                    new PriceDetails(2000),
                     new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null),
                     new ItemInformation("A thing"),
                 ),
@@ -107,15 +101,13 @@ class BusinessRulesVatRulesBROTest extends TestCase
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
-                new VatBreakdown(1000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank')
+                new VatBreakdown(2000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank')
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
                 2000,
-                2200,
-                2200,
-                invoiceTotalVatAmount: 200,
+                2000,
+                2000,
             )
         ];
     }
@@ -1021,5 +1013,122 @@ class BusinessRulesVatRulesBROTest extends TestCase
             'reasonText' => null,
             'reasonCode' => null
         ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-11 :
+     */
+    public function brO11_success(): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956454'),
+            ),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null, vatExemptionReasonText: 'Hoobastank')
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    /**
+     * @test
+     * @testdox BR-O-11 :
+     */
+    public function brO11_error(): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956454'),
+            ),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null, vatExemptionReasonText: 'Hoobastank'),
+                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+        );
     }
 }
