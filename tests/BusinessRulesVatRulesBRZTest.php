@@ -569,7 +569,7 @@ class BusinessRulesVatRulesBRZTest extends TestCase
      */
     public function brZ3_error(): void
     {
-        $this->markTestSkipped('Same error case as BR-Z-2 so BR-Z-2 exception is thrown before BR-Z-3 exception');
+        $this->markTestSkipped('Same error case as BR-Z-2 that\'s why BR-Z-2 exception is thrown before BR-Z-3 exception');
     }
 
     /**

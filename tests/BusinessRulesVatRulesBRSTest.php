@@ -624,7 +624,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      */
     public function brS3_error(): void
     {
-        $this->markTestSkipped('Same error case as BR-S-2 so BR-S-2 exception is thrown before BR-S-3 exception');
+        $this->markTestSkipped('Same error case as BR-S-2 that\'s why BR-S-2 exception is thrown before BR-S-3 exception');
     }
 
     /**

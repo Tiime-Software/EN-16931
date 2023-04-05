@@ -388,6 +388,109 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 
     /**
      * @test
+     * @testdox BR-IC-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Intra-community supply” shall contain the Seller VAT Identifier (BT-31) or the
+     * Seller tax representative VAT identifier (BT-63) and the Buyer VAT identifier (BT-48).
+     * @dataProvider provideBrIC3Success
+     */
+    public function brIC3_success(Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956454'),
+            ),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [
+                new DocumentLevelAllowance(0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 'Hoobastank', vatRate: 0),
+            ],
+            [],
+            deliveryInformation: new DeliveryInformation(
+                actualDeliveryDate: new \DateTimeImmutable(),
+                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
+            ),
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIC3Success(): \Generator
+    {
+        yield 'BR-IC-3 - Only (Seller) VatIdentifier' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-IC-3 - Only (TaxRepresentativeParty) VatIdentifier' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Intra-community supply” shall contain the Seller VAT Identifier (BT-31) or the
+     * Seller tax representative VAT identifier (BT-63) and the Buyer VAT identifier (BT-48).
+     */
+    public function brIC3_error(): void
+    {
+        $this->markTestSkipped('Same error case as BR-IC-2 that\'s why BR-IC-2 exception is thrown before BR-IC-3 exception');
+    }
+
+    /**
+     * @test
      * @testdox BR-IC-5 : In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is
      * "Intracommunity supply" the Invoiced item VAT rate (BT-152) shall be 0 (zero).
      * @dataProvider provideBrIC5Success
