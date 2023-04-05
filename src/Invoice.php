@@ -760,8 +760,10 @@ class Invoice
                     }
                 }
 
-                if ($documentLevelAllowanceVatCategoryCode
-                    === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES) {
+                if (
+                    $documentLevelAllowanceVatCategoryCode
+                    === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
+                ) {
                     /** BR-IC-1 */
                     if (!$hasBT151orBT95orBT102VatCategoryIntraCommunitySupply) {
                         $hasBT151orBT95orBT102VatCategoryIntraCommunitySupply = true;
