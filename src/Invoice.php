@@ -920,7 +920,9 @@ class Invoice
         $this->additionalSupportingDocuments = [];
         $this->sellerTaxRepresentativeParty = $sellerTaxRepresentativeParty;
 
-        foreach ($vatBreakdowns as $vatBreakdown) {
+        $this->checkNotSubjectToVatBreakdown();
+
+        foreach ($this->vatBreakdowns as $vatBreakdown) {
             $this->checkVatBreakdownTaxableAmountCoherence($vatBreakdown);
             $this->checkNeedsDeliveryInformation($vatBreakdown);
         }
@@ -1328,6 +1330,57 @@ class Invoice
 
         if (false === $this->deliveryInformation->getDeliverToAddress() instanceof DeliverToAddress) {
             throw new \Exception('@todo: BR-IC-12');
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function checkNotSubjectToVatBreakdown(): void
+    {
+        $notSubjectToVatBreakdowns = array_filter($this->vatBreakdowns, function (VatBreakdown $vatBreakdown) {
+            return $vatBreakdown->getVatCategoryCode() === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX;
+        });
+
+        if (0 === count($notSubjectToVatBreakdowns)) {
+            return;
+        }
+
+        if (1 < count($notSubjectToVatBreakdowns) || 1 < count($this->vatBreakdowns)) {
+            throw new \Exception('@todo: BR-0-11');
+        }
+
+        $this->checkNotSubjectToVatInvoiceLines();
+        $this->checkNotSubjectToVatAllowances();
+        $this->checkNotSubjectToVatCharges();
+    }
+
+    private function checkNotSubjectToVatInvoiceLines(): void
+    {
+        foreach ($this->invoiceLines as $invoiceLine) {
+            $invoiceLineVatCategoryCode = $invoiceLine->getLineVatInformation()->getInvoicedItemVatCategoryCode();
+
+            if ($invoiceLineVatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+                throw new \Exception('@todo: BR-O-12');
+            }
+        }
+    }
+
+    private function checkNotSubjectToVatAllowances(): void
+    {
+        foreach ($this->documentLevelAllowances as $documentLevelAllowance) {
+            if ($documentLevelAllowance->getVatCategoryCode() !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+                throw new \Exception('@todo: BR-O-13');
+            }
+        }
+    }
+
+    private function checkNotSubjectToVatCharges(): void
+    {
+        foreach ($this->documentLevelCharges as $documentLevelCharge) {
+            if ($documentLevelCharge->getVatCategoryCode() !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+                throw new \Exception('@todo: BR-O-14');
+            }
         }
     }
 }
