@@ -898,7 +898,7 @@ class BusinessRulesConditionsTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null
+                new VatIdentifier('AZE')
             ),
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
@@ -910,7 +910,7 @@ class BusinessRulesConditionsTest extends TestCase
                 UnitOfMeasurement::BOX_REC21,
                 100,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                new LineVatInformation(VatCategory::EXEMPT_FROM_TAX, 0),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -937,7 +937,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 100
                 ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank'),
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
                 new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00),
             ],
             'documentLevelCharges' => [
@@ -955,7 +955,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 0
                 ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank'),
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
                 new VatBreakdown(0, 0, VatCategory::STANDARD, 20.00),
             ],
             'documentLevelCharges' => [
@@ -973,7 +973,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfChargesOnDocumentLevel: 60
                 ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank'),
+                new VatBreakdown(100, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank'),
                 new VatBreakdown(60, 12, VatCategory::STANDARD, 20.00),
             ],
             'documentLevelCharges' => [
@@ -1322,7 +1322,7 @@ class BusinessRulesConditionsTest extends TestCase
                 ),
             'vatBreakdowns' => [
                 new VatBreakdown(1000, 250, VatCategory::STANDARD, 25),
-                new VatBreakdown(0, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank')
+                new VatBreakdown(0, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'invoiceLines' => [
                 new InvoiceLine(
