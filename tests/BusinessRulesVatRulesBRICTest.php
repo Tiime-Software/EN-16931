@@ -237,7 +237,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(
@@ -256,6 +256,11 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             [],
             [],
+            deliveryInformation: new DeliveryInformation(
+                actualDeliveryDate: new \DateTimeImmutable(),
+                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
+            ),
             sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
@@ -324,7 +329,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0)
+                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(
@@ -343,6 +348,11 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             [],
             [],
+            deliveryInformation: new DeliveryInformation(
+                actualDeliveryDate: new \DateTimeImmutable(),
+                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
+            ),
             sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
     }
@@ -999,9 +1009,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
@@ -1069,9 +1083,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
@@ -1125,9 +1143,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
@@ -1183,9 +1205,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],

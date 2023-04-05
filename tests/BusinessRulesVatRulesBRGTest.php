@@ -5,10 +5,13 @@ namespace Tests\Tiime\EN16931;
 use PHPUnit\Framework\TestCase;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\BuyerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
+use Tiime\EN16931\BusinessTermsGroup\DeliveryInformation;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelAllowance;
 use Tiime\EN16931\BusinessTermsGroup\DocumentLevelCharge;
 use Tiime\EN16931\BusinessTermsGroup\DocumentTotals;
 use Tiime\EN16931\BusinessTermsGroup\InvoiceLine;
+use Tiime\EN16931\BusinessTermsGroup\InvoicingPeriod;
 use Tiime\EN16931\BusinessTermsGroup\ItemInformation;
 use Tiime\EN16931\BusinessTermsGroup\LineVatInformation;
 use Tiime\EN16931\BusinessTermsGroup\PriceDetails;
@@ -230,7 +233,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
+                new VatBreakdown(3000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(
@@ -317,7 +320,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0)
+                new VatBreakdown(3000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(

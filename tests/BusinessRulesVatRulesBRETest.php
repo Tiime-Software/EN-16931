@@ -225,7 +225,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0)
+                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(
@@ -384,7 +384,7 @@ class BusinessRulesVatRulesBRETest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0)
+                new VatBreakdown(3000, 0, VatCategory::EXEMPT_FROM_TAX, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(

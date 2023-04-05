@@ -226,7 +226,7 @@ class BusinessRulesVatRulesBROTest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)
+                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(
@@ -407,7 +407,7 @@ class BusinessRulesVatRulesBROTest extends TestCase
                 invoiceTotalVatAmount: 0,
             ),
             [
-                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX)
+                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank')
             ],
             [
                 new InvoiceLine(
