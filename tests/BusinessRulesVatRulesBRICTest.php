@@ -19,13 +19,17 @@ use Tiime\EN16931\BusinessTermsGroup\PriceDetails;
 use Tiime\EN16931\BusinessTermsGroup\ProcessControl;
 use Tiime\EN16931\BusinessTermsGroup\Seller;
 use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
+use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
+use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
 use Tiime\EN16931\DataType\Identifier\InvoiceLineIdentifier;
+use Tiime\EN16931\DataType\Identifier\LegalRegistrationIdentifier;
 use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
@@ -61,9 +65,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE), new VatIdentifier('FR966666'),),
             null,
             $documentTotal,
             $vatBreakdowns,
@@ -199,6 +203,186 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 2400,
                 invoiceTotalVatAmount: 400,
             )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-2 : An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code
+     * (BT-151) is “Intra-community supply” shall contain the Seller VAT Identifier (BT31) or the Seller tax
+     * representative VAT identifier (BT-63) and the Buyer VAT identifier (BT-48).
+     * @dataProvider provideBrIC2Success
+     */
+    public function brIC2_success(Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956454'),
+            ),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            deliveryInformation: new DeliveryInformation(
+                actualDeliveryDate: new \DateTimeImmutable(),
+                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
+            ),
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIC2Success(): \Generator
+    {
+        yield 'BR-IC-2 - Only (Seller) VatIdentifier' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-IC-2 - Only (TaxRepresentativeParty) VatIdentifier' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IC-2 : An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code
+     * (BT-151) is “Intra-community supply” shall contain the Seller VAT Identifier (BT31) or the Seller tax
+     * representative VAT identifier (BT-63) and the Buyer VAT identifier (BT-48).
+     * @dataProvider provideBrIC2Error
+     */
+    public function brIC2_error(Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $this->expectException(\Exception::class);
+
+        new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956454'),
+            ),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [],
+            [],
+            deliveryInformation: new DeliveryInformation(
+                actualDeliveryDate: new \DateTimeImmutable(),
+                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
+                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
+            ),
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+    }
+
+    public static function provideBrIC2Error(): \Generator
+    {
+        yield 'BR-IC-2 - (Seller) VatIdentifier and (TaxRepresentativeParty) VatIdentifier' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-IC-2 - No field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => null
         ];
     }
 
@@ -373,9 +557,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE), new VatIdentifier('FR96666')),
             null,
             $totals,
             $vatBreakdowns,
@@ -825,9 +1009,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
@@ -895,9 +1083,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
@@ -951,9 +1143,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],
@@ -1009,9 +1205,13 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new SellerPostalAddress(CountryAlpha2Code::FRANCE),
                 [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
                 null,
-                null,
+                new VatIdentifier('FR978515485'),
             ),
-            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR978494945')
+            ),
             null,
             new DocumentTotals(100, 100, 100, 100),
             [new VatBreakdown(100, 0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 0, vatExemptionReasonText: 'Hoobastank')],

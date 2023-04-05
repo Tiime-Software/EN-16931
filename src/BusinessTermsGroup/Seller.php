@@ -92,6 +92,7 @@ class Seller
         array $identifiers,
         ?LegalRegistrationIdentifier $legalRegistrationIdentifier,
         ?VatIdentifier $vatIdentifier,
+        ?TaxRegistrationIdentifier $taxRegistrationIdentifier = null
     ) {
         $this->name = $name;
         $this->address = $address;
@@ -100,14 +101,18 @@ class Seller
 
         $this->identifiers = [];
         foreach ($identifiers as $identifier) {
-            if ($identifier instanceof SellerIdentifier) {
-                $this->identifiers[] = $identifier;
+            if (!$identifier instanceof SellerIdentifier) {
+                throw new \TypeError();
             }
+
+            $this->identifiers[] = $identifier;
         }
 
         if (empty($this->identifiers) && null === $legalRegistrationIdentifier && null === $vatIdentifier) {
             throw new \Exception('@todo');
         }
+
+        $this->taxRegistrationIdentifier = $taxRegistrationIdentifier;
     }
 
     public function getName(): string
@@ -191,13 +196,6 @@ class Seller
     public function getTaxRegistrationIdentifier(): ?TaxRegistrationIdentifier
     {
         return $this->taxRegistrationIdentifier;
-    }
-
-    public function setTaxRegistrationIdentifier(?TaxRegistrationIdentifier $taxRegistrationIdentifier): self
-    {
-        $this->taxRegistrationIdentifier = $taxRegistrationIdentifier;
-
-        return $this;
     }
 
     public function getAdditionalLegalInformation(): ?string
