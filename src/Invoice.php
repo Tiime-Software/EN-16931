@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931;
 
+use _PHPStan_7d6f0f6a4\Nette\Neon\Exception;
 use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
@@ -24,7 +25,10 @@ use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\DateCode2005;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
+use Tiime\EN16931\DataType\Identifier\LegalRegistrationIdentifier;
 use Tiime\EN16931\DataType\Identifier\ObjectIdentifier;
+use Tiime\EN16931\DataType\Identifier\TaxRegistrationIdentifier;
+use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\Reference\ContractReference;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
@@ -838,8 +842,7 @@ class Invoice
             && !$seller->getTaxRegistrationIdentifier()
             && !$sellerTaxRepresentativeParty?->getVatIdentifier()
         ) {
-            throw new \InvalidArgumentException();
-//            throw new \Exception('@todo : BR-[S/Z/E/IG/IP]-3');
+            throw new \Exception('@todo : BR-[S/Z/E/IG/IP]-3');
         }
 
         /** BR-AE-3 */
@@ -1045,6 +1048,8 @@ class Invoice
         $this->paymentInstructions = null;
         $this->additionalSupportingDocuments = [];
         $this->sellerTaxRepresentativeParty = $sellerTaxRepresentativeParty;
+
+        $this->checkChargesVatCategoryCodeConsistencyWithPartyIdentifiers();
 
         $this->checkNotSubjectToVatBreakdown();
 
@@ -1506,6 +1511,79 @@ class Invoice
         foreach ($this->documentLevelCharges as $documentLevelCharge) {
             if ($documentLevelCharge->getVatCategoryCode() !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
                 throw new \Exception('@todo: BR-O-14');
+            }
+        }
+    }
+
+    private function checkChargesVatCategoryCodeConsistencyWithPartyIdentifiers(): void
+    {
+        $categoriesRequiringASellerIdentifier = [
+            VatCategory::STANDARD,
+            VatCategory::ZERO_RATED_GOODS,
+            VatCategory::EXEMPT_FROM_TAX,
+            VatCategory::VAT_REVERSE_CHARGE,
+            VatCategory::CANARY_ISLANDS,
+            VatCategory::CEUTA_AND_MELILLA,
+        ];
+
+        $hasSellerVatIdentifier = $this->seller->getVatIdentifier() instanceof VatIdentifier;
+
+        $hasSellerTaxRegistrationIdentifier =
+            $this->seller->getTaxRegistrationIdentifier() instanceof TaxRegistrationIdentifier;
+
+        $hasSellerRepresentativeIdentifier =
+            $this->sellerTaxRepresentativeParty?->getVatIdentifier() instanceof VatIdentifier;
+
+        $hasBuyerVatIdentifier = $this->buyer->getVatIdentifier() instanceof VatIdentifier;
+        $hasBuyerLegalRegistrationIdentifier =
+            $this->buyer->getLegalRegistrationIdentifier() instanceof LegalRegistrationIdentifier;
+
+        foreach ($this->documentLevelCharges as $charge) {
+            $vatCategoryCode = $charge->getVatCategoryCode();
+
+            if (
+                in_array($vatCategoryCode, $categoriesRequiringASellerIdentifier)
+                && !(
+                    $hasSellerVatIdentifier
+                    || $hasSellerTaxRegistrationIdentifier
+                    || $hasSellerRepresentativeIdentifier
+                )
+            ) {
+                throw new \Exception('@todo: BR-[S/Z/E/AE/IG/IP]-4');
+            }
+
+            if (
+                $vatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
+                && (
+                    $hasSellerVatIdentifier
+                    || $hasSellerTaxRegistrationIdentifier
+                    || $hasSellerRepresentativeIdentifier
+                )
+            ) {
+                throw new \Exception('@todo: BR-O-4');
+            }
+
+            if (
+                in_array($vatCategoryCode, [
+                    VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES,
+                    VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED
+                ]) && !($hasSellerVatIdentifier || $hasSellerRepresentativeIdentifier)
+            ) {
+                throw new \Exception('@todo: BR-[K/G]-4');
+            }
+
+            if (
+                $vatCategoryCode === VatCategory::VAT_REVERSE_CHARGE
+                && !($hasBuyerVatIdentifier || $hasBuyerLegalRegistrationIdentifier)
+            ) {
+                throw new \Exception('@todo: BR-AE-4');
+            }
+
+            if (
+                $vatCategoryCode === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
+                && !$hasBuyerVatIdentifier
+            ) {
+                throw new \Exception('@todo: BR-K-4');
             }
         }
     }
