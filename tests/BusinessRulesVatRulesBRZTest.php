@@ -409,6 +409,171 @@ class BusinessRulesVatRulesBRZTest extends TestCase
 
     /**
      * @test
+     * @testdox BR-Z-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Zero rated” shall contain the Seller VAT Identifier (BT-31), the Seller tax
+     * registration identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63).
+     * @dataProvider provideBrZ3Success
+     */
+    public function brZ3_success(Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::ZERO_RATED_GOODS, 0),
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::ZERO_RATED_GOODS, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [
+                new DocumentLevelAllowance(0, VatCategory::ZERO_RATED_GOODS, 'Hoobastank', vatRate: 0),
+            ],
+            [],
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrZ3Success(): \Generator
+    {
+        yield 'BR-Z-3 - Only Seller VatIdentifier field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-Z-3 - Only Seller TaxRegistrationIdentifier field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-Z-3 - Only SellerTaxRepresentativeParty field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-Z-3 - Seller VatIdentifier and Seller TaxRegistrationIdentifier fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-Z-3 - Seller VatIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-Z-3 - Seller TaxRegistrationIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-Z-3 - Seller VatIdentifier and Seller TaxRegistrationIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR986416485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-Z-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Zero rated” shall contain the Seller VAT Identifier (BT-31), the Seller tax
+     * registration identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63).
+     */
+    public function brZ3_error(): void
+    {
+        $this->markTestSkipped('Same error case as BR-Z-2 that\'s why BR-Z-2 exception is thrown before BR-Z-3 exception');
+    }
+
+    /**
+     * @test
      * @testdox BR-Z-5 : In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is "Zero rated"
      * the Invoiced item VAT rate (BT-152) shall be 0 (zero).
      * @dataProvider provideBrZ5Success

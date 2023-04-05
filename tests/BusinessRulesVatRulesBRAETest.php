@@ -825,6 +825,486 @@ class BusinessRulesVatRulesBRAETest extends TestCase
 
     /**
      * @test
+     * @testdox BR-AE-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Reverse charge” shall contain the Seller VAT Identifier (BT-31), the Seller tax
+     * registration identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63) and the Buyer VAT
+     * identifier (BT-48) and/or the Buyer legal registration identifier (BT-47).
+     * @dataProvider provideBrAE3Success
+     */
+    public function brAE3_success(Buyer $buyer, Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            $buyer,
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::VAT_REVERSE_CHARGE, 0, vatExemptionReasonText: 'Hoobastank')
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::VAT_REVERSE_CHARGE, 0),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [
+                new DocumentLevelAllowance(0, VatCategory::VAT_REVERSE_CHARGE, 'Hoobastank', vatRate: 0),
+            ],
+            [],
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrAE3Success(): \Generator
+    {
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (Seller) TaxRegistrationIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Seller) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Seller) TaxRegistrationIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier and (Seller) TaxRegistrationIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (Seller) TaxRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Seller) VatIdentifier and (Seller) TaxRegistrationIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Seller) VatIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Seller) TaxRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier and (Seller) TaxRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null,
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Seller) VatIdentifier and (Seller) TaxRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (Seller) TaxRegistrationIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier and (Seller) TaxRegistrationIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (Seller) TaxRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-AE-3 - (Buyer) VatIdentifier and (Buyer) LegalRegistrationIdentifier and (Seller) VatIdentifier and (Seller) TaxRegistrationIdentifier and (TaxRepresentativeParty) VatIdentifier fields' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR956415645'),
+                new LegalRegistrationIdentifier('FR9956959', InternationalCodeDesignator::ADVANCED_TELECOMMUNICATIONS_MODULES_LIMITED_CORPORATE_NETWORK)
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-AE-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Reverse charge” shall contain the Seller VAT Identifier (BT-31), the Seller tax
+     * registration identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63) and the Buyer VAT
+     * identifier (BT-48) and/or the Buyer legal registration identifier (BT-47).
+     */
+    public function brAE3_error(): void
+    {
+        $this->markTestSkipped('Same error case as BR-AE-2 that\'s why BR-AE-2 exception is thrown before BR-AE-3 exception');
+    }
+
+    /**
+     * @test
      * @testdox BR-AE-5 : In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is
      * "Reverse charge" the Invoiced item VAT rate (BT-152) shall be 0 (zero).
      * @dataProvider provideBrAE5Success

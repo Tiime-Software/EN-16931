@@ -358,6 +358,33 @@ class Invoice
         /** BR-IP-2 */
         $hasBT151VatCategoryCeutaMelilla = false;
 
+        /** BR-S-3 */
+        $hasBT95VatCategoryStandard = false;
+
+        /** BR-Z-3 */
+        $hasBT95VatCategoryZeroRatedGoods = false;
+
+        /** BR-E-3 */
+        $hasBT95VatCategoryExemptFromTax = false;
+
+        /** BR-AE-3 */
+        $hasBT95VatCategoryReverseCharge = false;
+
+        /** BR-IC-3 */
+        $hasBT95VatCategoryIntraCommunitySupply = false;
+
+        /** BR-G-3 */
+        $hasBT95VatCategoryExportOutsideEU = false;
+
+        /** BR-O-3 */
+        $hasBT95VatCategoryNotSubjectToVat = false;
+
+        /** BR-IG-3 */
+        $hasBT95VatCategoryCanaryIslands = false;
+
+        /** BR-IP-3 */
+        $hasBT95VatCategoryCeutaMelilla = false;
+
         $this->vatBreakdowns = [];
         $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(0);
         foreach ($vatBreakdowns as $vatBreakdown) {
@@ -685,79 +712,178 @@ class Invoice
 
                 $documentLevelAllowanceVatCategoryCode = $documentLevelAllowance->getVatCategoryCode();
 
-                /** BR-S-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryStandard
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::STANDARD
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryStandard = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::STANDARD) {
+                    /** BR-S-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryStandard) {
+                        $hasBT151orBT95orBT102VatCategoryStandard = true;
+                    }
+
+                    /** BR-S-3 */
+                    if (!$hasBT95VatCategoryStandard) {
+                        $hasBT95VatCategoryStandard = true;
+                    }
                 }
 
-                /** BR-Z-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryZeroRatedGoods
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::ZERO_RATED_GOODS
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryZeroRatedGoods = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::ZERO_RATED_GOODS) {
+                    /** BR-Z-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryZeroRatedGoods) {
+                        $hasBT151orBT95orBT102VatCategoryZeroRatedGoods = true;
+                    }
+
+                    /** BR-Z-3 */
+                    if (!$hasBT95VatCategoryZeroRatedGoods) {
+                        $hasBT95VatCategoryZeroRatedGoods = true;
+                    }
                 }
 
-                /** BR-E-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryExemptFromTax
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::EXEMPT_FROM_TAX
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryExemptFromTax = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::EXEMPT_FROM_TAX) {
+                    /** BR-E-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryExemptFromTax) {
+                        $hasBT151orBT95orBT102VatCategoryExemptFromTax = true;
+                    }
+
+                    /** BR-E-3 */
+                    if (!$hasBT95VatCategoryExemptFromTax) {
+                        $hasBT95VatCategoryExemptFromTax = true;
+                    }
                 }
 
-                /** BR-AE-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryReverseCharge
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::VAT_REVERSE_CHARGE
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryReverseCharge = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::VAT_REVERSE_CHARGE) {
+                    /** BR-AE-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryReverseCharge) {
+                        $hasBT151orBT95orBT102VatCategoryReverseCharge = true;
+                    }
+
+                    /** BR-AE-3 */
+                    if (!$hasBT95VatCategoryReverseCharge) {
+                        $hasBT95VatCategoryReverseCharge = true;
+                    }
                 }
 
-                /** BR-IC-1 */
                 if (
-                    !$hasBT151orBT95orBT102VatCategoryIntraCommunitySupply
-                    && $documentLevelAllowanceVatCategoryCode
-                        === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
+                    $documentLevelAllowanceVatCategoryCode
+                    === VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
                 ) {
-                    $hasBT151orBT95orBT102VatCategoryIntraCommunitySupply = true;
+                    /** BR-IC-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryIntraCommunitySupply) {
+                        $hasBT151orBT95orBT102VatCategoryIntraCommunitySupply = true;
+                    }
+
+                    /** BR-IC-3 */
+                    if (!$hasBT95VatCategoryIntraCommunitySupply) {
+                        $hasBT95VatCategoryIntraCommunitySupply = true;
+                    }
                 }
 
-                /** BR-G-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryExportOutsideEU
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryExportOutsideEU = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED) {
+                    /** BR-G-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryExportOutsideEU) {
+                        $hasBT151orBT95orBT102VatCategoryExportOutsideEU = true;
+                    }
+
+                    /** BR-G-3 */
+                    if (!$hasBT95VatCategoryExportOutsideEU) {
+                        $hasBT95VatCategoryExportOutsideEU = true;
+                    }
                 }
 
-                /** BR-O-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryNotSubjectToVat
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryNotSubjectToVat = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX) {
+                    /** BR-O-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryNotSubjectToVat) {
+                        $hasBT151orBT95orBT102VatCategoryNotSubjectToVat = true;
+                    }
+
+                    /** BR-O-3 */
+                    if (!$hasBT95VatCategoryNotSubjectToVat) {
+                        $hasBT95VatCategoryNotSubjectToVat = true;
+                    }
                 }
 
-                /** BR-IG-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryCanaryIslands
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::CANARY_ISLANDS
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryCanaryIslands = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::CANARY_ISLANDS) {
+                    /** BR-IG-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryCanaryIslands) {
+                        $hasBT151orBT95orBT102VatCategoryCanaryIslands = true;
+                    }
+
+                    /** BR-IG-3 */
+                    if (!$hasBT95VatCategoryCanaryIslands) {
+                        $hasBT95VatCategoryCanaryIslands = true;
+                    }
                 }
 
-                /** BR-IP-1 */
-                if (
-                    !$hasBT151orBT95orBT102VatCategoryCeutaMelilla
-                    && $documentLevelAllowanceVatCategoryCode === VatCategory::CEUTA_AND_MELILLA
-                ) {
-                    $hasBT151orBT95orBT102VatCategoryCeutaMelilla = true;
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::CEUTA_AND_MELILLA) {
+                    /** BR-IP-1 */
+                    if (!$hasBT151orBT95orBT102VatCategoryCeutaMelilla) {
+                        $hasBT151orBT95orBT102VatCategoryCeutaMelilla = true;
+                    }
+
+                    /** BR-IP-3 */
+                    if (!$hasBT95VatCategoryCeutaMelilla) {
+                        $hasBT95VatCategoryCeutaMelilla = true;
+                    }
                 }
             }
+        }
+
+        /** BR-[S/Z/E/IG/IP]-3 */
+        if (
+            (
+                $hasBT95VatCategoryStandard
+                || $hasBT95VatCategoryZeroRatedGoods
+                || $hasBT95VatCategoryExemptFromTax
+                || $hasBT95VatCategoryCanaryIslands
+                || $hasBT95VatCategoryCeutaMelilla
+            )
+            && !$seller->getVatIdentifier()
+            && !$seller->getTaxRegistrationIdentifier()
+            && !$sellerTaxRepresentativeParty?->getVatIdentifier()
+        ) {
+            throw new \InvalidArgumentException();
+//            throw new \Exception('@todo : BR-[S/Z/E/IG/IP]-3');
+        }
+
+        /** BR-AE-3 */
+        if (
+            $hasBT95VatCategoryReverseCharge
+            && (
+                (
+                    !$seller->getVatIdentifier()
+                    && !$seller->getTaxRegistrationIdentifier()
+                    && !$sellerTaxRepresentativeParty?->getVatIdentifier()
+                )
+                || (!$buyer->getLegalRegistrationIdentifier() && !$buyer->getVatIdentifier())
+            )
+        ) {
+            throw new \Exception('@todo : BR-AE-3');
+        }
+
+        /** BR-IC-3 */
+        if (
+            $hasBT95VatCategoryIntraCommunitySupply
+            && !(
+                ($seller->getVatIdentifier() xor $sellerTaxRepresentativeParty?->getVatIdentifier())
+                && $buyer->getVatIdentifier()
+            )
+        ) {
+            throw new \Exception('@todo : BR-IC-3');
+        }
+
+        /** BR-G-3 */
+        if (
+            $hasBT95VatCategoryExportOutsideEU
+            && !($seller->getVatIdentifier() xor $sellerTaxRepresentativeParty?->getVatIdentifier())
+        ) {
+            throw new \Exception('@todo : BR-G-3');
+        }
+
+        /** BR-O-3 */
+        if (
+            $hasBT95VatCategoryNotSubjectToVat
+            && $seller->getVatIdentifier()
+            && $sellerTaxRepresentativeParty?->getVatIdentifier()
+            && $buyer->getVatIdentifier()
+        ) {
+            throw new \Exception('@todo : BR-O-3');
         }
 
         $totalAmountDocumentLevelAllowances = round($totalAmountDocumentLevelAllowances->getValue(), Amount::DECIMALS);
