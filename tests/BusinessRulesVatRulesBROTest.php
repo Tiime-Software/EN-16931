@@ -455,6 +455,199 @@ class BusinessRulesVatRulesBROTest extends TestCase
 
     /**
      * @test
+     * @testdox BR-O-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Not subject to VAT” shall not contain the Seller VAT identifier (BT-31), the Seller
+     * tax representative VAT identifier (BT-63) or the Buyer VAT identifier (BT-48).
+     * @dataProvider provideBrO3Success
+     */
+    public function brO3_success(Buyer $buyer, Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            $buyer,
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3000,
+                3000,
+                invoiceTotalVatAmount: 0,
+            ),
+            [
+                new VatBreakdown(3000, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, vatExemptionReasonText: 'Hoobastank')
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [
+                new DocumentLevelAllowance(0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, 'Hoobastank'),
+            ],
+            [],
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrO3Success(): \Generator
+    {
+        yield 'BR-O-3 - No field' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-O-3 - (Seller) VatIdentifier' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR9594515'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-O-3 - (TaxRepresentativeParty) VatIdentifier' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-O-3 - (Buyer) VatIdentifier' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR985465151')
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-O-3 - (Seller) VatIdentifier and (TaxRepresentativeParty) VatIdentifier' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                null
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR9594515'),
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-O-3 - (Seller) VatIdentifier and (Buyer) VatIdentifier' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR9594515'),
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR9594515'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-O-3 - (TaxRepresentativeParty) VatIdentifier and (Buyer) VatIdentifier' => [
+            'buyer' => new Buyer(
+                'Richard Roe',
+                new BuyerPostalAddress(CountryAlpha2Code::FRANCE),
+                new VatIdentifier('FR9594515'),
+            ),
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+
+    /**
+     * @test
+     * @testdox BR-O-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “Not subject to VAT” shall not contain the Seller VAT identifier (BT-31), the Seller
+     * tax representative VAT identifier (BT-63) or the Buyer VAT identifier (BT-48).
+     */
+    public function brO3_error(): void
+    {
+        $this->markTestSkipped('Same error case as BR-O-2 that\'s why BR-O-2 exception is thrown before BR-O-3 exception');
+    }
+
+    /**
+     * @test
      * @testdox BR-O-5 : An Invoice line (BG-25) where the VAT category code (BT-151) is "Not subject to VAT" shall not
      * contain an Invoiced item VAT rate (BT-152).
      */

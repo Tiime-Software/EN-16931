@@ -409,6 +409,171 @@ class BusinessRulesVatRulesBRIGTest extends TestCase
 
     /**
      * @test
+     * @testdox BR-IG-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “IGIC” shall contain the Seller VAT Identifier (BT31), the Seller tax registration
+     * identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63).
+     * @dataProvider provideBrIG3Success
+     */
+    public function brIG3_success(Seller $seller, ?SellerTaxRepresentativeParty $sellerTaxRepresentativeParty): void
+    {
+        $invoice = new Invoice(
+            new InvoiceIdentifier('34'),
+            new \DateTimeImmutable(),
+            InvoiceTypeCode::COMMERCIAL_INVOICE,
+            CurrencyCode::EURO,
+            (new ProcessControl(new SpecificationIdentifier(SpecificationIdentifier::BASIC)))
+                ->setBusinessProcessType('A1'),
+            $seller,
+            new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
+            null,
+            new DocumentTotals(
+                3000,
+                3000,
+                3600,
+                3600,
+                invoiceTotalVatAmount: 600,
+            ),
+            [
+                new VatBreakdown(3000, 600, VatCategory::CANARY_ISLANDS, 20)
+            ],
+            [
+                new InvoiceLine(
+                    new InvoiceLineIdentifier("A1"),
+                    1,
+                    UnitOfMeasurement::BOX_REC21,
+                    3000,
+                    new PriceDetails(3000),
+                    new LineVatInformation(VatCategory::CANARY_ISLANDS, 20),
+                    new ItemInformation("A thing"),
+                )
+            ],
+            null,
+            null,
+            new \DateTimeImmutable(),
+            null,
+            [
+                new DocumentLevelAllowance(0, VatCategory::CANARY_ISLANDS, 'Hoobastank', vatRate: 0),
+            ],
+            [],
+            sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
+        );
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+    }
+
+    public static function provideBrIG3Success(): \Generator
+    {
+        yield 'BR-IG-2 - Only Seller VatIdentifier field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-IG-2 - Only Seller TaxRegistrationIdentifier field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-IG-2 - Only SellerTaxRepresentativeParty field' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-IG-2 - Seller VatIdentifier and Seller TaxRegistrationIdentifier fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => null
+        ];
+
+        yield 'BR-IG-2 - Seller VatIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR978515485')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-IG-2 - Seller TaxRegistrationIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                null,
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+
+        yield 'BR-IG-2 - Seller VatIdentifier and Seller TaxRegistrationIdentifier and SellerTaxRepresentativeParty fields' => [
+            'seller' => new Seller(
+                'John Doe',
+                new SellerPostalAddress(CountryAlpha2Code::FRANCE),
+                [new SellerIdentifier('10000000900017', InternationalCodeDesignator::SIRET_CODE)],
+                null,
+                new VatIdentifier('FR986416485'),
+                new TaxRegistrationIdentifier('FR995464564')
+            ),
+            'sellerTaxRepresentativeParty' => new SellerTaxRepresentativeParty(
+                'SellerTaxRepresentativeParty',
+                new VatIdentifier('FR986416485'),
+                new SellerTaxRepresentativePostalAddress(CountryAlpha2Code::FRANCE)
+            )
+        ];
+    }
+
+    /**
+     * @test
+     * @testdox BR-IG-3 : An Invoice that contains a Document level allowance (BG-20) where the Document level allowance
+     * VAT category code (BT-95) is “IGIC” shall contain the Seller VAT Identifier (BT31), the Seller tax registration
+     * identifier (BT-32) and/or the Seller tax representative VAT identifier (BT-63).
+     */
+    public function brIG3_error(): void
+    {
+        $this->markTestSkipped('Same error case as BR-IG-2 that\'s why BR-IG-2 exception is thrown before BR-IG-3 exception');
+    }
+
+    /**
+     * @test
      * @testdox BR-IG-5 : In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is "IGIC" the
      * invoiced item VAT rate (BT-152) shall be 0 (zero) or greater than zero.
      * @dataProvider provideBrIG5Success
