@@ -43,13 +43,6 @@ class Payee
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function getIdentifier(): ?PayeeIdentifier
     {
         return $this->identifier;

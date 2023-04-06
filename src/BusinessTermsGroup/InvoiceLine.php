@@ -159,13 +159,6 @@ class InvoiceLine
         return $this->identifier;
     }
 
-    public function setIdentifier(InvoiceLineIdentifier $identifier): self
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
     public function getNote(): ?string
     {
         return $this->note;
@@ -198,14 +191,6 @@ class InvoiceLine
     public function getInvoicedQuantityUnitOfMeasureCode(): UnitOfMeasurement
     {
         return $this->invoicedQuantityUnitOfMeasureCode;
-    }
-
-    public function setInvoicedQuantityUnitOfMeasureCode(
-        UnitOfMeasurement $invoicedQuantityUnitOfMeasureCode
-    ): self {
-        $this->invoicedQuantityUnitOfMeasureCode = $invoicedQuantityUnitOfMeasureCode;
-
-        return $this;
     }
 
     public function getNetAmount(): float
@@ -291,34 +276,13 @@ class InvoiceLine
         return $this->priceDetails;
     }
 
-    public function setPriceDetails(PriceDetails $priceDetails): self
-    {
-        $this->priceDetails = $priceDetails;
-
-        return $this;
-    }
-
     public function getLineVatInformation(): LineVatInformation
     {
         return $this->lineVatInformation;
     }
 
-    public function setLineVatInformation(LineVatInformation $lineVatInformation): self
-    {
-        $this->lineVatInformation = $lineVatInformation;
-
-        return $this;
-    }
-
     public function getItemInformation(): ItemInformation
     {
         return $this->itemInformation;
-    }
-
-    public function setItemInformation(ItemInformation $itemInformation): self
-    {
-        $this->itemInformation = $itemInformation;
-
-        return $this;
     }
 }

@@ -44,42 +44,13 @@ class BuyerContact
         return $this->point;
     }
 
-    public function setPoint(string $point): self
-    {
-        $this->point = $point;
-
-        return $this;
-    }
-
     public function getPhoneNumber(): ?string
     {
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(?string $phoneNumber): self
-    {
-        if (!is_string($phoneNumber) && !is_string($this->email)) {
-            throw new \Exception('@todo');
-        }
-
-        $this->phoneNumber = $phoneNumber;
-
-        return $this;
-    }
-
     public function getEmail(): ?string
     {
         return $this->email;
-    }
-
-    public function setEmail(?string $email): self
-    {
-        if (!is_string($this->phoneNumber) && !is_string($email)) {
-            throw new \Exception('@todo');
-        }
-
-        $this->email = $email;
-
-        return $this;
     }
 }

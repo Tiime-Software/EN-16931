@@ -122,13 +122,6 @@ class DocumentLevelCharge
         return $this->amount->getValueRounded();
     }
 
-    public function setAmount(float $amount): self
-    {
-        $this->amount = new Amount($amount);
-
-        return $this;
-    }
-
     public function getBaseAmount(): ?float
     {
         return $this->baseAmount?->getValueRounded();
@@ -158,23 +151,9 @@ class DocumentLevelCharge
         return $this->vatCategoryCode;
     }
 
-    public function setVatCategoryCode(VatCategory $vatCategoryCode): self
-    {
-        $this->vatCategoryCode = $vatCategoryCode;
-
-        return $this;
-    }
-
     public function getVatRate(): ?float
     {
         return $this->vatRate?->getValueRounded();
-    }
-
-    public function setVatRate(?float $vatRate): self
-    {
-        $this->vatRate = \is_float($vatRate) ? new Percentage($vatRate) : null;
-
-        return $this;
     }
 
     public function getReason(): ?string

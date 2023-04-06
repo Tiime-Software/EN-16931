@@ -24,24 +24,17 @@ class PaymentCardInformation
 
     public function __construct(string $primaryAccountNumber)
     {
-        $this->setPrimaryAccountNumber($primaryAccountNumber);
+        if (!preg_match('/^[^0-9]*\d{4,6}$/', $primaryAccountNumber)) {
+            throw new \Exception('@todo');
+        }
+
+        $this->primaryAccountNumber = $primaryAccountNumber;
         $this->holderName = null;
     }
 
     public function getPrimaryAccountNumber(): string
     {
         return $this->primaryAccountNumber;
-    }
-
-    public function setPrimaryAccountNumber(string $primaryAccountNumber): self
-    {
-        if (!preg_match('/^[^0-9]*\d{4,6}$/', $primaryAccountNumber)) {
-            throw new \Exception('@todo');
-        }
-
-        $this->primaryAccountNumber = $primaryAccountNumber;
-
-        return $this;
     }
 
     public function getHolderName(): ?string

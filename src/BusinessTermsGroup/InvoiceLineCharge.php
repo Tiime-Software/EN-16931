@@ -65,13 +65,6 @@ class InvoiceLineCharge
         return $this->amount->getValueRounded();
     }
 
-    public function setAmount(float $amount): self
-    {
-        $this->amount = new Amount($amount);
-
-        return $this;
-    }
-
     public function getBaseAmount(): ?float
     {
         return $this->baseAmount?->getValueRounded();

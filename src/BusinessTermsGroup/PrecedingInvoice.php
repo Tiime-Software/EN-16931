@@ -35,13 +35,6 @@ class PrecedingInvoice
         return $this->reference;
     }
 
-    public function setReference(PrecedingInvoiceReference $reference): self
-    {
-        $this->reference = $reference;
-
-        return $this;
-    }
-
     public function getIssueDate(): ?\DateTimeInterface
     {
         return $this->issueDate;
