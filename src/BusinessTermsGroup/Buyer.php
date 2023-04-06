@@ -81,13 +81,6 @@ class Buyer
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function getTradingName(): ?string
     {
         return $this->tradingName;
@@ -137,13 +130,6 @@ class Buyer
     public function getAddress(): BuyerPostalAddress
     {
         return $this->address;
-    }
-
-    public function setAddress(BuyerPostalAddress $address): self
-    {
-        $this->address = $address;
-
-        return $this;
     }
 
     public function getContact(): ?BuyerContact

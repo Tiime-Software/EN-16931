@@ -47,11 +47,4 @@ class InvoiceNote
     {
         return $this->note;
     }
-
-    public function setNote(string $note): self
-    {
-        $this->note = $note;
-
-        return $this;
-    }
 }

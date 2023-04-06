@@ -135,11 +135,4 @@ class SellerPostalAddress
     {
         return $this->countryCode;
     }
-
-    public function setCountryCode(CountryAlpha2Code $countryCode): self
-    {
-        $this->countryCode = $countryCode;
-
-        return $this;
-    }
 }

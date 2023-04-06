@@ -123,13 +123,6 @@ class DocumentTotals
         return $this->sumOfInvoiceLineNetAmount->getValueRounded();
     }
 
-    public function setSumOfInvoicesLineNetAmount(float $sumOfInvoiceLineNetAmount): self
-    {
-        $this->sumOfInvoiceLineNetAmount = new Amount($sumOfInvoiceLineNetAmount);
-
-        return $this;
-    }
-
     public function getSumOfAllowancesOnDocumentLevel(): ?float
     {
         return $this->sumOfAllowancesOnDocumentLevel?->getValueRounded();
@@ -160,35 +153,14 @@ class DocumentTotals
         return $this->invoiceTotalAmountWithVat->getValueRounded();
     }
 
-    public function setInvoiceTotalAmountWithVat(float $invoiceTotalAmountWithVat): self
-    {
-        $this->invoiceTotalAmountWithVat = new Amount($invoiceTotalAmountWithVat);
-
-        return $this;
-    }
-
     public function getPaidAmount(): ?float
     {
         return $this->paidAmount?->getValueRounded();
     }
 
-    public function setPaidAmount(?float $paidAmount): self
-    {
-        $this->paidAmount = \is_float($paidAmount) ? new Amount($paidAmount) : null;
-
-        return $this;
-    }
-
     public function getRoundingAmount(): ?float
     {
         return $this->roundingAmount?->getValueRounded();
-    }
-
-    public function setRoundingAmount(?float $roundingAmount): self
-    {
-        $this->roundingAmount = \is_float($roundingAmount) ? new Amount($roundingAmount) : null;
-
-        return $this;
     }
 
     public function getAmountDueForPayment(): float

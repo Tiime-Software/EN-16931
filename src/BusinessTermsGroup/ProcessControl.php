@@ -47,11 +47,4 @@ class ProcessControl
     {
         return $this->specificationIdentifier;
     }
-
-    public function setSpecificationIdentifier(SpecificationIdentifier $specificationIdentifier): self
-    {
-        $this->specificationIdentifier = $specificationIdentifier;
-
-        return $this;
-    }
 }

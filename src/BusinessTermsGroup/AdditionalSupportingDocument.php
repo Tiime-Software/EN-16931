@@ -51,13 +51,6 @@ class AdditionalSupportingDocument
         return $this->reference;
     }
 
-    public function setReference(SupportingDocumentReference $reference): self
-    {
-        $this->reference = $reference;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;

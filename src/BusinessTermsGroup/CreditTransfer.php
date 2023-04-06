@@ -44,13 +44,6 @@ class CreditTransfer
         return $this->paymentAccountIdentifier;
     }
 
-    public function setPaymentAccountIdentifier(PaymentAccountIdentifier $paymentAccountIdentifier): self
-    {
-        $this->paymentAccountIdentifier = $paymentAccountIdentifier;
-
-        return $this;
-    }
-
     public function getPaymentAccountName(): ?string
     {
         return $this->paymentAccountName;

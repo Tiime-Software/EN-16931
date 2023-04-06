@@ -68,13 +68,6 @@ class PriceDetails
         return $this->itemNetPrice->getValueRounded();
     }
 
-    public function setItemNetPrice(float $itemNetPrice): self
-    {
-        $this->itemNetPrice = new UnitPriceAmount($itemNetPrice);
-
-        return $this;
-    }
-
     public function getItemPriceDiscount(): ?float
     {
         return $this->itemPriceDiscount?->getValueRounded();

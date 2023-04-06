@@ -120,13 +120,6 @@ class VatBreakdown
         return $this->vatCategoryTaxableAmount->getValue();
     }
 
-    public function setVatCategoryTaxableAmount(float $vatCategoryTaxableAmount): self
-    {
-        $this->vatCategoryTaxableAmount = new Amount($vatCategoryTaxableAmount);
-
-        return $this;
-    }
-
     public function getVatCategoryTaxAmount(): float
     {
         return $this->vatCategoryTaxAmount->getValue();

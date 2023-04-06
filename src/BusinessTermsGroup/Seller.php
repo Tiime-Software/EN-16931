@@ -120,23 +120,9 @@ class Seller
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function getAddress(): SellerPostalAddress
     {
         return $this->address;
-    }
-
-    public function setAddress(SellerPostalAddress $address): self
-    {
-        $this->address = $address;
-
-        return $this;
     }
 
     public function getTradingName(): ?string
@@ -159,38 +145,14 @@ class Seller
         return $this->identifiers;
     }
 
-    /**
-     * @param array<int, SellerIdentifier> $identifiers
-     */
-    public function setIdentifiers(array $identifiers): self
-    {
-        $this->identifiers = $identifiers;
-
-        return $this;
-    }
-
     public function getLegalRegistrationIdentifier(): ?LegalRegistrationIdentifier
     {
         return $this->legalRegistrationIdentifier;
     }
 
-    public function setLegalRegistrationIdentifier(?LegalRegistrationIdentifier $legalRegistrationIdentifier): self
-    {
-        $this->legalRegistrationIdentifier = $legalRegistrationIdentifier;
-
-        return $this;
-    }
-
     public function getVatIdentifier(): ?VatIdentifier
     {
         return $this->vatIdentifier;
-    }
-
-    public function setVatIdentifier(?VatIdentifier $vatIdentifier): self
-    {
-        $this->vatIdentifier = $vatIdentifier;
-
-        return $this;
     }
 
     public function getTaxRegistrationIdentifier(): ?TaxRegistrationIdentifier
