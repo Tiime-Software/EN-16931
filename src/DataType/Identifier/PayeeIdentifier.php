@@ -8,7 +8,7 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 
 class PayeeIdentifier
 {
-    public function __construct(public readonly string $value, public readonly InternationalCodeDesignator $scheme)
+    public function __construct(public readonly string $value, public readonly ?InternationalCodeDesignator $scheme)
     {
     }
 }
