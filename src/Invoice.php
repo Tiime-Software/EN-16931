@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931;
 
-use _PHPStan_7d6f0f6a4\Nette\Neon\Exception;
 use Tiime\EN16931\BusinessTermsGroup\AdditionalSupportingDocument;
 use Tiime\EN16931\BusinessTermsGroup\Buyer;
 use Tiime\EN16931\BusinessTermsGroup\DeliverToAddress;
