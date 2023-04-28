@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Tiime\EN16931;
+namespace Tiime\EN16931\Tests;
 
 use PHPStan\Rules\DateTimeInstantiationRule;
 use PHPUnit\Framework\TestCase;

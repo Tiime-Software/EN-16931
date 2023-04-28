@@ -3,11 +3,6 @@
     "description": "EN-16931 compliant invoices as PHP objects",
     "type": "library",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Tiime\\EN16931\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "Flavien RODRIGUES",
@@ -32,6 +27,16 @@
         "squizlabs/php_codesniffer": "^3.7",
         "phpstan/phpstan": "^1.10",
         "staabm/annotate-pull-request-from-checkstyle": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tiime\\EN16931\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tiime\\EN16931\\Tests\\": "tests/"
+        }
     },
     "scripts": {
         "test": "vendor/bin/phpunit tests",
