@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Tiime\EN16931;
+namespace Tiime\EN16931\Tests;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
