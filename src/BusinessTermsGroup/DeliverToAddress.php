@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\BusinessTermsGroup;
 
+use Tiime\EN16931\DataType\Address;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 
 /**
@@ -11,7 +12,7 @@ use Tiime\EN16931\DataType\CountryAlpha2Code;
  * A group of business terms providing information about the address to which
  * goods and services invoiced were or are delivered.
  */
-class DeliverToAddress
+class DeliverToAddress implements Address
 {
     /**
      * BT-37

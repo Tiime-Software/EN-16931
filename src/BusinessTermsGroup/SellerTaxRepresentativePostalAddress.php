@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\BusinessTermsGroup;
 
+use Tiime\EN16931\DataType\Address;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 
 /**
  * BG-12
  * A group of business terms providing information about the postal address for the tax representative party.
  */
-class SellerTaxRepresentativePostalAddress
+class SellerTaxRepresentativePostalAddress implements Address
 {
     /**
      * BT-64

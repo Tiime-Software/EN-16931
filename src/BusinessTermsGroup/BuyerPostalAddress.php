@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\BusinessTermsGroup;
 
+use Tiime\EN16931\DataType\Address;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 
 /**
  * BG-8
  * A group of business terms providing information about the postal address for the Buyer.
  */
-class BuyerPostalAddress
+class BuyerPostalAddress implements Address
 {
     /**
      * BT-50
