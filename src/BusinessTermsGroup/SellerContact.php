@@ -14,7 +14,7 @@ class SellerContact
      * BT-41
      * A contact point for a legal entity or person.
      */
-    private string $point;
+    private ?string $point;
 
     /**
      * BT-42
@@ -28,20 +28,14 @@ class SellerContact
      */
     private ?string $email;
 
-    public function __construct(string $point, ?string $phoneNumber, ?string $email)
-    {
-        if (!is_string($phoneNumber) && !is_string($email)) {
-            throw new \Exception('@todo');
-        }
-
-        $this->point = $point;
-        $this->phoneNumber = $phoneNumber;
-        $this->email = $email;
-    }
-
-    public function getPoint(): string
+    public function getPoint(): ?string
     {
         return $this->point;
+    }
+
+    public function setPoint(?string $point): void
+    {
+        $this->point = $point;
     }
 
     public function getPhoneNumber(): ?string
@@ -49,8 +43,18 @@ class SellerContact
         return $this->phoneNumber;
     }
 
+    public function setPhoneNumber(?string $phoneNumber): void
+    {
+        $this->phoneNumber = $phoneNumber;
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    public function setEmail(?string $email): void
+    {
+        $this->email = $email;
     }
 }
