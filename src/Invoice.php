@@ -1284,6 +1284,13 @@ class Invoice
         return $this->paymentInstructions;
     }
 
+    public function setPaymentInstructions(?PaymentInstructions $paymentInstructions): self
+    {
+        $this->paymentInstructions = $paymentInstructions;
+
+        return $this;
+    }
+
     /**
      * @return array<int, DocumentLevelAllowance>
      */
