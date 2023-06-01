@@ -43,7 +43,8 @@ class DeliveryInformation
      */
     private ?DeliverToAddress $deliverToAddress;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->deliverToPartyName = null;
         $this->locationIdentifier = null;
         $this->actualDeliveryDate = null;
