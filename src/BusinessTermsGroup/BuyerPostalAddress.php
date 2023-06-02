@@ -58,6 +58,12 @@ class BuyerPostalAddress implements Address
     public function __construct(CountryAlpha2Code $countryCode)
     {
         $this->countryCode = $countryCode;
+        $this->line1 = null;
+        $this->line2 = null;
+        $this->line3 = null;
+        $this->city = null;
+        $this->postCode = null;
+        $this->countrySubdivision = null;
     }
 
     public function getLine1(): ?string
