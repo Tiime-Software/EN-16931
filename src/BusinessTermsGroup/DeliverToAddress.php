@@ -15,7 +15,7 @@ use Tiime\EN16931\DataType\CountryAlpha2Code;
 class DeliverToAddress implements Address
 {
     /**
-     * BT-37
+     * BT-75
      * The main address line in an address.
      */
     private ?string $line1;
