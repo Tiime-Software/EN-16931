@@ -78,7 +78,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             $documentLevelAllowances,
             $documentLevelCharges,
-            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
+            (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
         );
 
         $this->assertInstanceOf(Invoice::class,  $invoice);
@@ -164,7 +166,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             $documentLevelAllowances,
             $documentLevelCharges,
-            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
+            (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
         );
     }
 
@@ -256,11 +260,10 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             [],
             [],
-            deliveryInformation: new DeliveryInformation(
-                actualDeliveryDate: new \DateTimeImmutable(),
-                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
-                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
-            ),
+            deliveryInformation: (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setInvoicingPeriod(new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()))
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
             sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
@@ -348,11 +351,10 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             [],
             [],
-            deliveryInformation: new DeliveryInformation(
-                actualDeliveryDate: new \DateTimeImmutable(),
-                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
-                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
-            ),
+            deliveryInformation: (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setInvoicingPeriod(new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()))
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
             sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
     }
@@ -438,11 +440,10 @@ class BusinessRulesVatRulesBRICTest extends TestCase
                 new DocumentLevelAllowance(0, VatCategory::VAT_EXEMPT_FOR_EEA_INTRA_COMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES, 'Hoobastank', vatRate: 0),
             ],
             [],
-            deliveryInformation: new DeliveryInformation(
-                actualDeliveryDate: new \DateTimeImmutable(),
-                invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
-                deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)
-            ),
+            deliveryInformation: (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setInvoicingPeriod(new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()))
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
             sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
         );
 
@@ -673,7 +674,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             $allowances,
             $charges,
-            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM))
+            (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
         );
 
         $this->assertInstanceOf(Invoice::class, $invoice);
@@ -947,7 +950,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
             null,
             $allowances,
             $charges,
-            new DeliveryInformation(actualDeliveryDate: new \DateTimeImmutable(), deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM)),
+            (new DeliveryInformation())
+                ->setActualDeliveryDate(new \DateTimeImmutable())
+                ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
         );
     }
 
@@ -1145,23 +1150,21 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 
     public static function provideBrIC11Success(): \Generator
     {
-        yield ['deliveryInformation' => new DeliveryInformation(
-            actualDeliveryDate: new \DateTimeImmutable(),
-            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
-            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
-        )];
+        yield ['deliveryInformation' => (new DeliveryInformation())
+            ->setActualDeliveryDate(new \DateTimeImmutable())
+            ->setInvoicingPeriod(new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()))
+            ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
+        ];
 
-        yield ['deliveryInformation' => new DeliveryInformation(
-            actualDeliveryDate: null,
-            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
-            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
-        )];
+        yield ['deliveryInformation' => (new DeliveryInformation())
+            ->setInvoicingPeriod(new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()))
+            ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
+        ];
 
-        yield ['deliveryInformation' => new DeliveryInformation(
-            actualDeliveryDate: new \DateTimeImmutable(),
-            invoicingPeriod: null,
-            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
-        )];
+        yield ['deliveryInformation' => (new DeliveryInformation())
+            ->setActualDeliveryDate(new \DateTimeImmutable())
+            ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
+        ];
     }
 
     /**
@@ -1217,11 +1220,9 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 
     public static function provideBrIC11Error(): \Generator
     {
-        yield ['deliveryInformation' => new DeliveryInformation(
-            actualDeliveryDate: null,
-            invoicingPeriod: null,
-            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
-        )];
+        yield ['deliveryInformation' => (new DeliveryInformation())
+            ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
+        ];
 
         yield ['deliveryInformation' => null];
     }
@@ -1279,11 +1280,11 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 
     public static function provideBrIC12Success(): \Generator
     {
-        yield ['deliveryInformation' => new DeliveryInformation(
-            actualDeliveryDate: new \DateTimeImmutable(),
-            invoicingPeriod: new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()),
-            deliverToAddress: new DeliverToAddress(CountryAlpha2Code::BELGIUM),
-        )];
+        yield ['deliveryInformation' => (new DeliveryInformation())
+            ->setActualDeliveryDate(new \DateTimeImmutable())
+            ->setInvoicingPeriod(new InvoicingPeriod(new \DateTimeImmutable('-1 day'), new \DateTimeImmutable()))
+            ->setDeliverToAddress(new DeliverToAddress(CountryAlpha2Code::BELGIUM))
+        ];
     }
 
     /**
@@ -1339,10 +1340,8 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 
     public static function provideBrIC12Error(): \Generator
     {
-        yield ['deliveryInformation' => new DeliveryInformation(
-            actualDeliveryDate: new \DateTimeImmutable(),
-            invoicingPeriod: null,
-            deliverToAddress: null,
-        )];
+        yield ['deliveryInformation' => (new DeliveryInformation())
+            ->setActualDeliveryDate(new \DateTimeImmutable())
+        ];
     }
 }
