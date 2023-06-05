@@ -28,14 +28,23 @@ class SellerContact
      */
     private ?string $email;
 
+    public function __construct()
+    {
+        $this->point = null;
+        $this->phoneNumber = null;
+        $this->email = null;
+    }
+
     public function getPoint(): ?string
     {
         return $this->point;
     }
 
-    public function setPoint(?string $point): void
+    public function setPoint(?string $point): self
     {
         $this->point = $point;
+
+        return $this;
     }
 
     public function getPhoneNumber(): ?string
@@ -43,9 +52,11 @@ class SellerContact
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(?string $phoneNumber): void
+    public function setPhoneNumber(?string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -53,8 +64,10 @@ class SellerContact
         return $this->email;
     }
 
-    public function setEmail(?string $email): void
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
+
+        return $this;
     }
 }
