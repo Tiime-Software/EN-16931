@@ -34,6 +34,9 @@ class DirectDebit
 
     public function __construct()
     {
+        $this->mandateReferenceIdentifier = null;
+        $this->bankAssignedCreditorIdentifier = null;
+        $this->debitedAccountIdentifier = null;
     }
 
     public function getMandateReferenceIdentifier(): ?MandateReferenceIdentifier
