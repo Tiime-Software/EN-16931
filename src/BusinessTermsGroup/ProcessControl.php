@@ -29,6 +29,7 @@ class ProcessControl
     public function __construct(SpecificationIdentifier $specificationIdentifier)
     {
         $this->specificationIdentifier = $specificationIdentifier;
+        $this->businessProcessType = null;
     }
 
     public function getBusinessProcessType(): ?string
