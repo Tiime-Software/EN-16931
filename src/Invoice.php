@@ -1044,6 +1044,17 @@ class Invoice
         $this->deliveryInformation = $deliveryInformation;
 
         $this->buyerReference = null;
+        $this->projectReference = null;
+        $this->contractReference = null;
+        $this->purchaseOrderReference = null;
+        $this->salesOrderReference = null;
+        $this->receivingAdviceReference = null;
+        $this->despatchAdviceReference = null;
+        $this->tenderOrLotReference = null;
+        $this->objectIdentifier = null;
+        $this->buyerAccountingReference = null;
+        $this->precedingInvoices = [];
+        $this->payee = null;
         $this->paymentInstructions = null;
         $this->additionalSupportingDocuments = [];
         $this->sellerTaxRepresentativeParty = $sellerTaxRepresentativeParty;
