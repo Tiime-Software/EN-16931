@@ -100,7 +100,7 @@ class VatBreakdown
         $this->vatCategoryTaxableAmount = new Amount($vatCategoryTaxableAmount);
         $this->vatCategoryTaxAmount = new Amount($vatCategoryTaxAmount);
         $this->vatCategoryCode = $vatCategoryCode;
-        $this->vatCategoryRate = $vatCategoryRate !== null ? new Percentage($vatCategoryRate) : $vatCategoryRate;
+        $this->vatCategoryRate = is_float($vatCategoryRate) ? new Percentage($vatCategoryRate) : $vatCategoryRate;
         $this->vatExemptionReasonText = $vatExemptionReasonText;
         $this->vatExemptionReasonCode = $vatExemptionReasonCode;
 

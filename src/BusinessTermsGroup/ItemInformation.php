@@ -75,13 +75,13 @@ class ItemInformation
     public function __construct(string $name)
     {
         $this->name = $name;
+        $this->itemAttributes = [];
+        $this->classificationIdentifiers = [];
         $this->description = null;
         $this->sellerIdentifier = null;
         $this->buyerIdentifier = null;
         $this->standardIdentifier = null;
-        $this->classificationIdentifiers = [];
         $this->itemCountryOfOrigin = null;
-        $this->itemAttributes = [];
     }
 
     public function getName(): string

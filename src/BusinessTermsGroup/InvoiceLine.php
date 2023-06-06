@@ -35,7 +35,6 @@ class InvoiceLine
      */
     private ?string $note;
 
-
     /**
      * BT-128
      * An identifier for an object on which the invoice line is based, given by the Seller.
@@ -152,6 +151,13 @@ class InvoiceLine
         $this->priceDetails = $priceDetails;
         $this->lineVatInformation = $lineVatInformation;
         $this->itemInformation = $itemInformation;
+        $this->allowances = [];
+        $this->charges = [];
+        $this->note = null;
+        $this->objectIdentifier = null;
+        $this->referencedPurchaseOrderLineReference = null;
+        $this->buyerAccountingReference = null;
+        $this->period = null;
     }
 
     public function getIdentifier(): InvoiceLineIdentifier

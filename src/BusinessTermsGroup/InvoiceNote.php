@@ -27,8 +27,8 @@ class InvoiceNote
 
     public function __construct(string $note)
     {
-        $this->subjectCode = null;
         $this->note = $note;
+        $this->subjectCode = null;
     }
 
     public function getSubjectCode(): ?InvoiceNoteCode

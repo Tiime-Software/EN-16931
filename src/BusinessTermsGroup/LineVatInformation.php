@@ -70,7 +70,7 @@ class LineVatInformation
         }
 
         $this->invoicedItemVatCategoryCode = $invoicedItemVatCategoryCode;
-        $this->invoicedItemVatRate = $invoicedItemVatRate !== null ?
+        $this->invoicedItemVatRate = is_float($invoicedItemVatRate) ?
             new Percentage($invoicedItemVatRate) : $invoicedItemVatRate;
     }
 

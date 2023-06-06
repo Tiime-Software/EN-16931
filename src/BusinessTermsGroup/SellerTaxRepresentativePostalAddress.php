@@ -57,13 +57,13 @@ class SellerTaxRepresentativePostalAddress implements Address
 
     public function __construct(CountryAlpha2Code $countryCode)
     {
+        $this->countryCode = $countryCode;
         $this->line1 = null;
         $this->line2 = null;
         $this->line3 = null;
         $this->city = null;
         $this->postCode = null;
         $this->countrySubdivision = null;
-        $this->countryCode = $countryCode;
     }
 
     public function getLine1(): ?string

@@ -59,10 +59,9 @@ class PaymentInstructions
     public function __construct(PaymentMeansCode $paymentMeansTypeCode, array $creditTransfers = [])
     {
         $this->paymentMeansTypeCode = $paymentMeansTypeCode;
+        $this->setCreditTransfers($creditTransfers);
         $this->paymentMeansText = null;
         $this->remittanceInformation = null;
-        $this->setCreditTransfers($creditTransfers);
-
         $this->paymentCardInformation = null;
         $this->directDebit = null;
     }

@@ -74,6 +74,10 @@ class Buyer
         $this->address = $address;
         $this->vatIdentifier = $vatIdentifier;
         $this->legalRegistrationIdentifier = $legalRegistrationIdentifier;
+        $this->tradingName = null;
+        $this->identifier = null;
+        $this->electronicAddress = null;
+        $this->contact = null;
     }
 
     public function getName(): string

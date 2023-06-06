@@ -108,7 +108,7 @@ class DocumentLevelCharge
             throw new \Exception('@todo : BR-genericVAT-7');
         }
 
-        $this->vatRate = $vatRate !== null ? new Percentage($vatRate) : $vatRate;
+        $this->vatRate = is_float($vatRate) ? new Percentage($vatRate) : $vatRate;
         $this->amount = new Amount($amount);
         $this->baseAmount = null;
         $this->percentage = null;

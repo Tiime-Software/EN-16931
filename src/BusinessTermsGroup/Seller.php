@@ -108,11 +108,19 @@ class Seller
             $this->identifiers[] = $identifier;
         }
 
-        if (empty($this->identifiers) && null === $legalRegistrationIdentifier && null === $vatIdentifier) {
+        if (
+            count($this->identifiers) === 0
+            && !$legalRegistrationIdentifier instanceof LegalRegistrationIdentifier
+            && !$vatIdentifier instanceof VatIdentifier
+        ) {
             throw new \Exception('@todo');
         }
 
         $this->taxRegistrationIdentifier = $taxRegistrationIdentifier;
+        $this->tradingName = null;
+        $this->additionalLegalInformation = null;
+        $this->electronicAddress = null;
+        $this->contact = null;
     }
 
     public function getName(): string
