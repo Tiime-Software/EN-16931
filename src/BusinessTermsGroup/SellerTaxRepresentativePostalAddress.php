@@ -71,9 +71,11 @@ class SellerTaxRepresentativePostalAddress implements Address
         return $this->line1;
     }
 
-    public function setLine1(?string $line1): void
+    public function setLine1(?string $line1): self
     {
         $this->line1 = $line1;
+
+        return $this;
     }
 
     public function getLine2(): ?string
@@ -81,9 +83,11 @@ class SellerTaxRepresentativePostalAddress implements Address
         return $this->line2;
     }
 
-    public function setLine2(?string $line2): void
+    public function setLine2(?string $line2): self
     {
         $this->line2 = $line2;
+
+        return $this;
     }
 
     public function getLine3(): ?string
@@ -91,9 +95,11 @@ class SellerTaxRepresentativePostalAddress implements Address
         return $this->line3;
     }
 
-    public function setLine3(?string $line3): void
+    public function setLine3(?string $line3): self
     {
         $this->line3 = $line3;
+
+        return $this;
     }
 
     public function getCity(): ?string
@@ -101,9 +107,11 @@ class SellerTaxRepresentativePostalAddress implements Address
         return $this->city;
     }
 
-    public function setCity(?string $city): void
+    public function setCity(?string $city): self
     {
         $this->city = $city;
+
+        return $this;
     }
 
     public function getPostCode(): ?string
@@ -111,9 +119,11 @@ class SellerTaxRepresentativePostalAddress implements Address
         return $this->postCode;
     }
 
-    public function setPostCode(?string $postCode): void
+    public function setPostCode(?string $postCode): self
     {
         $this->postCode = $postCode;
+
+        return $this;
     }
 
     public function getCountrySubdivision(): ?string
@@ -121,9 +131,11 @@ class SellerTaxRepresentativePostalAddress implements Address
         return $this->countrySubdivision;
     }
 
-    public function setCountrySubdivision(?string $countrySubdivision): void
+    public function setCountrySubdivision(?string $countrySubdivision): self
     {
         $this->countrySubdivision = $countrySubdivision;
+
+        return $this;
     }
 
     public function getCountryCode(): CountryAlpha2Code
