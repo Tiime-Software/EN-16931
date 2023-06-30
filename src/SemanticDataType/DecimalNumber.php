@@ -30,6 +30,20 @@ class DecimalNumber implements Number
         return round($this->value, $this->decimals);
     }
 
+    public function getFormattedValueRounded(string $decimal_separator = '.', string $thousands_separator = ''): string
+    {
+        if (null === $this->decimals) {
+            return number_format($this->value, 0, $decimal_separator, $thousands_separator);
+        }
+
+        return number_format(
+            round($this->value, $this->decimals),
+            $this->decimals,
+            $decimal_separator,
+            $thousands_separator
+        );
+    }
+
     public function add(Number $number, ?int $decimals = null): float
     {
         $result = (float) bcadd((string) $this->getValue(), (string) $number->getValue(), Number::BC_MATH_ROUNDING);
