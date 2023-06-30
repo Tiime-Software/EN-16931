@@ -36,7 +36,12 @@ class DecimalNumber implements Number
             return number_format($this->value, 0, $decimal_separator, $thousands_separator);
         }
 
-        return number_format(round($this->value, $this->decimals), $this->decimals, $decimal_separator, $thousands_separator);
+        return number_format(
+            round($this->value, $this->decimals),
+            $this->decimals,
+            $decimal_separator,
+            $thousands_separator
+        );
     }
 
     public function add(Number $number, ?int $decimals = null): float
