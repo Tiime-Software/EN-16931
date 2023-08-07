@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
+/**
+ * UNTDID 1001 (BT-3)
+ * Published by France (31/07/2023)
+ */
 enum InvoiceTypeCode: string
 {
     case DEBIT_NOTE_RELATED_TO_GOODS_OR_SERVICES = '80';
@@ -37,12 +41,15 @@ enum InvoiceTypeCode: string
     case LEASE_INVOICE = '394';
     case CONSIGNMENT_INVOICE = '395';
     case FACTORED_CREDIT_NOTE = '396';
-    case OCR_PAYMENT_CREDIT_NOTE = '420';
+    case OPTICAL_CHARACTER_READING_PAYMENT_CREDIT_NOTE = '420';
     case DEBIT_ADVICE = '456';
     case REVERSAL_OF_DEBIT = '457';
     case REVERSAL_OF_CREDIT = '458';
+    case SELF_BILLED_PREPAYMENT_INVOICE = '500';
+    case SELF_BILLED_FACTORED_INVOICE = '501';
+    case SELF_BILLED_FACTORED_CREDIT_NOTE = '502';
+    case PREPAYMENT_CREDIT_NOTE = '503';
     case SELF_BILLED_DEBIT_NOTE = '527';
-    case FORWARDER_CREDIT_NOTE = '532';
     case INSURER_INVOICE = '575';
     case FORWARDER_INVOICE = '623';
     case PORT_CHARGES_DOCUMENTS = '633';
