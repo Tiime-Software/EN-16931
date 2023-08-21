@@ -148,10 +148,10 @@ class VatBreakdown
     private function checkExemptionReason(): void
     {
         $noExemptionCategories = [
-            VatCategory::STANDARD,
+            VatCategory::STANDARD_RATE,
             VatCategory::ZERO_RATED_GOODS,
-            VatCategory::CANARY_ISLANDS,
-            VatCategory::CEUTA_AND_MELILLA
+            VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX,
+            VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
         ];
 
         $shallHaveExemptionReason = !in_array($this->vatCategoryCode, $noExemptionCategories);

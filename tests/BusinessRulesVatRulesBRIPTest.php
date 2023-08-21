@@ -88,7 +88,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -97,15 +97,15 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 0),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 0),
                     new ItemInformation("A thing"),
                 ),
             ],
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
-                new VatBreakdown(1000, 0, VatCategory::CEUTA_AND_MELILLA, 0)
+                new VatBreakdown(1000, 200, VatCategory::STANDARD_RATE, 20),
+                new VatBreakdown(1000, 0, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 0)
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -170,7 +170,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -179,14 +179,14 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 0),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 0),
                     new ItemInformation("A thing"),
                 ),
             ],
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(2000, 400, VatCategory::STANDARD, 20)
+                new VatBreakdown(2000, 400, VatCategory::STANDARD_RATE, 20)
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -225,7 +225,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 invoiceTotalVatAmount: 600,
             ),
             [
-                new VatBreakdown(3000, 600, VatCategory::CEUTA_AND_MELILLA, 20)
+                new VatBreakdown(3000, 600, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20)
             ],
             [
                 new InvoiceLine(
@@ -234,7 +234,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     3000,
                     new PriceDetails(3000),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -384,7 +384,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 invoiceTotalVatAmount: 600,
             ),
             [
-                new VatBreakdown(3000, 600, VatCategory::CEUTA_AND_MELILLA, 20)
+                new VatBreakdown(3000, 600, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20)
             ],
             [
                 new InvoiceLine(
@@ -393,7 +393,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     3000,
                     new PriceDetails(3000),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -434,7 +434,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 invoiceTotalVatAmount: 600,
             ),
             [
-                new VatBreakdown(3000, 600, VatCategory::CEUTA_AND_MELILLA, 20)
+                new VatBreakdown(3000, 600, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20)
             ],
             [
                 new InvoiceLine(
@@ -443,7 +443,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     3000,
                     new PriceDetails(3000),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -452,7 +452,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
             new \DateTimeImmutable(),
             null,
             [
-                new DocumentLevelAllowance(0, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 0),
+                new DocumentLevelAllowance(0, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 0),
             ],
             [],
             sellerTaxRepresentativeParty: $sellerTaxRepresentativeParty
@@ -580,7 +580,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
      */
     public function brIP5_success(?float $invoicedItemVatRate): void
     {
-        $lineVatInformation = new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, $invoicedItemVatRate);
+        $lineVatInformation = new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, $invoicedItemVatRate);
 
         $this->assertInstanceOf(LineVatInformation::class, $lineVatInformation);
     }
@@ -605,7 +605,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, $invoicedItemVatRate);
+        new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, $invoicedItemVatRate);
     }
 
     public static function provideBrIP5Error(): \Generator
@@ -626,7 +626,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
      */
     public function brIP6_success(?float $vatRate): void
     {
-        $documentLevelAllowance = new DocumentLevelAllowance(1, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
+        $documentLevelAllowance = new DocumentLevelAllowance(1, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
 
         $this->assertInstanceOf(DocumentLevelAllowance::class, $documentLevelAllowance);
     }
@@ -651,7 +651,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelAllowance(1, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
+        new DocumentLevelAllowance(1, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
     }
 
     public static function provideBrIP6Error(): \Generator
@@ -672,7 +672,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
      */
     public function brIP7_success(?float $vatRate): void
     {
-        $documentLevelCharge = new DocumentLevelCharge(1, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
+        $documentLevelCharge = new DocumentLevelCharge(1, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
 
         $this->assertInstanceOf(DocumentLevelCharge::class, $documentLevelCharge);
     }
@@ -697,7 +697,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelCharge(1, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
+        new DocumentLevelCharge(1, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: $vatRate);
     }
 
     public static function provideBrIP7Error(): \Generator
@@ -774,7 +774,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 invoiceTotalVatAmount: 20
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20)
+                new VatBreakdown(100, 20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20)
             ],
             'lines' => [
                 new InvoiceLine(
@@ -783,7 +783,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     100,
                     new PriceDetails(100),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -800,7 +800,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 invoiceTotalVatAmount: 20
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20)
+                new VatBreakdown(100, 20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20)
             ],
             'lines' => [
                 new InvoiceLine(
@@ -809,7 +809,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     50,
                     new PriceDetails(50),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -818,7 +818,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     50,
                     new PriceDetails(50),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -835,8 +835,8 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 invoiceTotalVatAmount: 30
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
-                new VatBreakdown(100, 10, VatCategory::CEUTA_AND_MELILLA, 10)
+                new VatBreakdown(100, 20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 10, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 10)
             ],
             'lines' => [
                 new InvoiceLine(
@@ -845,7 +845,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     100,
                     new PriceDetails(100),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -854,7 +854,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     100,
                     new PriceDetails(100),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 10),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 10),
                     new ItemInformation("A thing"),
                 )
             ],
@@ -872,7 +872,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, -20, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(-100, -20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -881,12 +881,12 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     0,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [
-                new DocumentLevelAllowance(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
+                new DocumentLevelAllowance(100, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
             ],
             'charges' => [],
         ];
@@ -901,7 +901,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfAllowancesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(-100, -20, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(-100, -20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -910,13 +910,13 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     0,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [
-                new DocumentLevelAllowance(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
-                new DocumentLevelAllowance(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
+                new DocumentLevelAllowance(40, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(60, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
             ],
             'charges' => [],
         ];
@@ -931,7 +931,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -940,13 +940,13 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     0,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [],
             'charges' => [
-                new DocumentLevelCharge(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(100, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
             ],
         ];
 
@@ -960,7 +960,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -969,14 +969,14 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     0,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [],
             'charges' => [
-                new DocumentLevelCharge(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
-                new DocumentLevelCharge(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(40, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(60, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
             ],
         ];
 
@@ -991,7 +991,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(100, 20, VatCategory::CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 20, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -1000,7 +1000,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     50,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -1009,17 +1009,17 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     50,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [
-                new DocumentLevelAllowance(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
-                new DocumentLevelAllowance(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
+                new DocumentLevelAllowance(40, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(60, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20)
             ],
             'charges' => [
-                new DocumentLevelCharge(40, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
-                new DocumentLevelCharge(60, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(40, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(60, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
             ],
         ];
 
@@ -1034,8 +1034,8 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(50, 10, VatCategory::CEUTA_AND_MELILLA, 20),
-                new VatBreakdown(50, 5, VatCategory::CEUTA_AND_MELILLA, 10),
+                new VatBreakdown(50, 10, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(50, 5, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 10),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -1044,7 +1044,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     50,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -1053,17 +1053,17 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     50,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 10),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 10),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [
-                new DocumentLevelAllowance(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
-                new DocumentLevelAllowance(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 10)
+                new DocumentLevelAllowance(50, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(50, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 10)
             ],
             'charges' => [
-                new DocumentLevelCharge(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
-                new DocumentLevelCharge(50, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 10),
+                new DocumentLevelCharge(50, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(50, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 10),
             ],
         ];
     }
@@ -1133,8 +1133,8 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(50, 10, VatCategory::CEUTA_AND_MELILLA, 20),
-                new VatBreakdown(100, 10, VatCategory::CEUTA_AND_MELILLA, 10),
+                new VatBreakdown(50, 10, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
+                new VatBreakdown(100, 10, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 10),
             ],
             'lines' => [
                 new InvoiceLine(
@@ -1143,15 +1143,15 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     100,
                     new PriceDetails(0),
-                    new LineVatInformation(VatCategory::CEUTA_AND_MELILLA, 20),
+                    new LineVatInformation(VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 20),
                     new ItemInformation("A thing"),
                 )
             ],
             'allowances' => [
-                new DocumentLevelAllowance(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelAllowance(100, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
             ],
             'charges' => [
-                new DocumentLevelCharge(100, VatCategory::CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
+                new DocumentLevelCharge(100, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 'Hoobastank', vatRate: 20),
             ],
         ];
     }
@@ -1175,7 +1175,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
      */
     public function brIP10_success(?string $reasonText, ?VatExoneration $reasonCode): void
     {
-        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
+        $vatBreakdown = new VatBreakdown(0, 0, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
 
         $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
     }
@@ -1198,7 +1198,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new VatBreakdown(0, 0, VatCategory::CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
+        new VatBreakdown(0, 0, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
     }
 
     public static function provideBrIP10Error(): \Generator

@@ -84,14 +84,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 120,
                 invoiceTotalVatAmount: 20
             ),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
                 100,
                 new PriceDetails(100),
-                new LineVatInformation(VatCategory::STANDARD, 20.00),
+                new LineVatInformation(VatCategory::STANDARD_RATE, 20.00),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -285,7 +285,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             new DocumentTotals(0, 0, 0, 0),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00)],
             [],
             null,
             null,
@@ -320,7 +320,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             null,
             $documentTotals,
-            [new VatBreakdown(10, 2, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(10, 2, VatCategory::STANDARD_RATE, 20.00)],
             $lines,
             null,
             null,
@@ -360,7 +360,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         UnitOfMeasurement::CENTILITRE_REC20,
                         10,
                         new PriceDetails(10),
-                        new LineVatInformation(VatCategory::STANDARD, 20),
+                        new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                         new ItemInformation('item')
                     )
                 ]
@@ -381,7 +381,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         UnitOfMeasurement::CENTILITRE_REC20,
                         5,
                         new PriceDetails(10),
-                        new LineVatInformation(VatCategory::STANDARD, 20),
+                        new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                         new ItemInformation('item')
                     ),
                     new InvoiceLine(
@@ -390,7 +390,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                         UnitOfMeasurement::CENTILITRE_REC20,
                         5,
                         new PriceDetails(10),
-                        new LineVatInformation(VatCategory::STANDARD, 20),
+                        new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                         new ItemInformation('item2')
                     )
                 ]
@@ -474,7 +474,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD, 20),
+            new LineVatInformation(VatCategory::STANDARD_RATE, 20),
             new ItemInformation("A thing"),
         );
 
@@ -494,7 +494,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD, 20),
+            new LineVatInformation(VatCategory::STANDARD_RATE, 20),
             new ItemInformation("A thing"),
         );
 
@@ -514,7 +514,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD, 20),
+            new LineVatInformation(VatCategory::STANDARD_RATE, 20),
             new ItemInformation("A thing"),
         );
 
@@ -533,7 +533,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD, 20),
+            new LineVatInformation(VatCategory::STANDARD_RATE, 20),
             new ItemInformation("A thing"),
         );
 
@@ -552,7 +552,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD, 20),
+            new LineVatInformation(VatCategory::STANDARD_RATE, 20),
             new ItemInformation("A thing"),
         );
 
@@ -571,7 +571,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             UnitOfMeasurement::BOX_REC21,
             0,
             new PriceDetails(12),
-            new LineVatInformation(VatCategory::STANDARD, 20),
+            new LineVatInformation(VatCategory::STANDARD_RATE, 20),
             new ItemInformation("A thing"),
         );
 
@@ -727,7 +727,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br31MandatoryDocumentLevelAllowanceAmount(): void
     {
-        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD_RATE, 'Hoobastank', vatRate: 20);
 
         $this->assertEquals(1, $allowance->getAmount());
     }
@@ -738,9 +738,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br32MandatoryDocumentLevelAllowanceVatCategoryCode(): void
     {
-        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD_RATE, 'Hoobastank', vatRate: 20);
 
-        $this->assertSame(VatCategory::STANDARD, $allowance->getVatCategoryCode());
+        $this->assertSame(VatCategory::STANDARD_RATE, $allowance->getVatCategoryCode());
     }
 
     /**
@@ -751,7 +751,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelAllowance(1, VatCategory::STANDARD, vatRate: 20);
+        new DocumentLevelAllowance(1, VatCategory::STANDARD_RATE, vatRate: 20);
     }
 
     /**
@@ -761,7 +761,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br33CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCode $reasonCode): void
     {
-        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
+        $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD_RATE, $reason, $reasonCode, vatRate: 20);
 
         $this->assertSame($reason, $allowance->getReason());
         $this->assertSame($reasonCode, $allowance->getReasonCode());
@@ -794,7 +794,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br36MandatoryDocumentLevelChargeAmount(): void
     {
-        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD_RATE, 'Hoobastank', vatRate: 20);
 
         $this->assertEquals(1, $charge->getAmount());
     }
@@ -805,9 +805,9 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br37MandatoryDocumentLevelChargeVatCategoryCode(): void
     {
-        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, 'Hoobastank', vatRate: 20);
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD_RATE, 'Hoobastank', vatRate: 20);
 
-        $this->assertSame(VatCategory::STANDARD, $charge->getVatCategoryCode());
+        $this->assertSame(VatCategory::STANDARD_RATE, $charge->getVatCategoryCode());
     }
 
     /**
@@ -818,7 +818,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        new DocumentLevelCharge(1, VatCategory::STANDARD, vatRate: 20);
+        new DocumentLevelCharge(1, VatCategory::STANDARD_RATE, vatRate: 20);
     }
 
     /**
@@ -828,7 +828,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br38CasesWithReasonAndCodeCombinations(?string $reason, ?ChargeReasonCode $reasonCode): void
     {
-        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD, $reason, $reasonCode, vatRate: 20);
+        $charge = new DocumentLevelCharge(1, VatCategory::STANDARD_RATE, $reason, $reasonCode, vatRate: 20);
 
         $this->assertSame($reason, $charge->getReason());
         $this->assertSame($reasonCode, $charge->getReasonCode());
@@ -974,7 +974,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br45MandatoryVatCategoryTaxableAmount(): void
     {
-        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00);
+        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00);
 
         $this->assertEquals(100, $vatBreakdown->getVatCategoryTaxableAmount());
     }
@@ -985,7 +985,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br46MandatoryVatCategoryTaxAmount(): void
     {
-        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00);
+        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00);
 
         $this->assertEquals(20, $vatBreakdown->getVatCategoryTaxAmount());
     }
@@ -996,10 +996,10 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br47MandatoryVatCategoryCode(): void
     {
-        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00);
+        $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00);
 
         $this->assertInstanceOf(VatCategory::class, $vatBreakdown->getVatCategoryCode());
-        $this->assertSame(VatCategory::STANDARD, $vatBreakdown->getVatCategoryCode());
+        $this->assertSame(VatCategory::STANDARD_RATE, $vatBreakdown->getVatCategoryCode());
     }
 
     /**
@@ -1038,7 +1038,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             'subject to vat with rate' => [
                 'vatCategoryTaxableAmount' => 100.00,
                 'vatCategoryTaxAmount' => 20.00,
-                'vatCategory' => VatCategory::STANDARD,
+                'vatCategory' => VatCategory::STANDARD_RATE,
                 'vatRate' => 20.00,
             ],
             'not subject to vat without rate' => [
@@ -1070,7 +1070,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         return [
             'subject to vat without rate' => [
-                'vatCategory' => VatCategory::STANDARD,
+                'vatCategory' => VatCategory::STANDARD_RATE,
                 'vatRate' => null,
             ],
             'not subject to vat with rate' => [
@@ -1207,14 +1207,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
                 $vatAmount,
                 invoiceTotalVatAmount: 20
             ),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
                 100,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD, 20),
+                new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                 new ItemInformation("A thing"),
             )],
             null,
@@ -1272,14 +1272,14 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new Buyer('Richard Roe', new BuyerPostalAddress(CountryAlpha2Code::FRANCE)),
             $currencyCode,
             new DocumentTotals(0, 0, 0, 0, $vatAmount),
-            [new VatBreakdown(100, 20, VatCategory::STANDARD, 20.00)],
+            [new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00)],
             [new InvoiceLine(
                 new InvoiceLineIdentifier("1"),
                 1,
                 UnitOfMeasurement::BOX_REC21,
                 0,
                 new PriceDetails(12),
-                new LineVatInformation(VatCategory::STANDARD, 20),
+                new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                 new ItemInformation("A thing"),
             )],
             null,

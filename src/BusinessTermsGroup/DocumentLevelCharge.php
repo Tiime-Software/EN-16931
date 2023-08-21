@@ -72,7 +72,7 @@ class DocumentLevelCharge
         }
 
         if (
-            $vatCategoryCode === VatCategory::STANDARD
+            $vatCategoryCode === VatCategory::STANDARD_RATE
             && (null === $vatRate || $vatRate <= 0.0)
         ) {
             throw new \Exception('@todo : BR-genericVAT-7');
@@ -102,7 +102,10 @@ class DocumentLevelCharge
         }
 
         if (
-            in_array($vatCategoryCode, [VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA])
+            in_array($vatCategoryCode, [
+                VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX,
+                VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
+            ])
             && ($vatRate < 0.0 || null === $vatRate)
         ) {
             throw new \Exception('@todo : BR-genericVAT-7');

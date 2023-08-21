@@ -403,7 +403,7 @@ class Invoice
             );
 
             /** BR-S-1 */
-            if (!$hasBT118VatCategoryStandard && $vatBreakdown->getVatCategoryCode() === VatCategory::STANDARD) {
+            if (!$hasBT118VatCategoryStandard && $vatBreakdown->getVatCategoryCode() === VatCategory::STANDARD_RATE) {
                 $hasBT118VatCategoryStandard = true;
             }
 
@@ -443,7 +443,7 @@ class Invoice
             /** BR-IG-1 */
             if (
                 !$hasBT118VatCategoryCanaryIslands
-                && $vatBreakdown->getVatCategoryCode() === VatCategory::CANARY_ISLANDS
+                && $vatBreakdown->getVatCategoryCode() === VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX
             ) {
                 $hasBT118VatCategoryCanaryIslands = true;
             }
@@ -451,7 +451,8 @@ class Invoice
             /** BR-IP-1 */
             if (
                 !$hasBT118VatCategoryCeutaMelilla
-                && $vatBreakdown->getVatCategoryCode() === VatCategory::CEUTA_AND_MELILLA
+                && $vatBreakdown->getVatCategoryCode()
+                    === VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
             ) {
                 $hasBT118VatCategoryCeutaMelilla = true;
             }
@@ -489,7 +490,7 @@ class Invoice
 
             $invoiceLineVatCategoryCode = $invoiceLine->getLineVatInformation()->getInvoicedItemVatCategoryCode();
 
-            if ($invoiceLineVatCategoryCode === VatCategory::STANDARD) {
+            if ($invoiceLineVatCategoryCode === VatCategory::STANDARD_RATE) {
                 /** BR-S-1 */
                 if (!$hasBT151orBT95orBT102VatCategoryStandard) {
                     $hasBT151orBT95orBT102VatCategoryStandard = true;
@@ -576,7 +577,7 @@ class Invoice
                 }
             }
 
-            if ($invoiceLineVatCategoryCode === VatCategory::CANARY_ISLANDS) {
+            if ($invoiceLineVatCategoryCode === VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX) {
                 /** BR-IG-1 */
                 if (!$hasBT151orBT95orBT102VatCategoryCanaryIslands) {
                     $hasBT151orBT95orBT102VatCategoryCanaryIslands = true;
@@ -588,7 +589,10 @@ class Invoice
                 }
             }
 
-            if ($invoiceLineVatCategoryCode === VatCategory::CEUTA_AND_MELILLA) {
+            if (
+                $invoiceLineVatCategoryCode
+                === VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
+            ) {
                 /** BR-IP-1 */
                 if (!$hasBT151orBT95orBT102VatCategoryCeutaMelilla) {
                     $hasBT151orBT95orBT102VatCategoryCeutaMelilla = true;
@@ -715,7 +719,7 @@ class Invoice
 
                 $documentLevelAllowanceVatCategoryCode = $documentLevelAllowance->getVatCategoryCode();
 
-                if ($documentLevelAllowanceVatCategoryCode === VatCategory::STANDARD) {
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::STANDARD_RATE) {
                     /** BR-S-1 */
                     if (!$hasBT151orBT95orBT102VatCategoryStandard) {
                         $hasBT151orBT95orBT102VatCategoryStandard = true;
@@ -802,7 +806,7 @@ class Invoice
                     }
                 }
 
-                if ($documentLevelAllowanceVatCategoryCode === VatCategory::CANARY_ISLANDS) {
+                if ($documentLevelAllowanceVatCategoryCode === VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX) {
                     /** BR-IG-1 */
                     if (!$hasBT151orBT95orBT102VatCategoryCanaryIslands) {
                         $hasBT151orBT95orBT102VatCategoryCanaryIslands = true;
@@ -814,7 +818,10 @@ class Invoice
                     }
                 }
 
-                if ($documentLevelAllowanceVatCategoryCode === VatCategory::CEUTA_AND_MELILLA) {
+                if (
+                    $documentLevelAllowanceVatCategoryCode
+                    === VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
+                ) {
                     /** BR-IP-1 */
                     if (!$hasBT151orBT95orBT102VatCategoryCeutaMelilla) {
                         $hasBT151orBT95orBT102VatCategoryCeutaMelilla = true;
@@ -910,7 +917,7 @@ class Invoice
                 /** BR-S-1 */
                 if (
                     !$hasBT151orBT95orBT102VatCategoryStandard
-                    && $documentLevelCharge->getVatCategoryCode() === VatCategory::STANDARD
+                    && $documentLevelCharge->getVatCategoryCode() === VatCategory::STANDARD_RATE
                 ) {
                     $hasBT151orBT95orBT102VatCategoryStandard = true;
                 }
@@ -967,7 +974,7 @@ class Invoice
                 /** BR-IG-1 */
                 if (
                     !$hasBT151orBT95orBT102VatCategoryCanaryIslands
-                    && $documentLevelCharge->getVatCategoryCode() === VatCategory::CANARY_ISLANDS
+                    && $documentLevelCharge->getVatCategoryCode() === VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX
                 ) {
                     $hasBT151orBT95orBT102VatCategoryCanaryIslands = true;
                 }
@@ -975,7 +982,8 @@ class Invoice
                 /** BR-IP-1 */
                 if (
                     !$hasBT151orBT95orBT102VatCategoryCeutaMelilla
-                    && $documentLevelCharge->getVatCategoryCode() === VatCategory::CEUTA_AND_MELILLA
+                    && $documentLevelCharge->getVatCategoryCode()
+                        === VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
                 ) {
                     $hasBT151orBT95orBT102VatCategoryCeutaMelilla = true;
                 }
@@ -1369,7 +1377,11 @@ class Invoice
     private function checkVatBreakdownTaxableAmountCoherence(VatBreakdown $vatBreakdown): void
     {
         $vatCategoryCode = $vatBreakdown->getVatCategoryCode();
-        $positiveRateCategories = [VatCategory::STANDARD, VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA];
+        $positiveRateCategories = [
+            VatCategory::STANDARD_RATE,
+            VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX,
+            VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
+        ];
 
         $vatRate = 0;
 
@@ -1535,12 +1547,12 @@ class Invoice
     private function checkChargesVatCategoryCodeConsistencyWithPartyIdentifiers(): void
     {
         $categoriesRequiringASellerIdentifier = [
-            VatCategory::STANDARD,
+            VatCategory::STANDARD_RATE,
             VatCategory::ZERO_RATED_GOODS,
             VatCategory::EXEMPT_FROM_TAX,
             VatCategory::VAT_REVERSE_CHARGE,
-            VatCategory::CANARY_ISLANDS,
-            VatCategory::CEUTA_AND_MELILLA,
+            VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX,
+            VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA,
         ];
 
         $hasSellerVatIdentifier = $this->seller->getVatIdentifier() instanceof VatIdentifier;

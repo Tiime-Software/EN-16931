@@ -91,7 +91,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -107,7 +107,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(1000, 200, VatCategory::STANDARD, 20),
+                new VatBreakdown(1000, 200, VatCategory::STANDARD_RATE, 20),
                 new VatBreakdown(1000, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank')
             ],
             'documentTotals' => new DocumentTotals(
@@ -174,7 +174,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                     UnitOfMeasurement::BOX_REC21,
                     1000,
                     new PriceDetails(1000),
-                    new LineVatInformation(VatCategory::STANDARD, 20),
+                    new LineVatInformation(VatCategory::STANDARD_RATE, 20),
                     new ItemInformation("A thing"),
                 ),
                 new InvoiceLine(
@@ -190,7 +190,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
             'documentLevelAllowances' => [],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [
-                new VatBreakdown(2000, 400, VatCategory::STANDARD, 20)
+                new VatBreakdown(2000, 400, VatCategory::STANDARD_RATE, 20)
             ],
             'documentTotals' => new DocumentTotals(
                 2000,
@@ -944,7 +944,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
                 sumOfChargesOnDocumentLevel: 100
             ),
             'vatBreakdowns' => [
-                new VatBreakdown(50, 10, VatCategory::STANDARD, 20),
+                new VatBreakdown(50, 10, VatCategory::STANDARD_RATE, 20),
                 new VatBreakdown(50, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, vatExemptionReasonText: 'Hoobastank'),
             ],
             'lines' => [
