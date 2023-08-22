@@ -33,7 +33,7 @@ class LineVatInformation
         ?float $invoicedItemVatRate = null,
     ) {
         if (
-            $invoicedItemVatCategoryCode === VatCategory::STANDARD
+            $invoicedItemVatCategoryCode === VatCategory::STANDARD_RATE
             && (null === $invoicedItemVatRate || $invoicedItemVatRate <= 0.0)
         ) {
             throw new \Exception('@todo : BR-genericVAT-5');
@@ -63,7 +63,10 @@ class LineVatInformation
         }
 
         if (
-            in_array($invoicedItemVatCategoryCode, [VatCategory::CANARY_ISLANDS, VatCategory::CEUTA_AND_MELILLA])
+            in_array($invoicedItemVatCategoryCode, [
+                VatCategory::CANARY_ISLANDS_GENERAL_INDIRECT_TAX,
+                VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
+            ])
             && ($invoicedItemVatRate < 0.0 || null === $invoicedItemVatRate)
         ) {
             throw new \Exception('@todo : BR-genericVAT-5');
