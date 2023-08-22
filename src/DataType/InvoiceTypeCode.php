@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tiime\EN16931\DataType;
 
 /**
- * UNTDID 1001 (BT-3)
+ * UNTDID 1001 - Document type (BT-3)
  * Published by France (31/07/2023)
  */
 enum InvoiceTypeCode: string
