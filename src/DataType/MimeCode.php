@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tiime\EN16931\DataType;
 
 /**
- * MIME (BT-125-1)
+ * Mime type codes - Mime codes (BT-125-1)
  * Published by France (31/07/2023)
  */
 enum MimeCode: string
