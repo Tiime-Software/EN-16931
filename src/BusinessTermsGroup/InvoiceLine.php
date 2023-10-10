@@ -189,9 +189,9 @@ class InvoiceLine
         return $this;
     }
 
-    public function getInvoicedQuantity(): float
+    public function getInvoicedQuantity(): Quantity
     {
-        return $this->invoicedQuantity->getValueRounded();
+        return $this->invoicedQuantity;
     }
 
     public function getInvoicedQuantityUnitOfMeasureCode(): UnitOfMeasurement
@@ -199,9 +199,9 @@ class InvoiceLine
         return $this->invoicedQuantityUnitOfMeasureCode;
     }
 
-    public function getNetAmount(): float
+    public function getNetAmount(): Amount
     {
-        return $this->netAmount->getValueRounded();
+        return $this->netAmount;
     }
 
     public function getReferencedPurchaseOrderLineReference(): ?PurchaseOrderLineReference

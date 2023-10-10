@@ -60,14 +60,14 @@ class InvoiceLineCharge
         $this->reasonCode = $reasonCode;
     }
 
-    public function getAmount(): float
+    public function getAmount(): Amount
     {
-        return $this->amount->getValueRounded();
+        return $this->amount;
     }
 
-    public function getBaseAmount(): ?float
+    public function getBaseAmount(): ?Amount
     {
-        return $this->baseAmount?->getValueRounded();
+        return $this->baseAmount;
     }
 
     public function setBaseAmount(?float $baseAmount): self
@@ -77,9 +77,9 @@ class InvoiceLineCharge
         return $this;
     }
 
-    public function getPercentage(): ?float
+    public function getPercentage(): ?Percentage
     {
-        return $this->percentage?->getValueRounded();
+        return $this->percentage;
     }
 
     public function setPercentage(?float $percentage): self

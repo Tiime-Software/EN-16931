@@ -119,14 +119,14 @@ class DocumentLevelAllowance
         $this->reasonCode = $reasonCode;
     }
 
-    public function getAmount(): float
+    public function getAmount(): Amount
     {
-        return $this->amount->getValueRounded();
+        return $this->amount;
     }
 
-    public function getBaseAmount(): ?float
+    public function getBaseAmount(): ?Amount
     {
-        return $this->baseAmount?->getValueRounded();
+        return $this->baseAmount;
     }
 
     public function setBaseAmount(?float $baseAmount): self
@@ -136,9 +136,9 @@ class DocumentLevelAllowance
         return $this;
     }
 
-    public function getPercentage(): ?float
+    public function getPercentage(): ?Percentage
     {
-        return $this->percentage?->getValueRounded();
+        return $this->percentage;
     }
 
     public function setPercentage(?float $percentage): self
@@ -153,9 +153,9 @@ class DocumentLevelAllowance
         return $this->vatCategoryCode;
     }
 
-    public function getVatRate(): ?float
+    public function getVatRate(): ?Percentage
     {
-        return $this->vatRate?->getValueRounded();
+        return $this->vatRate;
     }
 
     public function getReason(): ?string

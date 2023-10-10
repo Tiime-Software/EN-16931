@@ -39,6 +39,7 @@ use Tiime\EN16931\DataType\Reference\TenderOrLotReference;
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\SemanticDataType\Amount;
 use Tiime\EN16931\SemanticDataType\DecimalNumber;
+use Tiime\EN16931\SemanticDataType\Percentage;
 
 class Invoice
 {
@@ -399,7 +400,7 @@ class Invoice
 
             $totalVatCategoryTaxAmountVatBreakdowns = new DecimalNumber(
                 $totalVatCategoryTaxAmountVatBreakdowns
-                    ->add(new DecimalNumber($vatBreakdown->getVatCategoryTaxAmount()))
+                    ->add($vatBreakdown->getVatCategoryTaxAmount())
             );
 
             /** BR-S-1 */
@@ -466,7 +467,7 @@ class Invoice
         if (
             count($this->vatBreakdowns) > 0
             && $totalVatCategoryTaxAmountVatBreakdowns
-                !== ($documentTotals->getInvoiceTotalVatAmount() ?? (new Amount(0.00))->getValueRounded())
+                !== ($documentTotals->getInvoiceTotalVatAmount()?->getValueRounded() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-14');
         }
@@ -485,7 +486,7 @@ class Invoice
             $this->invoiceLines[] = $invoiceLine;
 
             $totalNetAmountInvoiceLines = new DecimalNumber(
-                $totalNetAmountInvoiceLines->add(new DecimalNumber($invoiceLine->getNetAmount()))
+                $totalNetAmountInvoiceLines->add($invoiceLine->getNetAmount())
             );
 
             $invoiceLineVatCategoryCode = $invoiceLine->getLineVatInformation()->getInvoicedItemVatCategoryCode();
@@ -670,28 +671,23 @@ class Invoice
         }
 
 
-        if ($documentTotals->getSumOfInvoiceLineNetAmount() !== $totalNetAmountInvoiceLines->getValueRounded()) {
+        if ($documentTotals->getSumOfInvoiceLineNetAmount()->getValueRounded() !== $totalNetAmountInvoiceLines->getValueRounded()) {
             throw new \Exception('@todo : BR-CO-10');
         }
 
-        $totalBT131_minus_BT107 = $totalNetAmountInvoiceLines->subtract(
-            $documentTotals->getSumOfAllowancesOnDocumentLevel() ?
-                new Amount($documentTotals->getSumOfAllowancesOnDocumentLevel()) :
-                new Amount(0.00)
-        );
+        $totalBT131_minus_BT107 = $totalNetAmountInvoiceLines->subtract($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? new Amount(0.00));
 
-        $documentTotalsSumOfChargesOnDocumentLevel = $documentTotals->getSumOfChargesOnDocumentLevel() ?
-            new Amount($documentTotals->getSumOfChargesOnDocumentLevel()) : new Amount(0.00);
+        $documentTotalsSumOfChargesOnDocumentLevel = $documentTotals->getSumOfChargesOnDocumentLevel() ?? new Amount(0.00);
         $totalBT131_BT107_plus_BT108 = (new DecimalNumber($totalBT131_minus_BT107))
             ->add($documentTotalsSumOfChargesOnDocumentLevel);
 
-        if ($documentTotals->getInvoiceTotalAmountWithoutVat() !== $totalBT131_BT107_plus_BT108) {
+        if ($documentTotals->getInvoiceTotalAmountWithoutVat()->getValueRounded() !== $totalBT131_BT107_plus_BT108) {
             throw new \Exception('@todo : BR-CO-13');
         }
 
         if (
             $vatAccountingCurrencyCode instanceof CurrencyCode
-            xor is_float($documentTotals->getInvoiceTotalVatAmountInAccountingCurrency())
+            xor is_float($documentTotals->getInvoiceTotalVatAmountInAccountingCurrency()?->getValueRounded())
         ) {
             throw new \Exception('@todo');
         }
@@ -714,7 +710,7 @@ class Invoice
                 $this->documentLevelAllowances[] = $documentLevelAllowance;
 
                 $totalAmountDocumentLevelAllowances = new DecimalNumber(
-                    $totalAmountDocumentLevelAllowances->add(new DecimalNumber($documentLevelAllowance->getAmount()))
+                    $totalAmountDocumentLevelAllowances->add($documentLevelAllowance->getAmount())
                 );
 
                 $documentLevelAllowanceVatCategoryCode = $documentLevelAllowance->getVatCategoryCode();
@@ -899,7 +895,7 @@ class Invoice
         if (
             count($this->documentLevelAllowances) > 0
             && $totalAmountDocumentLevelAllowances
-                !== ($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+                !== ($documentTotals->getSumOfAllowancesOnDocumentLevel()?->getValueRounded() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-11');
         }
@@ -911,7 +907,7 @@ class Invoice
                 $this->documentLevelCharges[] = $documentLevelCharge;
 
                 $totalDocumentLevelCharges = new DecimalNumber(
-                    $totalDocumentLevelCharges->add(new DecimalNumber($documentLevelCharge->getAmount()))
+                    $totalDocumentLevelCharges->add($documentLevelCharge->getAmount())
                 );
 
                 /** BR-S-1 */
@@ -994,7 +990,7 @@ class Invoice
         if (
             count($this->documentLevelCharges) > 0
             && $totalDocumentLevelCharges
-                !== ($documentTotals->getSumOfChargesOnDocumentLevel() ?? (new Amount(0.00))->getValueRounded())
+                !== ($documentTotals->getSumOfChargesOnDocumentLevel()?->getValueRounded() ?? (new Amount(0.00))->getValueRounded())
         ) {
             throw new \Exception('@todo : BR-CO-12');
         }
@@ -1383,7 +1379,7 @@ class Invoice
             VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA
         ];
 
-        $vatRate = 0;
+        $vatRate = new Percentage(0);
 
         if (in_array($vatCategoryCode, $positiveRateCategories)) {
             $vatRate = $vatBreakdown->getVatCategoryRate();
@@ -1399,7 +1395,7 @@ class Invoice
 
         $computedSum = new Amount((new DecimalNumber($invoiceLinesNetSum->add($chargesSum)))->subtract($allowancesSum));
 
-        if ($computedSum->getValueRounded() !== $vatBreakdown->getVatCategoryTaxableAmount()) {
+        if ($computedSum->getValueRounded() !== $vatBreakdown->getVatCategoryTaxableAmount()->getValueRounded()) {
             throw new \Exception('@todo BR-genericVAT-8');
         }
     }
@@ -1409,7 +1405,7 @@ class Invoice
      */
     private function getInvoiceLinesNetSumPerVatCategory(
         VatCategory $vatCategoryCode,
-        ?float $vatRate = null
+        ?Percentage $vatRate = null
     ): DecimalNumber {
         $sum = new DecimalNumber(0);
 
@@ -1418,9 +1414,9 @@ class Invoice
 
             if (
                 $vatInformation->getInvoicedItemVatCategoryCode() === $vatCategoryCode
-                && $vatInformation->getInvoicedItemVatRate() === $vatRate
+                && $vatInformation->getInvoicedItemVatRate()?->getValueRounded() === $vatRate?->getValueRounded()
             ) {
-                $sum = new DecimalNumber($sum->add(new Amount($invoiceLine->getNetAmount())));
+                $sum = new DecimalNumber($sum->add($invoiceLine->getNetAmount()));
             }
         }
 
@@ -1432,16 +1428,16 @@ class Invoice
      */
     private function getDocumentLevelChargesSumPerVatCategory(
         VatCategory $vatCategoryCode,
-        ?float $vatRate = null
+        ?Percentage $vatRate = null
     ): DecimalNumber {
         $sum = new DecimalNumber(0);
 
         foreach ($this->documentLevelCharges as $charge) {
             if (
                 $charge->getVatCategoryCode() === $vatCategoryCode
-                && $charge->getVatRate() === $vatRate
+                && $charge->getVatRate()?->getValueRounded() === $vatRate?->getValueRounded()
             ) {
-                $sum = new DecimalNumber($sum->add(new Amount($charge->getAmount())));
+                $sum = new DecimalNumber($sum->add($charge->getAmount()));
             }
         }
 
@@ -1453,16 +1449,16 @@ class Invoice
      */
     private function getDocumentLevelAllowancesSumPerVatCategory(
         VatCategory $vatCategoryCode,
-        ?float $vatRate = null
+        ?Percentage $vatRate = null
     ): DecimalNumber {
         $sum = new DecimalNumber(0);
 
         foreach ($this->documentLevelAllowances as $allowance) {
             if (
                 $allowance->getVatCategoryCode() === $vatCategoryCode
-                && $allowance->getVatRate() === $vatRate
+                && $allowance->getVatRate()?->getValueRounded() === $vatRate?->getValueRounded()
             ) {
-                $sum = new DecimalNumber($sum->add(new Amount($allowance->getAmount())));
+                $sum = new DecimalNumber($sum->add($allowance->getAmount()));
             }
         }
 

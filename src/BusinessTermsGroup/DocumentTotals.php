@@ -118,53 +118,53 @@ class DocumentTotals
         }
     }
 
-    public function getSumOfInvoiceLineNetAmount(): float
+    public function getSumOfInvoiceLineNetAmount(): Amount
     {
-        return $this->sumOfInvoiceLineNetAmount->getValueRounded();
+        return $this->sumOfInvoiceLineNetAmount;
     }
 
-    public function getSumOfAllowancesOnDocumentLevel(): ?float
+    public function getSumOfAllowancesOnDocumentLevel(): ?Amount
     {
-        return $this->sumOfAllowancesOnDocumentLevel?->getValueRounded();
+        return $this->sumOfAllowancesOnDocumentLevel;
     }
 
-    public function getSumOfChargesOnDocumentLevel(): ?float
+    public function getSumOfChargesOnDocumentLevel(): ?Amount
     {
-        return $this->sumOfChargesOnDocumentLevel?->getValueRounded();
+        return $this->sumOfChargesOnDocumentLevel;
     }
 
-    public function getInvoiceTotalAmountWithoutVat(): float
+    public function getInvoiceTotalAmountWithoutVat(): Amount
     {
-        return $this->invoiceTotalAmountWithoutVat->getValueRounded();
+        return $this->invoiceTotalAmountWithoutVat;
     }
 
-    public function getInvoiceTotalVatAmount(): ?float
+    public function getInvoiceTotalVatAmount(): ?Amount
     {
-        return $this->invoiceTotalVatAmount?->getValueRounded();
+        return $this->invoiceTotalVatAmount;
     }
 
-    public function getInvoiceTotalVatAmountInAccountingCurrency(): ?float
+    public function getInvoiceTotalVatAmountInAccountingCurrency(): ?Amount
     {
-        return $this->invoiceTotalVatAmountInAccountingCurrency?->getValueRounded();
+        return $this->invoiceTotalVatAmountInAccountingCurrency;
     }
 
-    public function getInvoiceTotalAmountWithVat(): float
+    public function getInvoiceTotalAmountWithVat(): Amount
     {
-        return $this->invoiceTotalAmountWithVat->getValueRounded();
+        return $this->invoiceTotalAmountWithVat;
     }
 
-    public function getPaidAmount(): ?float
+    public function getPaidAmount(): ?Amount
     {
-        return $this->paidAmount?->getValueRounded();
+        return $this->paidAmount;
     }
 
-    public function getRoundingAmount(): ?float
+    public function getRoundingAmount(): ?Amount
     {
-        return $this->roundingAmount?->getValueRounded();
+        return $this->roundingAmount;
     }
 
-    public function getAmountDueForPayment(): float
+    public function getAmountDueForPayment(): Amount
     {
-        return $this->amountDueForPayment->getValueRounded();
+        return $this->amountDueForPayment;
     }
 }

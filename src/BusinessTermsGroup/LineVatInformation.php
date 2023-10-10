@@ -82,8 +82,8 @@ class LineVatInformation
         return $this->invoicedItemVatCategoryCode;
     }
 
-    public function getInvoicedItemVatRate(): ?float
+    public function getInvoicedItemVatRate(): ?Percentage
     {
-        return $this->invoicedItemVatRate?->getValueRounded();
+        return $this->invoicedItemVatRate;
     }
 }

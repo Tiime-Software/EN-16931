@@ -115,14 +115,14 @@ class VatBreakdown
         $this->checkExemptionReason();
     }
 
-    public function getVatCategoryTaxableAmount(): float
+    public function getVatCategoryTaxableAmount(): Amount
     {
-        return $this->vatCategoryTaxableAmount->getValue();
+        return $this->vatCategoryTaxableAmount;
     }
 
-    public function getVatCategoryTaxAmount(): float
+    public function getVatCategoryTaxAmount(): Amount
     {
-        return $this->vatCategoryTaxAmount->getValue();
+        return $this->vatCategoryTaxAmount;
     }
 
     public function getVatCategoryCode(): VatCategory
@@ -130,9 +130,9 @@ class VatBreakdown
         return $this->vatCategoryCode;
     }
 
-    public function getVatCategoryRate(): ?float
+    public function getVatCategoryRate(): ?Percentage
     {
-        return $this->vatCategoryRate?->getValue();
+        return $this->vatCategoryRate;
     }
 
     public function getVatExemptionReasonText(): ?string
