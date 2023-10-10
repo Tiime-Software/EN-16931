@@ -42,6 +42,7 @@ use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\Invoice;
+use Tiime\EN16931\SemanticDataType\Amount;
 
 class BusinessRulesConditionsTest extends TestCase
 {
@@ -398,10 +399,10 @@ class BusinessRulesConditionsTest extends TestCase
         $invoiceLinesFromObject = $invoice->getInvoiceLines();
         $invoiceLinesTotal = 0.00;
         foreach ($invoiceLinesFromObject as $invoiceLineFromObject) {
-            $invoiceLinesTotal += $invoiceLineFromObject->getNetAmount() * $invoiceLineFromObject->getInvoicedQuantity();
+            $invoiceLinesTotal += $invoiceLineFromObject->getNetAmount()->multiply($invoiceLineFromObject->getInvoicedQuantity());
         }
 
-        $this->assertEquals($invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount(), round($invoiceLinesTotal * 100) / 100);
+        $this->assertEquals($invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount()->getValueRounded(), round($invoiceLinesTotal * 100) / 100);
     }
 
     public static function provideBrCo10Success(): \Generator
@@ -1474,7 +1475,11 @@ class BusinessRulesConditionsTest extends TestCase
         );
 
         $this->assertInstanceOf(DocumentTotals::class, $documentTotals);
-        $this->assertEquals($documentTotals->getInvoiceTotalAmountWithVat(), $documentTotals->getInvoiceTotalAmountWithoutVat() + ($documentTotals->getInvoiceTotalVatAmount() ?? 0));
+        $this->assertEquals(
+            $documentTotals->getInvoiceTotalAmountWithVat()->getValueRounded(),
+            $documentTotals->getInvoiceTotalAmountWithoutVat()
+                ->add($documentTotals->getInvoiceTotalVatAmount() ?? new Amount(0.00))
+        );
     }
 
     public static function provideBrCo15_success(): \Generator
@@ -1715,10 +1720,10 @@ class BusinessRulesConditionsTest extends TestCase
         );
 
         $this->assertInstanceOf(VatBreakdown::class, $vatBreakdown);
-        $this->assertSame($vatCategoryTaxableAmount, $vatBreakdown->getVatCategoryTaxableAmount());
-        $this->assertSame($vatCategoryTaxAmount, $vatBreakdown->getVatCategoryTaxAmount());
+        $this->assertSame($vatCategoryTaxableAmount, $vatBreakdown->getVatCategoryTaxableAmount()->getValueRounded());
+        $this->assertSame($vatCategoryTaxAmount, $vatBreakdown->getVatCategoryTaxAmount()->getValueRounded());
         $this->assertSame($vatCategoryCode, $vatBreakdown->getVatCategoryCode());
-        $this->assertSame($vatCategoryRate, $vatBreakdown->getVatCategoryRate());
+        $this->assertSame($vatCategoryRate, $vatBreakdown->getVatCategoryRate()?->getValueRounded());
         $this->assertSame($vatExemptionReasonText, $vatBreakdown->getVatExemptionReasonText());
     }
 
@@ -2278,7 +2283,7 @@ class BusinessRulesConditionsTest extends TestCase
             []
         ));
 
-        if ($invoice->getDocumentTotals()->getAmountDueForPayment() > 0) {
+        if ($invoice->getDocumentTotals()->getAmountDueForPayment()->getValueRounded() > 0) {
             $this->assertTrue($paymentDueDate || $paymentTerms);
         } else {
             $this->assertTrue(true);
