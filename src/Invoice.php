@@ -467,7 +467,10 @@ class Invoice
         if (
             count($this->vatBreakdowns) > 0
             && $totalVatCategoryTaxAmountVatBreakdowns
-                !== ($documentTotals->getInvoiceTotalVatAmount()?->getValueRounded() ?? (new Amount(0.00))->getValueRounded())
+                !== (
+                    $documentTotals->getInvoiceTotalVatAmount()?->getValueRounded() ??
+                    (new Amount(0.00))->getValueRounded()
+                )
         ) {
             throw new \Exception('@todo : BR-CO-14');
         }
@@ -671,13 +674,19 @@ class Invoice
         }
 
 
-        if ($documentTotals->getSumOfInvoiceLineNetAmount()->getValueRounded() !== $totalNetAmountInvoiceLines->getValueRounded()) {
+        if (
+            $documentTotals->getSumOfInvoiceLineNetAmount()->getValueRounded()
+            !== $totalNetAmountInvoiceLines->getValueRounded()
+        ) {
             throw new \Exception('@todo : BR-CO-10');
         }
 
-        $totalBT131_minus_BT107 = $totalNetAmountInvoiceLines->subtract($documentTotals->getSumOfAllowancesOnDocumentLevel() ?? new Amount(0.00));
+        $totalBT131_minus_BT107 = $totalNetAmountInvoiceLines->subtract(
+            $documentTotals->getSumOfAllowancesOnDocumentLevel() ?? new Amount(0.00)
+        );
 
-        $documentTotalsSumOfChargesOnDocumentLevel = $documentTotals->getSumOfChargesOnDocumentLevel() ?? new Amount(0.00);
+        $documentTotalsSumOfChargesOnDocumentLevel = $documentTotals->getSumOfChargesOnDocumentLevel()
+            ?? new Amount(0.00);
         $totalBT131_BT107_plus_BT108 = (new DecimalNumber($totalBT131_minus_BT107))
             ->add($documentTotalsSumOfChargesOnDocumentLevel);
 
@@ -699,7 +708,10 @@ class Invoice
             throw new \Exception('@todo : BR-CO-3');
         }
 
-        if ($documentTotals->getAmountDueForPayment() > 0 && null === $paymentDueDate && empty($paymentTerms)) {
+        if (
+            $documentTotals->getAmountDueForPayment()->getValueRounded() > 0
+            && null === $paymentDueDate && empty($paymentTerms)
+        ) {
             throw new \Exception('@todo : BR-CO-25');
         }
 
@@ -895,7 +907,10 @@ class Invoice
         if (
             count($this->documentLevelAllowances) > 0
             && $totalAmountDocumentLevelAllowances
-                !== ($documentTotals->getSumOfAllowancesOnDocumentLevel()?->getValueRounded() ?? (new Amount(0.00))->getValueRounded())
+                !== (
+                    $documentTotals->getSumOfAllowancesOnDocumentLevel()?->getValueRounded()
+                    ?? (new Amount(0.00))->getValueRounded()
+                )
         ) {
             throw new \Exception('@todo : BR-CO-11');
         }
@@ -990,7 +1005,10 @@ class Invoice
         if (
             count($this->documentLevelCharges) > 0
             && $totalDocumentLevelCharges
-                !== ($documentTotals->getSumOfChargesOnDocumentLevel()?->getValueRounded() ?? (new Amount(0.00))->getValueRounded())
+                !== (
+                    $documentTotals->getSumOfChargesOnDocumentLevel()?->getValueRounded()
+                    ?? (new Amount(0.00))->getValueRounded()
+                )
         ) {
             throw new \Exception('@todo : BR-CO-12');
         }
