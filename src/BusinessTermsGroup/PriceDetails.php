@@ -63,14 +63,14 @@ class PriceDetails
         $this->itemPriceBaseQuantityUnitOfMeasureCode = null;
     }
 
-    public function getItemNetPrice(): float
+    public function getItemNetPrice(): UnitPriceAmount
     {
-        return $this->itemNetPrice->getValueRounded();
+        return $this->itemNetPrice;
     }
 
-    public function getItemPriceDiscount(): ?float
+    public function getItemPriceDiscount(): ?UnitPriceAmount
     {
-        return $this->itemPriceDiscount?->getValueRounded();
+        return $this->itemPriceDiscount;
     }
 
     public function setItemPriceDiscount(?float $itemPriceDiscount): self
@@ -80,9 +80,9 @@ class PriceDetails
         return $this;
     }
 
-    public function getItemGrossPrice(): ?float
+    public function getItemGrossPrice(): ?UnitPriceAmount
     {
-        return $this->itemGrossPrice?->getValueRounded();
+        return $this->itemGrossPrice;
     }
 
     public function setItemGrossPrice(?float $itemGrossPrice): self
@@ -96,9 +96,9 @@ class PriceDetails
         return $this;
     }
 
-    public function getItemPriceBaseQuantity(): ?float
+    public function getItemPriceBaseQuantity(): ?Quantity
     {
-        return $this->itemPriceBaseQuantity?->getValueRounded();
+        return $this->itemPriceBaseQuantity;
     }
 
     public function setItemPriceBaseQuantity(?float $itemPriceBaseQuantity): self

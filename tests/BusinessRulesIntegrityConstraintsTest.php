@@ -228,8 +228,8 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br12MandatoryInvoiceLineNetAmount(): void
     {
-        $this->assertIsFloat($this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
-        $this->assertEquals(100, $this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount());
+        $this->assertIsFloat($this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount()->getValueRounded());
+        $this->assertEquals(100, $this->invoice->getDocumentTotals()->getSumOfInvoiceLineNetAmount()->getValueRounded());
     }
 
     /**
@@ -238,8 +238,8 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br13MandatoryTotalAmountWithoutVat(): void
     {
-        $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
-        $this->assertEquals(100, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat());
+        $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat()->getValueRounded());
+        $this->assertEquals(100, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithoutVat()->getValueRounded());
     }
 
     /**
@@ -248,8 +248,8 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br14MandatoryTotalAmountWithVat(): void
     {
-        $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
-        $this->assertEquals(120, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat());
+        $this->assertIsFloat($this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat()->getValueRounded());
+        $this->assertEquals(120, $this->invoice->getDocumentTotals()->getInvoiceTotalAmountWithVat()->getValueRounded());
     }
 
     /**
@@ -258,7 +258,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      */
     public function br15MandatoryAmountDueForPayment(): void
     {
-        $this->assertEquals(120, $this->invoice->getDocumentTotals()->getAmountDueForPayment());
+        $this->assertEquals(120, $this->invoice->getDocumentTotals()->getAmountDueForPayment()->getValueRounded());
     }
 
     /**
@@ -498,8 +498,8 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new ItemInformation("A thing"),
         );
 
-        $this->assertIsFloat($invoiceLine->getInvoicedQuantity());
-        $this->assertEquals(1, $invoiceLine->getInvoicedQuantity());
+        $this->assertIsFloat($invoiceLine->getInvoicedQuantity()->getValueRounded());
+        $this->assertEquals(1, $invoiceLine->getInvoicedQuantity()->getValueRounded());
     }
 
     /**
@@ -537,7 +537,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new ItemInformation("A thing"),
         );
 
-        $this->assertEquals(0, $invoiceLine->getNetAmount());
+        $this->assertEquals(0, $invoiceLine->getNetAmount()->getValueRounded());
     }
 
     /**
@@ -575,7 +575,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             new ItemInformation("A thing"),
         );
 
-        $this->assertEquals(12, $invoiceLine->getPriceDetails()->getItemNetPrice());
+        $this->assertEquals(12, $invoiceLine->getPriceDetails()->getItemNetPrice()->getValueRounded());
     }
 
     /**
@@ -598,7 +598,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $priceDetails =  new PriceDetails($netPrice);
 
-        $this->assertSame($netPrice, $priceDetails->getItemNetPrice());
+        $this->assertSame($netPrice, $priceDetails->getItemNetPrice()->getValueRounded());
     }
 
     /**
@@ -635,7 +635,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         $priceDetails = new PriceDetails(1);
         $priceDetails->setItemGrossPrice($price);
 
-        $this->assertSame($price, $priceDetails->getItemGrossPrice());
+        $this->assertSame($price, $priceDetails->getItemGrossPrice()?->getValueRounded());
     }
 
     /**
@@ -729,7 +729,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD_RATE, 'Hoobastank', vatRate: 20);
 
-        $this->assertEquals(1, $allowance->getAmount());
+        $this->assertEquals(1, $allowance->getAmount()->getValueRounded());
     }
 
     /**
@@ -796,7 +796,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $charge = new DocumentLevelCharge(1, VatCategory::STANDARD_RATE, 'Hoobastank', vatRate: 20);
 
-        $this->assertEquals(1, $charge->getAmount());
+        $this->assertEquals(1, $charge->getAmount()->getValueRounded());
     }
 
     /**
@@ -863,7 +863,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $allowance = new InvoiceLineAllowance(1, 'Hoobastank');
 
-        $this->assertEquals(1, $allowance->getAmount());
+        $this->assertEquals(1, $allowance->getAmount()->getValueRounded());
     }
 
     /**
@@ -920,7 +920,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $charge = new InvoiceLineCharge(1, 'Hoobastank');
 
-        $this->assertEquals(1, $charge->getAmount());
+        $this->assertEquals(1, $charge->getAmount()->getValueRounded());
     }
 
     /**
@@ -976,7 +976,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00);
 
-        $this->assertEquals(100, $vatBreakdown->getVatCategoryTaxableAmount());
+        $this->assertEquals(100, $vatBreakdown->getVatCategoryTaxableAmount()->getValueRounded());
     }
 
     /**
@@ -987,7 +987,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     {
         $vatBreakdown = new VatBreakdown(100, 20, VatCategory::STANDARD_RATE, 20.00);
 
-        $this->assertEquals(20, $vatBreakdown->getVatCategoryTaxAmount());
+        $this->assertEquals(20, $vatBreakdown->getVatCategoryTaxAmount()->getValueRounded());
     }
 
     /**
@@ -1022,10 +1022,10 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             vatExemptionReasonText: $vatExemptionReasonText
         );
 
-        $this->assertSame($vatCategoryTaxableAmount, $vatBreakdown->getVatCategoryTaxableAmount());
-        $this->assertSame($vatCategoryTaxAmount, $vatBreakdown->getVatCategoryTaxAmount());
+        $this->assertSame($vatCategoryTaxableAmount, $vatBreakdown->getVatCategoryTaxableAmount()->getValueRounded());
+        $this->assertSame($vatCategoryTaxAmount, $vatBreakdown->getVatCategoryTaxAmount()->getValueRounded());
         $this->assertSame($vatCategory, $vatBreakdown->getVatCategoryCode());
-        $this->assertSame($vatRate, $vatBreakdown->getVatCategoryRate());
+        $this->assertSame($vatRate, $vatBreakdown->getVatCategoryRate()?->getValueRounded());
         $this->assertSame($vatExemptionReasonText, $vatBreakdown->getVatExemptionReasonText());
     }
 
@@ -1226,7 +1226,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
         );
 
         $this->assertSame($currencyCode, $invoice->getVatAccountingCurrencyCode());
-        $this->assertSame($vatAmount, $invoice->getDocumentTotals()->getInvoiceTotalVatAmountInAccountingCurrency());
+        $this->assertSame($vatAmount, $invoice->getDocumentTotals()->getInvoiceTotalVatAmountInAccountingCurrency()?->getValueRounded());
     }
 
     /**
