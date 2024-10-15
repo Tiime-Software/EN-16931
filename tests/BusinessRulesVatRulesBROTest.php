@@ -21,6 +21,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -34,7 +35,6 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBROTest extends TestCase
@@ -1162,7 +1162,7 @@ class BusinessRulesVatRulesBROTest extends TestCase
      * "Not subject to VAT" shall not contain other VAT breakdown groups (BG-23).
      * @dataProvider provideBrO10Success
      */
-    public function brO10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brO10_success(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $vatBreakdown = new VatBreakdown(0, 0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, null, $reasonText, $reasonCode);
 
@@ -1173,7 +1173,7 @@ class BusinessRulesVatRulesBROTest extends TestCase
     {
         yield [
             'reasonText' => null,
-            'reasonCode' => VatExoneration::NOT_SUBJECT_TO_VAT,
+            'reasonCode' => VatExemptionReasonCode::NOT_SUBJECT_TO_VAT,
         ];
 
         yield [
@@ -1183,7 +1183,7 @@ class BusinessRulesVatRulesBROTest extends TestCase
 
         yield [
             'reasonText' => 'Hoobastank',
-            'reasonCode' => VatExoneration::NOT_SUBJECT_TO_VAT,
+            'reasonCode' => VatExemptionReasonCode::NOT_SUBJECT_TO_VAT,
         ];
     }
 
@@ -1193,7 +1193,7 @@ class BusinessRulesVatRulesBROTest extends TestCase
      * "Not subject to VAT" shall not contain other VAT breakdown groups (BG-23).
      * @dataProvider provideBrO10Error
      */
-    public function brO10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brO10_error(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $this->expectException(\Exception::class);
 

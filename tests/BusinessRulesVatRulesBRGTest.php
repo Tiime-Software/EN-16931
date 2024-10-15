@@ -21,6 +21,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -32,7 +33,6 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRGTest extends TestCase
@@ -1018,7 +1018,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
      * "Export outside the EU" (or the equivalent standard text in another language).
      * @dataProvider provideBrG10Success
      */
-    public function brG10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brG10_success(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $vatBreakdown = new VatBreakdown(0, 0, VatCategory::FREE_EXPORT_ITEM_TAX_NOT_CHARGED, 0, $reasonText, $reasonCode);
 
@@ -1029,7 +1029,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
     {
         yield [
             'reasonText' => null,
-            'reasonCode' => VatExoneration::EXPORT_OUTSIDE_THE_EU,
+            'reasonCode' => VatExemptionReasonCode::EXPORT_OUTSIDE_THE_EU,
         ];
 
         yield [
@@ -1039,7 +1039,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
 
         yield [
             'reasonText' => 'Hoobastank',
-            'reasonCode' => VatExoneration::EXPORT_OUTSIDE_THE_EU,
+            'reasonCode' => VatExemptionReasonCode::EXPORT_OUTSIDE_THE_EU,
         ];
     }
 
@@ -1050,7 +1050,7 @@ class BusinessRulesVatRulesBRGTest extends TestCase
      * "Export outside the EU" (or the equivalent standard text in another language).
      * @dataProvider provideBrG10Error
      */
-    public function brG10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brG10_error(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $this->expectException(\Exception::class);
 

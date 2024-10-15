@@ -22,6 +22,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -34,7 +35,6 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRICTest extends TestCase
@@ -1043,7 +1043,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
      * "Intra-community supply" (or the equivalent standard text in another language).
      * @dataProvider provideBrIC10Success
      */
-    public function brIC10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brIC10_success(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $vatBreakdown = new VatBreakdown(
             0,
@@ -1061,7 +1061,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
     {
         yield [
             'reasonText' => null,
-            'reasonCode' => VatExoneration::INTRA_COMMUNITY_SUPPLY,
+            'reasonCode' => VatExemptionReasonCode::INTRA_COMMUNITY_SUPPLY,
         ];
 
         yield [
@@ -1071,7 +1071,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
 
         yield [
             'reasonText' => 'Hoobastank',
-            'reasonCode' => VatExoneration::INTRA_COMMUNITY_SUPPLY,
+            'reasonCode' => VatExemptionReasonCode::INTRA_COMMUNITY_SUPPLY,
         ];
     }
 
@@ -1082,7 +1082,7 @@ class BusinessRulesVatRulesBRICTest extends TestCase
      * "Intra-community supply" (or the equivalent standard text in another language).
      * @dataProvider provideBrIC10Error
      */
-    public function brIC10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brIC10_error(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $this->expectException(\Exception::class);
 

@@ -19,6 +19,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
 use Tiime\EN16931\Codelist\AllowanceReasonCodeUNTDID5189;
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -31,7 +32,6 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRSTest extends TestCase
@@ -1394,7 +1394,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      * exemption reason code (BT-121) or VAT exemption reason text (BT-120).
      * @dataProvider provideBrS10Success
      */
-    public function brS10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brS10_success(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $vatBreakdown = new VatBreakdown(0, 0, VatCategory::STANDARD_RATE, 0, $reasonText, $reasonCode);
 
@@ -1415,7 +1415,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
      * exemption reason code (BT-121) or VAT exemption reason text (BT-120).
      * @dataProvider provideBrS10Error
      */
-    public function brS10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brS10_error(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $this->expectException(\Exception::class);
 
@@ -1426,7 +1426,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
     {
         yield [
             'reasonText' => null,
-            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+            'reasonCode' => VatExemptionReasonCode::TRAVEL_AGENTS_VAT_SCHEME,
         ];
 
         yield [
@@ -1436,7 +1436,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
 
         yield [
             'reasonText' => 'Hoobastank',
-            'reasonCode' => VatExoneration::TRAVEL_AGENTS_VAT_SCHEME,
+            'reasonCode' => VatExemptionReasonCode::TRAVEL_AGENTS_VAT_SCHEME,
         ];
     }
 

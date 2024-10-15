@@ -18,6 +18,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -30,7 +31,6 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRIPTest extends TestCase
@@ -1173,7 +1173,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
      * reason code (BT-121) or VAT exemption reason text (BT-120).
      * @dataProvider provideBrIP10Success
      */
-    public function brIP10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brIP10_success(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $vatBreakdown = new VatBreakdown(0, 0, VatCategory::TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA, 0, $reasonText, $reasonCode);
 
@@ -1194,7 +1194,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
      * reason code (BT-121) or VAT exemption reason text (BT-120).
      * @dataProvider provideBrIP10Error
      */
-    public function brIP10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brIP10_error(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $this->expectException(\Exception::class);
 
@@ -1205,7 +1205,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
     {
         yield [
             'reasonText' => null,
-            'reasonCode' => VatExoneration::COUNCIL_DIRECTIVE_309,
+            'reasonCode' => VatExemptionReasonCode::EXEMPT_BASED_ON_ARTICLE_309_OF_COUNCIL_DIRECTIVE_2006_112_EC,
         ];
 
         yield [
@@ -1215,7 +1215,7 @@ class BusinessRulesVatRulesBRIPTest extends TestCase
 
         yield [
             'reasonText' => 'Hoobastank',
-            'reasonCode' => VatExoneration::COUNCIL_DIRECTIVE_309,
+            'reasonCode' => VatExemptionReasonCode::EXEMPT_BASED_ON_ARTICLE_309_OF_COUNCIL_DIRECTIVE_2006_112_EC,
         ];
     }
 }

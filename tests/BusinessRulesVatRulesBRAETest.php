@@ -18,6 +18,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -31,7 +32,6 @@ use Tiime\EN16931\DataType\InternationalCodeDesignator;
 use Tiime\EN16931\DataType\InvoiceTypeCode;
 use Tiime\EN16931\DataType\UnitOfMeasurement;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\Invoice;
 
 class BusinessRulesVatRulesBRAETest extends TestCase
@@ -1859,7 +1859,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
      * (or the equivalent standard text in another language).
      * @dataProvider provideBrAE10Success
      */
-    public function brAE10_success(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brAE10_success(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $vatBreakdown = new VatBreakdown(0, 0, VatCategory::VAT_REVERSE_CHARGE, 0, $reasonText, $reasonCode);
 
@@ -1870,7 +1870,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
     {
         yield [
             'reasonText' => null,
-            'reasonCode' => VatExoneration::REVERSE_CHARGE,
+            'reasonCode' => VatExemptionReasonCode::REVERSE_CHARGE,
         ];
 
         yield [
@@ -1880,7 +1880,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
 
         yield [
             'reasonText' => 'Hoobastank',
-            'reasonCode' => VatExoneration::REVERSE_CHARGE,
+            'reasonCode' => VatExemptionReasonCode::REVERSE_CHARGE,
         ];
     }
 
@@ -1891,7 +1891,7 @@ class BusinessRulesVatRulesBRAETest extends TestCase
      * (or the equivalent standard text in another language).
      * @dataProvider provideBrAE10Error
      */
-    public function brAE10_error(?string $reasonText, ?VatExoneration $reasonCode): void
+    public function brAE10_error(?string $reasonText, ?VatExemptionReasonCode $reasonCode): void
     {
         $this->expectException(\Exception::class);
 
