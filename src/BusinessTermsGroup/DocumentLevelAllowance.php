@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\BusinessTermsGroup;
 
-use Tiime\EN16931\DataType\AllowanceReasonCode;
+use Tiime\EN16931\Codelist\AllowanceReasonCodeUNTDID5189;
 use Tiime\EN16931\DataType\VatCategory;
 use Tiime\EN16931\SemanticDataType\Amount;
 use Tiime\EN16931\SemanticDataType\Percentage;
@@ -57,16 +57,16 @@ class DocumentLevelAllowance
      * BT-98
      * The reason for the document level allowance, expressed as a code.
      */
-    private ?AllowanceReasonCode $reasonCode;
+    private ?AllowanceReasonCodeUNTDID5189 $reasonCode;
 
     public function __construct(
         float $amount,
         VatCategory $vatCategoryCode,
         ?string $reason = null,
-        ?AllowanceReasonCode $reasonCode = null,
+        ?AllowanceReasonCodeUNTDID5189 $reasonCode = null,
         ?float $vatRate = null
     ) {
-        if ((!is_string($reason) || empty($reason)) && !$reasonCode instanceof AllowanceReasonCode) {
+        if ((!is_string($reason) || empty($reason)) && !$reasonCode instanceof AllowanceReasonCodeUNTDID5189) {
             throw new \Exception('@todo');
         }
 
@@ -163,7 +163,7 @@ class DocumentLevelAllowance
         return $this->reason;
     }
 
-    public function getReasonCode(): ?AllowanceReasonCode
+    public function getReasonCode(): ?AllowanceReasonCodeUNTDID5189
     {
         return $this->reasonCode;
     }

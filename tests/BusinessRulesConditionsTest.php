@@ -25,7 +25,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
-use Tiime\EN16931\DataType\AllowanceReasonCode;
+use Tiime\EN16931\Codelist\AllowanceReasonCodeUNTDID5189;
 use Tiime\EN16931\DataType\ChargeReasonCode;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
@@ -738,7 +738,7 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(100, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD)
             ]
         ];
         yield 'BR-CO-11 Success #2' => [
@@ -765,7 +765,7 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, reasonCode: AllowanceReasonCode::STANDARD)
+                new DocumentLevelAllowance(0, VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD)
             ]
         ];
         yield 'BR-CO-11 Success #3' => [
@@ -793,8 +793,8 @@ class BusinessRulesConditionsTest extends TestCase
                 )
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20),
-                new DocumentLevelAllowance(900.0, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(100, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD, vatRate: 20),
+                new DocumentLevelAllowance(900.0, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD, vatRate: 20)
             ]
         ];
     }
@@ -858,7 +858,7 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfAllowancesOnDocumentLevel: 1000.00
                 ),
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(0.0, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(0.0, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD, vatRate: 20)
             ]
         ];
         yield 'BR-CO-11 Error #2' => [
@@ -872,8 +872,8 @@ class BusinessRulesConditionsTest extends TestCase
                     sumOfAllowancesOnDocumentLevel: 1000.00
                 ),
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20),
-                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(100, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD, vatRate: 20),
+                new DocumentLevelAllowance(1000.0, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD, vatRate: 20)
             ]
         ];
     }
@@ -2024,7 +2024,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @testdox BR-CO-21 : Each Document level allowance (BG-20) shall contain a Document level allowance reason (BT-97) or a Document level allowance reason code (BT-98), or both.
      * @dataProvider provideBrCo21_success
      */
-    public function brCo21_success(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    public function brCo21_success(?string $reason, ?AllowanceReasonCodeUNTDID5189 $reasonCode): void
     {
         $documentLevelAllowance = new DocumentLevelAllowance(14, VatCategory::STANDARD_RATE, $reason, $reasonCode, vatRate: 20);
 
@@ -2041,11 +2041,11 @@ class BusinessRulesConditionsTest extends TestCase
         ];
         yield 'Document level allowance reason code (BT-98) is present' => [
             'reason' => null,
-            'reasonCode' => AllowanceReasonCode::STANDARD
+            'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
         ];
         yield 'Document level allowance reason (BT-97) and Document level allowance reason code (BT-98) are present' => [
             'reason' => 'Reason',
-            'reasonCode' => AllowanceReasonCode::STANDARD
+            'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
         ];
     }
 
@@ -2054,7 +2054,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @testdox BR-CO-21 : Each Document level allowance (BG-20) shall contain a Document level allowance reason (BT-97) or a Document level allowance reason code (BT-98), or both.
      * @dataProvider provideBrCo21_error
      */
-    public function brCo21_error(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    public function brCo21_error(?string $reason, ?AllowanceReasonCodeUNTDID5189 $reasonCode): void
     {
         $this->expectException(\Exception::class);
 
@@ -2132,7 +2132,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @testdox BR-CO-23 : Each Invoice line allowance (BG-27) shall contain an Invoice line allowance reason (BT-139) or an Invoice line allowance reason code (BT-140), or both.
      * @dataProvider provideBrCo23_success
      */
-    public function brCo23_success(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    public function brCo23_success(?string $reason, ?AllowanceReasonCodeUNTDID5189 $reasonCode): void
     {
         $invoiceLineAllowance = new InvoiceLineAllowance(14, $reason, $reasonCode);
 
@@ -2149,11 +2149,11 @@ class BusinessRulesConditionsTest extends TestCase
         ];
         yield 'Invoice line allowance reason code (BT-140) is present' => [
             'reason' => null,
-            'reasonCode' => AllowanceReasonCode::STANDARD
+            'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
         ];
         yield 'Invoice line allowance reason (BT-139) and Invoice line allowance reason code (BT-140) are present' => [
             'reason' => 'Reason',
-            'reasonCode' => AllowanceReasonCode::STANDARD
+            'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
         ];
     }
 
@@ -2162,7 +2162,7 @@ class BusinessRulesConditionsTest extends TestCase
      * @testdox BR-CO-23 : Each Invoice line allowance (BG-27) shall contain an Invoice line allowance reason (BT-139) or an Invoice line allowance reason code (BT-140), or both.
      * @dataProvider provideBrCo23_error
      */
-    public function brCo23_error(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    public function brCo23_error(?string $reason, ?AllowanceReasonCodeUNTDID5189 $reasonCode): void
     {
         $this->expectException(\Exception::class);
 
