@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
+/**
+ * @deprecated
+ */
 enum ElectronicAddressScheme: string
 {
     case SYSTEM_INFORMATION_ET_REPERTOIRE_DES_ENTREPRISE_ET_DES_ETABLISSEMENTS_SIRENE = "0002";

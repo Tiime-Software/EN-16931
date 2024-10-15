@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
+/**
+ * @deprecated
+ */
 enum ChargeReasonCode: string
 {
     case ADVERTISING = "AA";

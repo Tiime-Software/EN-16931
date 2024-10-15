@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
+/**
+ * @deprecated
+ */
 enum VatExoneration: string
 {
     case COUNCIL_DIRECTIVE_132 = "VATEX-EU-132";

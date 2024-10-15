@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
+/**
+ * @deprecated
+ */
 enum InvoiceNoteCode: string
 {
     /** Plain language description of the nature of a goods item sufficient to identify it for customs, statistical or transport purposes. */
