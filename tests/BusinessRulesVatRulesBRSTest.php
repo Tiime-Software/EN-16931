@@ -18,7 +18,7 @@ use Tiime\EN16931\BusinessTermsGroup\SellerPostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
 use Tiime\EN16931\BusinessTermsGroup\VatBreakdown;
-use Tiime\EN16931\DataType\AllowanceReasonCode;
+use Tiime\EN16931\Codelist\AllowanceReasonCodeUNTDID5189;
 use Tiime\EN16931\DataType\CountryAlpha2Code;
 use Tiime\EN16931\DataType\CurrencyCode;
 use Tiime\EN16931\DataType\Identifier\InvoiceIdentifier;
@@ -128,7 +128,7 @@ class BusinessRulesVatRulesBRSTest extends TestCase
                 ),
             ],
             'documentLevelAllowances' => [
-                new DocumentLevelAllowance(100, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCode::STANDARD, vatRate: 20)
+                new DocumentLevelAllowance(100, VatCategory::STANDARD_RATE, reasonCode: AllowanceReasonCodeUNTDID5189::STANDARD, vatRate: 20)
             ],
             'documentLevelCharges' => [],
             'vatBreakdowns' => [

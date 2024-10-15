@@ -23,7 +23,7 @@ use Tiime\EN16931\BusinessTermsGroup\PaymentInstructions;
 use Tiime\EN16931\BusinessTermsGroup\PrecedingInvoice;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativeParty;
 use Tiime\EN16931\BusinessTermsGroup\SellerTaxRepresentativePostalAddress;
-use Tiime\EN16931\DataType\AllowanceReasonCode;
+use Tiime\EN16931\Codelist\AllowanceReasonCodeUNTDID5189;
 use Tiime\EN16931\DataType\ChargeReasonCode;
 use Tiime\EN16931\DataType\ElectronicAddressScheme;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
@@ -759,7 +759,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      * @testdox BR-33 [cases with at least a reason or code] : Each document level allowance shall have a document level allowance reason or a document level allowance reason code
      * @dataProvider provideBR33ReasonAndCodeCombinations
      */
-    public function br33CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    public function br33CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCodeUNTDID5189 $reasonCode): void
     {
         $allowance = new DocumentLevelAllowance(1, VatCategory::STANDARD_RATE, $reason, $reasonCode, vatRate: 20);
 
@@ -768,7 +768,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, array{reason: ?string, reasonCode: ?AllowanceReasonCode}>
+     * @return array<string, array{reason: ?string, reasonCode: ?AllowanceReasonCodeUNTDID5189}>
      */
     public static function provideBR33ReasonAndCodeCombinations(): array
     {
@@ -779,11 +779,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             ],
             'with reason, with code' => [
                 'reason' => 'Hoobastank',
-                'reasonCode' => AllowanceReasonCode::STANDARD
+                'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
             ],
             'without reason, with code' => [
                 'reason' => null,
-                'reasonCode' => AllowanceReasonCode::STANDARD
+                'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
             ],
         ];
     }
@@ -883,7 +883,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
      * @testdox BR-42 [cases with at least a reason or code] : Each invoice line allowance shall have an invoice line allowance reason or an invoice line allowance reason code
      * @dataProvider provideBR42ReasonAndCodeCombinations
      */
-    public function br42CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCode $reasonCode): void
+    public function br42CasesWithReasonAndCodeCombinations(?string $reason, ?AllowanceReasonCodeUNTDID5189 $reasonCode): void
     {
         $allowance = new InvoiceLineAllowance(1, $reason, $reasonCode);
 
@@ -892,7 +892,7 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
     }
 
     /**
-     * @return array<string, array{reason: ?string, reasonCode: ?AllowanceReasonCode}>
+     * @return array<string, array{reason: ?string, reasonCode: ?AllowanceReasonCodeUNTDID5189}>
      */
     public static function provideBR42ReasonAndCodeCombinations(): array
     {
@@ -903,11 +903,11 @@ class BusinessRulesIntegrityConstraintsTest extends TestCase
             ],
             'with reason, with code' => [
                 'reason' => 'Hoobastank',
-                'reasonCode' => AllowanceReasonCode::STANDARD
+                'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
             ],
             'without reason, with code' => [
                 'reason' => null,
-                'reasonCode' => AllowanceReasonCode::STANDARD
+                'reasonCode' => AllowanceReasonCodeUNTDID5189::STANDARD
             ],
         ];
     }
