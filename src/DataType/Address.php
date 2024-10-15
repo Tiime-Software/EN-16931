@@ -16,5 +16,5 @@ interface Address
 
     public function getCountrySubdivision(): ?string;
 
-    public function getCountryCode(): CountryAlpha2Code;
+    public function getCountryCode(): \Tiime\EN16931\Codelist\CountryAlpha2Code;
 }

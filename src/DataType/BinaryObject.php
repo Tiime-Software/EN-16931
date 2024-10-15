@@ -8,7 +8,7 @@ class BinaryObject
 {
     public function __construct(
         public readonly string $content,
-        public readonly MimeCode $mimeCode,
+        public readonly \Tiime\EN16931\Codelist\MimeCode $mimeCode,
         public readonly string $filename
     ) {
     }
