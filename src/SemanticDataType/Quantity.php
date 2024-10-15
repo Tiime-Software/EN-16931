@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\SemanticDataType;
 
-class Quantity extends DecimalNumber
+final readonly class Quantity extends DecimalNumber
 {
-    public const DECIMALS = 4;
+    public const int DECIMALS = 4;
 
     public function __construct(float $value)
     {

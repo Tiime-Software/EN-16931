@@ -6,9 +6,9 @@ namespace Tiime\EN16931\DataType\Identifier;
 
 use Tiime\EN16931\Codelist\ElectronicAddressSchemeCode;
 
-class ElectronicAddressIdentifier
+final readonly class ElectronicAddressIdentifier
 {
-    public function __construct(public readonly string $value, public readonly ElectronicAddressSchemeCode $scheme)
+    public function __construct(public string $value, public ElectronicAddressSchemeCode $scheme)
     {
     }
 }

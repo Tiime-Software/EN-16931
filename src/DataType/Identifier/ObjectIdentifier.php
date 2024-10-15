@@ -6,9 +6,11 @@ namespace Tiime\EN16931\DataType\Identifier;
 
 use Tiime\EN16931\Codelist\ReferenceQualifierCodeUNTDID1153;
 
-class ObjectIdentifier
+final readonly class ObjectIdentifier
 {
-    public function __construct(public readonly string $value, public readonly ?ReferenceQualifierCodeUNTDID1153 $scheme = null)
-    {
+    public function __construct(
+        public string $value,
+        public ?ReferenceQualifierCodeUNTDID1153 $scheme = null
+    ) {
     }
 }

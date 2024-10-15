@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType\Reference;
 
-class SupportingDocumentReference extends DocumentReference
+readonly class SupportingDocumentReference extends DocumentReference
 {
 }

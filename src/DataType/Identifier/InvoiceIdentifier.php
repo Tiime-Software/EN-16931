@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType\Identifier;
 
-class InvoiceIdentifier
+final readonly class InvoiceIdentifier
 {
-    public function __construct(public readonly string $value)
+    public function __construct(public string $value)
     {
     }
 }
