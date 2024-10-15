@@ -7,6 +7,8 @@ namespace Tiime\EN16931\DataType;
 /**
  * UNTDID 5305 - Duty or tax or fee category (BT-151 & BG-20 & BT-95 & BT-102 & BT-118)
  * Published by France (31/07/2023)
+ *
+ * @deprecated
  */
 enum VatCategory: string
 {

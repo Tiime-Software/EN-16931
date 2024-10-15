@@ -7,6 +7,8 @@ namespace Tiime\EN16931\DataType;
 /**
  * Mime type codes - Mime codes (BT-125-1)
  * Published by France (31/07/2023)
+ *
+ * @deprecated
  */
 enum MimeCode: string
 {

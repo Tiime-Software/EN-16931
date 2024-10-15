@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
+/**
+ * @deprecated
+ */
 enum ObjectSchemeCode: string
 {
     case ORDER_ACKNOWLEDGEMENT_DOCUMENT_IDENTIFIER = "AAA";

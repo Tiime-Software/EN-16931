@@ -7,6 +7,8 @@ namespace Tiime\EN16931\DataType;
 /**
  * UNTDID 5189 - Allowance codes (BT-140 / BT-98)
  * Published by France (31/07/2023)
+ *
+ * @deprecated
  */
 enum AllowanceReasonCode: string
 {
