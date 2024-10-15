@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
-class BinaryObject
+final readonly class BinaryObject
 {
     public function __construct(
-        public readonly string $content,
-        public readonly \Tiime\EN16931\Codelist\MimeCode $mimeCode,
-        public readonly string $filename
+        public string $content,
+        public \Tiime\EN16931\Codelist\MimeCode $mimeCode,
+        public string $filename
     ) {
     }
 }

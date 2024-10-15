@@ -6,7 +6,7 @@ namespace Tiime\EN16931\DataType\Identifier;
 
 use Tiime\EN16931\Codelist\CountryAlpha2Code;
 
-class VatIdentifier
+final readonly class VatIdentifier
 {
     private string $value;
 
