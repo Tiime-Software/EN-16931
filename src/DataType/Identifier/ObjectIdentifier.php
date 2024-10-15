@@ -6,7 +6,7 @@ namespace Tiime\EN16931\DataType\Identifier;
 
 use Tiime\EN16931\Codelist\ReferenceQualifierCodeUNTDID1153;
 
-final readonly class ObjectIdentifier
+readonly class ObjectIdentifier
 {
     public function __construct(
         public string $value,

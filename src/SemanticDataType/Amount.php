@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\SemanticDataType;
 
-final readonly class Amount extends DecimalNumber
+readonly class Amount extends DecimalNumber
 {
     public const int DECIMALS = 2;
 

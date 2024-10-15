@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType;
 
-final readonly class BinaryObject
+readonly class BinaryObject
 {
     public function __construct(
         public string $content,

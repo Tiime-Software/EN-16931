@@ -6,7 +6,7 @@ namespace Tiime\EN16931\DataType\Identifier;
 
 use Tiime\EN16931\Codelist\InternationalCodeDesignator;
 
-final readonly class PayeeIdentifier
+readonly class PayeeIdentifier
 {
     public function __construct(
         public string $value,
