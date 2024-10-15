@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\BusinessTermsGroup;
 
+use Tiime\EN16931\Codelist\VatExemptionReasonCode;
 use Tiime\EN16931\DataType\VatCategory;
-use Tiime\EN16931\DataType\VatExoneration;
 use Tiime\EN16931\SemanticDataType\Amount;
 use Tiime\EN16931\SemanticDataType\DecimalNumber;
 use Tiime\EN16931\SemanticDataType\IntegerNumber;
@@ -66,7 +66,7 @@ class VatBreakdown
      *
      * Énoncé codé expliquant pourquoi un montant est exonéré de TVA.
      */
-    private ?VatExoneration $vatExemptionReasonCode;
+    private ?VatExemptionReasonCode $vatExemptionReasonCode;
 
     public function __construct(
         float $vatCategoryTaxableAmount,
@@ -74,7 +74,7 @@ class VatBreakdown
         VatCategory $vatCategoryCode,
         ?float $vatCategoryRate = null,
         ?string $vatExemptionReasonText = null,
-        ?VatExoneration $vatExemptionReasonCode = null,
+        ?VatExemptionReasonCode $vatExemptionReasonCode = null,
     ) {
         if ($vatCategoryCode !== VatCategory::SERVICE_OUTSIDE_SCOPE_OF_TAX xor is_float($vatCategoryRate)) {
             throw new \Exception('@todo');
@@ -140,7 +140,7 @@ class VatBreakdown
         return $this->vatExemptionReasonText;
     }
 
-    public function getVatExemptionReasonCode(): ?VatExoneration
+    public function getVatExemptionReasonCode(): ?VatExemptionReasonCode
     {
         return $this->vatExemptionReasonCode;
     }
@@ -156,7 +156,7 @@ class VatBreakdown
 
         $shallHaveExemptionReason = !in_array($this->vatCategoryCode, $noExemptionCategories);
         $hasExemptionReason = is_string($this->vatExemptionReasonText)
-            || $this->vatExemptionReasonCode instanceof VatExoneration;
+            || $this->vatExemptionReasonCode instanceof VatExemptionReasonCode;
 
         if ($shallHaveExemptionReason !== $hasExemptionReason) {
             throw new \Exception('@todo BR-genericVAT-10');

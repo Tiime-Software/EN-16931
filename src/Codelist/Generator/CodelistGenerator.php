@@ -44,7 +44,7 @@ final readonly class CodelistGenerator
         $generator->generateCodelist(className: 'ChargeReasonCodeUNTDID7161', cases: $code7161List);
         $generator->generateCodelist(className: 'MimeCode', cases: $mimeList);
         $generator->generateCodelist(className: 'ElectronicAddressSchemeCode', cases: $electronicAddressSchemeList);
-        $generator->generateCodelist(className: 'VatExemptionReasonCodeList', cases: $vatExemptionReasonCodeList);
+        $generator->generateCodelist(className: 'VatExemptionReasonCode', cases: $vatExemptionReasonCodeList);
         $generator->generateCodelist(className: 'UnitOfMeasureCode', cases: $unitOfMeasure);
     }
 }

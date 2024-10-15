@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\Codelist;
 
-enum VatExemptionReasonCodeList : string
+enum VatExemptionReasonCode : string
 {
         case EXEMPT_BASED_ON_ARTICLE_79_POINT_C_OF_COUNCIL_DIRECTIVE_2006_112_EC = 'VATEX-EU-79-C';
         case EXEMPT_BASED_ON_ARTICLE_132_OF_COUNCIL_DIRECTIVE_2006_112_EC = 'VATEX-EU-132';
