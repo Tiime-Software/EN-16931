@@ -6,7 +6,7 @@ namespace Tiime\EN16931\DataType\Identifier;
 
 use Tiime\EN16931\Codelist\InternationalCodeDesignator;
 
-final readonly class LocationIdentifier
+readonly class LocationIdentifier
 {
     public function __construct(
         public string $value,

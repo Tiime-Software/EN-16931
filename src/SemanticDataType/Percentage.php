@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\SemanticDataType;
 
-final readonly class Percentage extends DecimalNumber
+readonly class Percentage extends DecimalNumber
 {
     public const int DECIMALS = 2;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tiime\EN16931\DataType\Identifier;
 
-final readonly class SpecificationIdentifier
+readonly class SpecificationIdentifier
 {
     public const string MINIMUM = 'urn:factur-x.eu:1p0:minimum';
     public const string BASICWL = 'urn:factur-x.eu:1p0:basicwl';
