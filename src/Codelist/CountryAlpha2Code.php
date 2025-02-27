@@ -94,7 +94,7 @@ enum CountryAlpha2Code : string
         case GUINEA = 'GN';
         case GUADELOUPE = 'GP';
         case EQUATORIAL_GUINEA = 'GQ';
-        case GREECE = 'GR';
+        case GREECE = 'EL'; // 'EL' must be used instead of 'GR' for Greece, from French E-invoicing documentation
         case SOUTH_GEORGIA_AND_THE_SOUTH_SANDWICH_ISLANDS = 'GS';
         case GUATEMALA = 'GT';
         case GUAM = 'GU';
