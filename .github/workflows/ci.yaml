@@ -1,0 +1,66 @@
+name: CI
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: 'Setup PHP'
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+
+            - uses: "ramsey/composer-install@v3"
+
+            - name: PHP CS Fixer
+              run: ./vendor/bin/php-cs-fixer check
+
+    phpstan:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Setup PHP with extensions
+              uses: shivammathur/setup-php@v2
+              with:
+                  extensions: json, tokenizer
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate
+
+            - uses: "ramsey/composer-install@v3"
+              with:
+                  composer-options: "--prefer-dist"
+
+            - name: Run PHPStan
+              run: composer run-script phpstan
+
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php-version:
+                    - "8.3"
+                    - "8.4"
+
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: 'Setup PHP'
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "${{ matrix.php-version }}"
+
+            - uses: "ramsey/composer-install@v3"
+              with:
+                  composer-options: "--prefer-dist"
+
+            - name: Run tests
+              run: vendor/bin/phpunit
