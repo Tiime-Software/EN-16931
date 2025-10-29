@@ -12,6 +12,9 @@ readonly class SpecificationIdentifier
     public const string EN16931 = 'urn:cen.eu:en16931:2017';
     public const string EXTENDED = 'urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended';
 
+    public const string DEMARRAGE = 'urn.cpro.gouv.fr:1p0:einvoicingextract#Base';
+    public const string CIBLE = 'urn.cpro.gouv.fr:1p0:einvoicingextract#Full';
+
     public function __construct(
         public string $value
     ) {
