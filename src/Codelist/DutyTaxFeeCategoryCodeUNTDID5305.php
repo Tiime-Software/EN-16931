@@ -15,4 +15,5 @@ enum DutyTaxFeeCategoryCodeUNTDID5305 : string
         case SERVICE_OUTSIDE_SCOPE_OF_TAX = 'O';
         case CANARY_ISLANDS_GENERAL_INDIRECT_TAX = 'L';
         case TAX_FOR_PRODUCTION_SERVICES_AND_IMPORTATION_IN_CEUTA_AND_MELILLA = 'M';
+        case TRANSFERRED_VAT = 'B';
 }
