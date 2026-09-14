@@ -10,12 +10,6 @@ readonly class DecimalNumber implements Number
         private float $value,
         private ?int $decimals = null
     ) {
-        if (
-            $this->decimals !== null
-            && !preg_match(sprintf('/^-?\d+(\.\d{1,%s})?$/', $decimals), (string) $value)
-        ) {
-            throw new \Exception('@todo');
-        }
     }
 
     public function getValue(): float
