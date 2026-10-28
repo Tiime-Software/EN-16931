@@ -19,7 +19,7 @@ jobs:
             - name: Validate composer.json and composer.lock
               run: composer validate
 
-            - uses: "ramsey/composer-install@v3"
+            - uses: "ramsey/composer-install@v4"
               with:
                   composer-options: "--prefer-dist"
 
@@ -44,7 +44,7 @@ jobs:
               with:
                   php-version: "${{ matrix.php-version }}"
 
-            - uses: "ramsey/composer-install@v3"
+            - uses: "ramsey/composer-install@v4"
               with:
                   composer-options: "--prefer-dist"
 
