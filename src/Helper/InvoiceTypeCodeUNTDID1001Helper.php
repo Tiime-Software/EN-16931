@@ -21,6 +21,8 @@ class InvoiceTypeCodeUNTDID1001Helper
                 InvoiceTypeCodeUNTDID1001::OPTICAL_CHARACTER_READING_OCR_PAYMENT_CREDIT_NOTE,
                 InvoiceTypeCodeUNTDID1001::REVERSAL_OF_CREDIT,
                 InvoiceTypeCodeUNTDID1001::FORWARDERS_CREDIT_NOTE,
+                InvoiceTypeCodeUNTDID1001::SELF_BILLED_FACTORED_CREDIT_NOTE,
+                InvoiceTypeCodeUNTDID1001::PREPAYMENT_CREDIT_NOTE,
             ])
         ) {
             return false;
